@@ -1,10 +1,17 @@
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import SignUpPage from "./pages/SignUpPage";
+import SignInPage from "./pages/SignInPage";
+
 function App() {
   return (
-    <div>
-      <h1>ברוכה הבאה לפרויקט שלך 🎉</h1>
-      <p>אם את רואה את זה – הפרויקט רץ!</p>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<SignUpPage />} />
+        <Route path="/SignInPage" element={<SignInPage />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
+
 
 export default App;
