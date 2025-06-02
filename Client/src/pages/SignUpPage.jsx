@@ -7,9 +7,9 @@ export default function LoginPage() {
       style={{ display: "flex", justifyContent: "center", marginTop: "100px" }}
     >
       <AuthForm
-        title="צור חשבון"
-        buttonText="Sign up with email"
-        bottomText="Already have an account?"
+        title="הרשמה"
+        buttonText="הירשם עם אימייל"
+        bottomText="משתמש קיים"
         link="/SignInPage"
       />
     </div>
