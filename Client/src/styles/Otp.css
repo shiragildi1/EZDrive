@@ -1,0 +1,43 @@
+.OTP h1 {
+  font-family: sans-serif;
+  text-align: center;
+}
+.OTP h2 {
+  font-family: sans-serif;
+  font-size: 16px;
+  text-align: center;
+}
+.rtl {
+  direction: rtl;
+}
+
+.text {
+  font-size: 24px;
+}
+.square {
+  width: 50px;
+  height: 57px;
+  border: 1px solid black;
+}
+.squares {
+  margin-top: 35px;
+  display: flex;
+  gap: 20px;
+}
+.OTP h5 {
+  font-family: sans-serif;
+  text-align: center;
+  font-weight: lighter;
+}
+.send {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+.squares input
+{
+    font-family: sans-serif;
+    font-size: 25px;
+    text-align: center;
+}

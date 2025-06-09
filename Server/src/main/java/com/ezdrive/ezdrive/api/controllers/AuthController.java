@@ -1,17 +1,15 @@
 package com.ezdrive.ezdrive.api.controllers;
 
 import java.util.Collections;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.ezdrive.ezdrive.api.dto.GoogleTokenRequest;
 import com.ezdrive.ezdrive.services.AuthService;
-
 import lombok.AllArgsConstructor;
 
 
@@ -21,19 +19,26 @@ import lombok.AllArgsConstructor;
 public class AuthController 
 {
     @Autowired
-    private final AuthService authService;
+    private AuthService authService;
 
     @PostMapping("/google")
     public ResponseEntity<?> googleLogin(@RequestBody GoogleTokenRequest request) 
     {
         try 
         {
-            String email = authService.verifyToken(request.getToken());
-            return ResponseEntity.ok(Collections.singletonMap("email", email)); 
+            String message = authService.registerGoogleUser(request.getToken());
+            return ResponseEntity.ok(Collections.singletonMap("message", message));
         } 
-        catch (Exception e) 
+        catch (RuntimeException e) 
         {
-            return ResponseEntity.badRequest().body("Invalid token");
+            if ("User already exists".equals(e.getMessage())) 
+            {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Collections.singletonMap("message", e.getMessage()));
+            }
+            return ResponseEntity.badRequest().body(Collections.singletonMap("error", e.getMessage()));
         }
     }
-}
+}       
+
+
