@@ -67,4 +67,26 @@ public class AuthService
         userService.createUser(newUser);
         return "User created successfully";
     }
+
+    public String registerEmailUser(String email)
+    {
+        if (userService.findByEmail(email).isPresent()) 
+        {
+            throw new RuntimeException("User already exists");
+        }
+
+        User newUser = new User();
+        newUser.setEmail(email);
+        newUser.setName(" ");
+        newUser.setPicture(" ");
+        newUser.setGoogleId(" ");
+        newUser.setEmailVerified(true);
+        newUser.setGivenName(" ");
+        newUser.setFamilyName(" ");
+
+        userService.createUser(newUser);
+        return "User created successfully";
+    }
+
+    
 }

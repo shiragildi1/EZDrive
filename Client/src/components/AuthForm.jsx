@@ -18,6 +18,7 @@ export default function AuthForm({ title, buttonText, bottomText, link }) {
 
   return (
     <form className="login-form" onSubmit={handleSubmit}>
+      <div className="container">
       <h1>EZDrive</h1>
       <br />
       <br />
@@ -57,6 +58,7 @@ export default function AuthForm({ title, buttonText, bottomText, link }) {
         בלחיצה על המשך, הנך מסכים <a href="#">לתנאי השירות </a>{" "}
         <a href="#">ולמדיניות הפרטיות </a> שלנו
       </p>
+      </div>
     </form>
   );
 }

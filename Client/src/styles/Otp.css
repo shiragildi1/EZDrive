@@ -7,19 +7,19 @@
   font-size: 16px;
   text-align: center;
 }
-.rtl {
+.otp-rtl {
   direction: rtl;
 }
 
 .text {
   font-size: 24px;
 }
-.square {
+.otp-square {
   width: 50px;
   height: 57px;
   border: 1px solid black;
 }
-.squares {
+.otp-squares {
   margin-top: 35px;
   display: flex;
   gap: 20px;

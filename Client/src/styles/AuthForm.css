@@ -1,8 +1,14 @@
+
+.container
+{
+  background-color: white
+}
 .login-form {
   width: 350px;
   height: 290px;
   text-align: center;
   font-family: sans-serif;
+  
 }
 .login-form h1 {
   font-size: 30px;
