@@ -1,18 +1,75 @@
-.squares {
-  margin-top: -200px;
-  flex-direction: column;
+.home-background {
+  position: relative;
+  height: 88vh;
+  overflow: hidden;
+  width: 100%;
+}
+
+.bg-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  z-index: -1;
+}
+
+.overlay-content {
+  position: relative;
+  z-index: 1;
+  height: 100%;
   display: flex;
-  gap: 50px;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.squares {
+  justify-content: center;
   align-items: center;
-  
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  margin-left: 20%;
 }
+
+.slogan {
+  font-family: "Varela Round", sans-serif;
+  font-size: 60px;
+  text-align: right;
+  margin-right: 700px;
+  color: #2c3e50;
+  margin-bottom: 3%;
+  text-shadow: 2px 2px 4px rgba(111, 104, 104, 0.4);
+}
+
 .square {
-  width: 300px;
-  height: 57px;
-  border: 2px solid black;
-  border-radius: 37%;
-}
-.square h3 {
-  text-align: center;
+  width: 280px;
+  height: 85px;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: white;
   font-family: sans-serif;
+  box-shadow: 0 4px 12px rgba(36, 12, 252, 0.2);
+  cursor: pointer;
+  margin-right: 70%;
+  backdrop-filter: blur(8px);
+}
+
+.square:hover {
+  transform: scale(1.05);
+}
+
+.square h3 {
+  margin: 0;
+  font-size: 30px;
+  font-weight: bold;
+  direction: rtl;
+}
+
+.icon {
+  color: rgb(255, 255, 255);
 }

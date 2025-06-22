@@ -1,0 +1,41 @@
+body,
+html {
+  font-family: sans-serif;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+.layout-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+.main-header {
+  height: 12%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+.logo {
+  margin-right: -60px;
+  margin-top: 25px;
+  height: 350px;
+  width: auto;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: row-reverse;
+  flex: 1;
+  height: 100%;
+  overflow: hidden;
+}
+
+.main-content {
+  flex: 1;
+  overflow: hidden;
+  box-sizing: border-box;
+}

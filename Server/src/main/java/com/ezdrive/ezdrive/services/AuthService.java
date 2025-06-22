@@ -4,6 +4,8 @@ import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import com.ezdrive.ezdrive.exceptions.UserAlreadyExistsException;
 import com.ezdrive.ezdrive.persistence.Entities.User;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
@@ -20,39 +22,32 @@ public class AuthService
     @Autowired
     private UserService userService;
 
-    public GoogleIdToken.Payload verifyToken(String idTokenString) 
+    public GoogleIdToken.Payload verifyToken(String idTokenString) throws Exception
     {
-        try 
-        {
-            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory())
-                    .setAudience(Collections.singletonList(clientId))
-                    .build();
+        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory())
+                .setAudience(Collections.singletonList(clientId))
+                .build();
 
-            GoogleIdToken idToken = verifier.verify(idTokenString);
-            if (idToken != null) 
-            {
-                return idToken.getPayload();
-            } 
-            else 
-            {
-                throw new RuntimeException("Invalid ID token.");
-            }
-        } 
-        catch (Exception e) 
+        GoogleIdToken idToken = verifier.verify(idTokenString);
+        if (idToken != null) 
         {
-            throw new RuntimeException("Token verification failed", e);
+            return idToken.getPayload();
+        } 
+        else 
+        {
+            throw new RuntimeException("Invalid ID token.");
         }
     }
 
 
-    public String registerGoogleUser(String idTokenString) 
+    public String registerGoogleUser(String idTokenString) throws Exception
     {
         GoogleIdToken.Payload payload = verifyToken(idTokenString);
         String email = payload.getEmail();
 
         if (userService.findByEmail(email).isPresent()) 
         {
-            throw new RuntimeException("User already exists");
+            throw new UserAlreadyExistsException();
         }
 
         User newUser = new User();
@@ -72,7 +67,7 @@ public class AuthService
     {
         if (userService.findByEmail(email).isPresent()) 
         {
-            throw new RuntimeException("User already exists");
+            throw new UserAlreadyExistsException();
         }
 
         User newUser = new User();

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ezdrive.ezdrive.api.dto.GoogleTokenRequest;
+import com.ezdrive.ezdrive.exceptions.UserAlreadyExistsException;
 import com.ezdrive.ezdrive.services.AuthService;
 import com.ezdrive.ezdrive.api.dto.EmailRequest;
 import lombok.AllArgsConstructor;
@@ -32,7 +33,7 @@ public class AuthController
             String message = authService.registerGoogleUser(request.getToken());
             return ResponseEntity.ok(Collections.singletonMap("message", message));
         } 
-        catch (RuntimeException e) 
+        catch (UserAlreadyExistsException e) 
         {
             if ("User already exists".equals(e.getMessage())) 
             {
@@ -40,6 +41,10 @@ public class AuthController
                     .body(Collections.singletonMap("message", e.getMessage()));
             }
             return ResponseEntity.badRequest().body(Collections.singletonMap("error", e.getMessage()));
+        }
+        catch(Exception e)
+        {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("error", e.getMessage()));
         }
     }
 
@@ -51,7 +56,7 @@ public class AuthController
             String message = authService.registerEmailUser(request.getEmail());
             return ResponseEntity.ok(Collections.singletonMap("message", message));
         } 
-        catch (RuntimeException e) 
+        catch (UserAlreadyExistsException e) 
         {
             if ("User already exists".equals(e.getMessage())) 
             {
@@ -59,6 +64,10 @@ public class AuthController
                     .body(Collections.singletonMap("message", e.getMessage()));
             }
             return ResponseEntity.badRequest().body(Collections.singletonMap("error", e.getMessage()));
+        }
+        catch(Exception e)
+        {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("error", e.getMessage()));
         }
     }   
 }       
