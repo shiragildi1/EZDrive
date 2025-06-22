@@ -6,18 +6,16 @@ import HomePage from "./pages/HomePage";
 import RankingPage from "./pages/RankingPage";
 import ProfilePage from "./pages/ProfilePage";
 import ChatPage from "./pages/ChatPage";
-import MainLayout from "./layout/MainLayout"; // ✅ חדש
+import MainLayout from "./layout/MainLayout"; 
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* עמודים ללא Sidebar */}
         <Route path="/" element={<SignUpPage />} />
         <Route path="/SignInPage" element={<SignInPage />} />
         <Route path="/OtpPage" element={<OtpPage />} />
 
-        {/* עמודים עם Sidebar קבוע */}
         <Route path="/" element={<MainLayout />}>
           <Route path="HomePage" element={<HomePage />} />
           <Route path="RankingPage" element={<RankingPage />} />
