@@ -26,27 +26,18 @@ public class AuthController
     private AuthService authService;
 
     @PostMapping("/google")
-    public ResponseEntity<?> googleLogin(@RequestBody GoogleTokenRequest request) 
+public ResponseEntity<?> googleLogin(@RequestBody GoogleTokenRequest request) {
+    try 
     {
-        try 
-        {
-            String message = authService.registerGoogleUser(request.getToken());
-            return ResponseEntity.ok(Collections.singletonMap("message", message));
-        } 
-        catch (UserAlreadyExistsException e) 
-        {
-            if ("User already exists".equals(e.getMessage())) 
-            {
-                return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(Collections.singletonMap("message", e.getMessage()));
-            }
-            return ResponseEntity.badRequest().body(Collections.singletonMap("error", e.getMessage()));
-        }
-        catch(Exception e)
-        {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("error", e.getMessage()));
-        }
+        boolean isValid = authService.registerGoogleUser(request.getToken());
+        return ResponseEntity.ok(Collections.singletonMap("valid", isValid));
+    } 
+    catch (Exception e) 
+    {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(Collections.singletonMap("error", e.getMessage()));
     }
+}
 
     @PostMapping("/email")
     public ResponseEntity<?> emailLogin(@RequestBody EmailRequest request) 

@@ -22,7 +22,7 @@ public class AuthService
     @Autowired
     private UserService userService;
 
-    public GoogleIdToken.Payload verifyToken(String idTokenString) throws Exception
+    private GoogleIdToken.Payload verifyToken(String idTokenString) throws Exception
     {
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory())
                 .setAudience(Collections.singletonList(clientId))
@@ -40,14 +40,15 @@ public class AuthService
     }
 
 
-    public String registerGoogleUser(String idTokenString) throws Exception
+    public boolean registerGoogleUser(String idTokenString) throws Exception
     {
         GoogleIdToken.Payload payload = verifyToken(idTokenString);
         String email = payload.getEmail();
 
         if (userService.findByEmail(email).isPresent()) 
         {
-            throw new UserAlreadyExistsException();
+            System.out.println("User already exists, logging in...");
+            return true;
         }
 
         User newUser = new User();
@@ -60,14 +61,15 @@ public class AuthService
         newUser.setFamilyName((String) payload.get("family_name"));
 
         userService.createUser(newUser);
-        return "User created successfully";
+        System.out.println("New user created successfully");
+        return true;
     }
 
     public String registerEmailUser(String email)
     {
         if (userService.findByEmail(email).isPresent()) 
         {
-            throw new UserAlreadyExistsException();
+            return "User already exists, logging in...";
         }
 
         User newUser = new User();
@@ -80,7 +82,7 @@ public class AuthService
         newUser.setFamilyName(" ");
 
         userService.createUser(newUser);
-        return "User created successfully";
+        return "New user created successfully";
     }
 
     

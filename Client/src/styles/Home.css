@@ -1,17 +1,38 @@
+/* .home-background {
+  position: relative;
+  height: 88vh;
+  overflow: hidden;
+  width: 100%;
+} */
+
 .home-background {
   position: relative;
   height: 88vh;
   overflow: hidden;
   width: 100%;
+  padding: 40px 5%;
+  box-sizing: border-box;
 }
 
-.bg-image {
+/* .bg-image {
   position: absolute;
   top: 0;
   left: 0;
   height: 100%;
   width: 100%;
   object-fit: cover;
+  z-index: -1;
+} */
+
+.bg-image {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 85%;
+  width: 78%;
+  object-fit: cover;
+  border-radius: 30px;
   z-index: -1;
 }
 
@@ -25,27 +46,40 @@
 }
 
 .squares {
+  width: 300px;
   justify-content: center;
   align-items: center;
   display: flex;
   flex-direction: column;
   gap: 30px;
-  margin-left: 20%;
+  margin-left: 185px;
+  margin-bottom: 190px;
 }
 
-.slogan {
+.slogan1 {
   font-family: "Varela Round", sans-serif;
   font-size: 60px;
   text-align: right;
-  margin-right: 700px;
-  color: #2c3e50;
-  margin-bottom: 3%;
+  width: 600px;
+  margin-left: 42%;
+  color: #313e4b;
+  margin-top: 15%;
   text-shadow: 2px 2px 4px rgba(111, 104, 104, 0.4);
+}
+.slogan2 {
+  font-family: "Varela Round", sans-serif;
+  font-weight: bold;
+  font-size: 60px;
+  text-align: right;
+  color: #313e4b;
+  text-shadow: 2px 2px 4px rgba(111, 104, 104, 0.4);
+  width: 350px;
+  margin-left: 42%;
 }
 
 .square {
   width: 280px;
-  height: 85px;
+  height: 70px;
   border-radius: 50px;
   display: flex;
   align-items: center;
@@ -55,7 +89,6 @@
   font-family: sans-serif;
   box-shadow: 0 4px 12px rgba(36, 12, 252, 0.2);
   cursor: pointer;
-  margin-right: 70%;
   backdrop-filter: blur(8px);
 }
 

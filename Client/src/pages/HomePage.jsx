@@ -10,7 +10,8 @@ export default function HomePage() {
     <div className="home-background">
       <img src={backgroundImage} alt="רקע כביש" className="bg-image" />
       <div className="overlay-content">
-        <div className="slogan">למד תיאוריה בדרך שלך</div>
+        <div className="slogan1">?רוצה ללמוד תיאוריה</div>
+        <div className="slogan2">.שחק אותה</div>
         <div className="squares">
           <div className="square">
             <TrafficIcon className="icon" />
