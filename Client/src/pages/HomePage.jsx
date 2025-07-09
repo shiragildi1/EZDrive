@@ -4,6 +4,7 @@ import StopIcon from "@mui/icons-material/Stop";
 import SafetyCheckIcon from "@mui/icons-material/SafetyCheck";
 import BuildIcon from "@mui/icons-material/Build";
 import backgroundImage from "../assets/home.png";
+import { Link } from "react-router-dom";
 
 export default function HomePage() {
   return (
@@ -13,22 +14,22 @@ export default function HomePage() {
         <div className="slogan1">?רוצה ללמוד תיאוריה</div>
         <div className="slogan2">.שחק אותה</div>
         <div className="squares">
-          <div className="square">
+          <Link to="/games?topic=traffic" className="square">
             <TrafficIcon className="icon" />
-            <h3>חוקי תנועה</h3>
-          </div>
-          <div className="square">
+            <h3>חוקי התנועה</h3>
+          </Link>
+          <Link to="/games?topic=signs" className="square">
             <StopIcon className="icon" />
             <h3>תמרורים</h3>
-          </div>
-          <div className="square">
+          </Link>
+          <Link to="/games?topic=safety" className="square">
             <SafetyCheckIcon className="icon" />
             <h3>בטיחות</h3>
-          </div>
-          <div className="square">
+          </Link>
+          <Link to="/games?topic=vehicle" className="square">
             <BuildIcon className="icon" />
             <h3>הכרת הרכב</h3>
-          </div>
+          </Link>
         </div>
       </div>
     </div>

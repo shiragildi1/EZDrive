@@ -12,7 +12,7 @@ public class EzDriveApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(EzDriveApplication.class, args);
 	}
-//Check if is nessery
+
 @Bean
 public WebMvcConfigurer corsConfigurer() {
     return new WebMvcConfigurer() {

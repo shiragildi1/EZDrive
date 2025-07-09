@@ -1,0 +1,59 @@
+.games-background {
+  position: relative;
+  height: 88vh;
+  width: 100%;
+  background: linear-gradient(120deg, #181c22 60%, #23242a 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.games-background h2 {
+  color: #fff;
+  font-family: "Varela Round", sans-serif;
+  font-size: 40px;
+  margin-bottom: 40px;
+  text-shadow: 2px 2px 4px rgba(111, 104, 104, 0.4);
+  direction: rtl;
+}
+.game-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  align-items: center;
+}
+.square-game {
+  width: 280px;
+  height: 85px;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-family: "Varela Round", sans-serif;
+  font-size: 28px;
+  font-weight: bold;
+  box-shadow: 0 4px 18px 0 rgba(49, 62, 75, 0.18);
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  background: linear-gradient(90deg, #f21717 0%, #f79124 100%);
+  transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+  text-decoration: none;
+  direction: rtl;
+  border: none;
+  outline: none;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+}
+.square-game:hover {
+  transform: scale(1.07);
+  background: linear-gradient(90deg, #ff9800 0%, #ffd600 100%);
+  box-shadow: 0 6px 24px 0 rgba(255, 214, 0, 0.25), 0 1.5px 8px 0 #ff9800;
+}
+
+.square-game h3 {
+  margin: 0;
+  font-size: 30px;
+  font-weight: bold;
+  direction: rtl;
+}

@@ -1,0 +1,92 @@
+
+.popup-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(2px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  direction: rtl;
+}
+
+.popup-box {
+  background-color: #0d1015;
+  border: 2px solid #00d4ff;
+  border-radius: 20px;
+  padding: 30px 20px;
+  width: 90%;
+  max-width: 400px;
+  color: #fff;
+  font-family: "Varela Round", sans-serif;
+  position: relative;
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.popup-box h2 {
+  text-align: center;
+  color: #ffb400;
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+}
+
+p {
+  font-size: 1rem;
+  margin-bottom: 20px;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.section {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 18px;
+  gap: 10px;
+}
+
+.section .icon {
+  font-size: 1.4rem;
+}
+
+.section h4 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #fff;
+}
+
+.section p {
+  margin: 4px 0 0;
+  font-size: 0.95rem;
+  color: #ccc;
+  text-align: right;
+}
+
+.start-btn {
+  background: linear-gradient(to right, #ff5200, #ffae00);
+  border: none;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: bold;
+  padding: 12px 24px;
+  border-radius: 25px;
+  width: 100%;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: transform 0.2s;
+}
+
+.start-btn:hover {
+  transform: scale(1.05);
+}

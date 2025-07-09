@@ -6,7 +6,9 @@ import HomePage from "./pages/HomePage";
 import RankingPage from "./pages/RankingPage";
 import ProfilePage from "./pages/ProfilePage";
 import ChatPage from "./pages/ChatPage";
-import MainLayout from "./layout/MainLayout"; // ✅ חדש
+import GamesPage from "./components/Games";
+import TriviaGame from "./components/TriviaGame";
+import MainLayout from "./layout/MainLayout";
 
 function App() {
   return (
@@ -23,6 +25,8 @@ function App() {
           <Route path="RankingPage" element={<RankingPage />} />
           <Route path="ProfilePage" element={<ProfilePage />} />
           <Route path="ChatPage" element={<ChatPage />} />
+          <Route path="Games" element={<GamesPage />} />
+          <Route path="TriviaGame" element={<TriviaGame />} />
         </Route>
       </Routes>
     </BrowserRouter>
