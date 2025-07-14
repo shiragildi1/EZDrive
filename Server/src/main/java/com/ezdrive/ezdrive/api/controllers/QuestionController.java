@@ -39,17 +39,14 @@ public class QuestionController
         }
     }
     
+
     @GetMapping("/category")
-    public ResponseEntity<?> getQuestionsByCategory(@RequestParam String category)
-    {
-        try 
-        {
-            return ResponseEntity.ok(questionService.getQuestionsByTopic(category));
-        } 
-        catch (Exception e) 
-        {
+    public ResponseEntity<?> getQuestionsByCategory(@RequestParam String category) {
+        try {
+            return ResponseEntity.ok(questionService.getQuestionsForGame(category));
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Collections.singletonMap("error", "Error fetching questions: " + e.getMessage()));
+                    .body(Collections.singletonMap("error", "Error fetching game questions: " + e.getMessage()));
         }
     }
 }

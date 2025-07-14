@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.NodeList;
 
+import com.ezdrive.ezdrive.api.dto.QuestionDto;
 import com.ezdrive.ezdrive.persistence.Entities.Question;
 import com.ezdrive.ezdrive.persistence.Repositories.QuestionRepository;
 
@@ -112,8 +113,24 @@ public class QuestionService
         }
     }
 
-    public List<Question> getQuestionsByTopic(String category)
-    {
-        return questionRepository.findByCategory(category);
+    public List<QuestionDto> getQuestionsForGame(String category) {
+    List<Question> questions = questionRepository.findByCategory(category);
+    List<QuestionDto> dtoList = new ArrayList<>();
+
+    for (Question q : questions) {
+        dtoList.add(new QuestionDto(
+            q.getQuestionId(),
+            q.getQuestionText(),
+            q.getCategory(),
+            q.getAnswer1(),
+            q.getAnswer2(),
+            q.getAnswer3(),
+            q.getAnswer4()
+        ));
     }
+
+    return dtoList;
+}
+
+    
 }

@@ -1,6 +1,8 @@
 package com.ezdrive.ezdrive.services;
 
 import java.util.Collections;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -40,17 +42,17 @@ public class AuthService
     }
 
 
-    public boolean registerGoogleUser(String idTokenString) throws Exception
+    public User registerGoogleUser(String idTokenString) throws Exception
     {
         GoogleIdToken.Payload payload = verifyToken(idTokenString);
         String email = payload.getEmail();
 
-        if (userService.findByEmail(email).isPresent()) 
+        Optional<User> existingUser = userService.findByEmail(email);
+        if (existingUser.isPresent()) 
         {
             System.out.println("User already exists, logging in...");
-            return true;
+            return existingUser.get();
         }
-
         User newUser = new User();
         newUser.setEmail(email);
         newUser.setName((String) payload.get("name"));
@@ -62,7 +64,7 @@ public class AuthService
 
         userService.createUser(newUser);
         System.out.println("New user created successfully");
-        return true;
+        return newUser;
     }
 
     public String registerEmailUser(String email)

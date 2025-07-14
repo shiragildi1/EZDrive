@@ -10,10 +10,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ezdrive.ezdrive.api.dto.GoogleTokenRequest;
+import com.ezdrive.ezdrive.api.dto.GoogleTokenRequestDto;
 import com.ezdrive.ezdrive.exceptions.UserAlreadyExistsException;
 import com.ezdrive.ezdrive.services.AuthService;
-import com.ezdrive.ezdrive.api.dto.EmailRequest;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+
+import com.ezdrive.ezdrive.api.dto.EmailRequestDto;
+import com.ezdrive.ezdrive.persistence.Entities.User;
+
 import lombok.AllArgsConstructor;
 
 
@@ -25,22 +31,46 @@ public class AuthController
     @Autowired
     private AuthService authService;
 
+    // @PostMapping("/google")
+    // public ResponseEntity<?> googleLogin(@RequestBody GoogleTokenRequestDto request) {
+    //     try 
+    //     {
+    //         boolean isValid = authService.registerGoogleUser(request.getToken());
+    //         return ResponseEntity.ok(Collections.singletonMap("valid", isValid));
+    //     } 
+    //     catch (Exception e) 
+    //     {
+    //         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+    //             .body(Collections.singletonMap("error", e.getMessage()));
+    //     }
+    // }
+
     @PostMapping("/google")
-public ResponseEntity<?> googleLogin(@RequestBody GoogleTokenRequest request) {
-    try 
-    {
-        boolean isValid = authService.registerGoogleUser(request.getToken());
-        return ResponseEntity.ok(Collections.singletonMap("valid", isValid));
-    } 
-    catch (Exception e) 
-    {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-            .body(Collections.singletonMap("error", e.getMessage()));
+    public ResponseEntity<?> googleLogin(@RequestBody GoogleTokenRequestDto request, HttpServletRequest req) {
+        HttpSession session = req.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        session = req.getSession(true);
+        
+        try 
+        {
+            User user = authService.registerGoogleUser(request.getToken());
+            session.setAttribute("user", user);//keep user in session 
+
+            return ResponseEntity.ok(Collections.singletonMap("valid", true));
+        } 
+        catch (Exception e)
+        {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Collections.singletonMap("error", e.getMessage()));
+        }
     }
-}
+
+
 
     @PostMapping("/email")
-    public ResponseEntity<?> emailLogin(@RequestBody EmailRequest request) 
+    public ResponseEntity<?> emailLogin(@RequestBody EmailRequestDto request) 
     {
         try 
         {

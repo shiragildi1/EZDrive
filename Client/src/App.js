@@ -1,4 +1,8 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
+import { useUserContext } from "./context/UserContext";
+import { getCurrentUser } from "./services/userService"; // פונקציה שמביאה את היוזר מהסשן
+
 import SignUpPage from "./pages/SignUpPage";
 import SignInPage from "./pages/SignInPage";
 import OtpPage from "./pages/OtpPage";
@@ -11,6 +15,20 @@ import TriviaGame from "./components/TriviaGame";
 import MainLayout from "./layout/MainLayout";
 
 function App() {
+  const { setUser } = useUserContext();
+
+  useEffect(() => {
+    getCurrentUser()
+      .then((user) => {
+        setUser(user);
+        console.log("User loaded from session:", user);
+      })
+      .catch(() => {
+        setUser(null);
+        console.log("No user found in session.");
+      });
+  }, []);
+
   return (
     <BrowserRouter>
       <Routes>

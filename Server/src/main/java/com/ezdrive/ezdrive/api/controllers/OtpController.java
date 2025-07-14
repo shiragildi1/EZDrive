@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ezdrive.ezdrive.api.dto.EmailRequest;
+import com.ezdrive.ezdrive.api.dto.EmailRequestDto;
 import com.ezdrive.ezdrive.services.OtpService;
 
 import lombok.AllArgsConstructor;
@@ -25,7 +25,7 @@ public class OtpController
     private OtpService otpService;
 
     @PostMapping("/create")
-    public ResponseEntity<?> createOtp(@RequestBody EmailRequest request) 
+    public ResponseEntity<?> createOtp(@RequestBody EmailRequestDto request) 
     {
         try 
         {
@@ -39,7 +39,7 @@ public class OtpController
         }
     }
     @PostMapping("/verify")
-    public ResponseEntity<?> verifyCode(@RequestBody EmailRequest request) 
+    public ResponseEntity<?> verifyCode(@RequestBody EmailRequestDto request) 
     {
         try 
         {

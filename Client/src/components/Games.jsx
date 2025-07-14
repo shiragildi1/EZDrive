@@ -1,17 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { getQuestionsByCategory } from "../services/GameCategoryService";
+import { startTriviaSession } from "../services/GameTriviaService";
 import TriviaGame from "./TriviaGame";
 import GameExplanation from "./GameExplanation";
 import HeadToHeadExplanation from "../data/HeadToHeadExplanationData";
 import simulationExplanation from "../data/SimulationExplanationData";
 import triviaExplanation from "../data/TriviaExplanationData";
-import "../styles/Games.css"; // Assuming you have a CSS file for styling
+import "../styles/Games.css";
 
 export default function GamesPage() {
   const [searchParams] = useSearchParams();
   const topic = searchParams.get("topic");
+
   const [questions, setQuestions] = useState([]);
+  const [sessionId, setSessionId] = useState(null);
   const [showTrivia, setShowTrivia] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -25,27 +27,40 @@ export default function GamesPage() {
   };
 
   const handleStartTrivia = () => {
-    setLoading(true);
-    getQuestionsByCategory(topicsMap[topic])
-      .then((data) => {
-        setQuestions(
-          data.map((q) => ({
-            question: q.questionText,
-            options: [q.answer1, q.answer2, q.answer3, q.answer4],
-            correctAnswer: [q.answer1, q.answer2, q.answer3, q.answer4][
-              q.correctAnswer - 1
-            ],
-          }))
-        );
-        setShowTrivia(true);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
+    setLoading(true);//start to load questions
+    const userEmail = "m.giladi1@gmail.com"; 
+    const category = topicsMap[topic];
+
+    startTriviaSession(userEmail, category)
+  .then((data) => {
+    console.log("response from startTriviaSession:", data);
+
+    // הפוך כל שאלה לאובייקט עם שדה options שמכיל את כל ארבע התשובות
+    const formattedQuestions = data.questions.map((question) => {
+      return {
+        questionId: question.questionId,
+        questionText: question.questionText,
+        options: [
+          question.answer1,
+          question.answer2,
+          question.answer3,
+          question.answer4,
+        ],
+      };
+    });
+
+    setQuestions(formattedQuestions);  // שמור את השאלות בפורמט החדש
+    setSessionId(data.session.id);     // שמור את מזהה הסשן
+    setShowTrivia(true);
+    console.log("formattedQuestions:" , formattedQuestions)               // עבור למצב משחק
+  })
+  .catch((err) => {
+    console.error("שגיאה ב-startTriviaSession:", err);
+  })
+  .finally(() => {
+    setLoading(false);
+  });
   };
-
-  //hendeleStartHeadToHead
-
-  //hendelStartSimulazya
 
   const getExplanationData = () => {
     switch (selectedGame) {
@@ -57,6 +72,7 @@ export default function GamesPage() {
         return simulationExplanation;
       default:
         console.error("Unknown game selected");
+        return {};
     }
   };
 
@@ -65,11 +81,8 @@ export default function GamesPage() {
       case "trivia":
         return handleStartTrivia;
       case "headToHead":
-        return null;
-      //!!!!!!!replace with actual head-to-head start logic
       case "simulation":
         return null;
-      //!!!!!!!replace with actual simulation start logic
       default:
         return () => {};
     }
@@ -78,7 +91,13 @@ export default function GamesPage() {
   if (loading) return <div>טוען שאלות...</div>;
 
   if (showTrivia) {
-    return <TriviaGame questions={questions} topic={topicsMap[topic]} />;
+    return (
+      <TriviaGame
+        questions={questions}
+        sessionId={sessionId}
+        topic={topicsMap[topic]}
+      />
+    );
   }
 
   return (

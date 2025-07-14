@@ -4,6 +4,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 import { sendGoogleToken } from "../services/authService";
 import { sendEmailForOtp } from "../services/OtpService";
+import { useUserContext } from "../context/UserContext";
+import { getCurrentUser } from "../services/userService";
 
 export default function AuthForm({ title, buttonText, bottomText, link }) {
   const [email, setEmail] = useState("");
@@ -14,6 +16,7 @@ export default function AuthForm({ title, buttonText, bottomText, link }) {
     sendEmailForOtp(email);
     navigate("/OtpPage", { state: { userEmail: email } });
   };
+  const { setUser } = useUserContext();
 
   return (
     <form className="login-form" onSubmit={handleSubmit}>
@@ -35,11 +38,18 @@ export default function AuthForm({ title, buttonText, bottomText, link }) {
         <GoogleLogin
           onSuccess={(credentialResponse) => {
             console.log("id_token:", credentialResponse.credential);
+            console.log("Client ID from env:", process.env.REACT_APP_GOOGLE_CLIENT_ID);
+
             sendGoogleToken(credentialResponse.credential)
               .then((data) => {
                 if (data.valid) {
                   console.log("Verification succeeded!");
-                  navigate("/HomePage");
+
+                  getCurrentUser().then((user) => {
+                    console.log("User after Google login:", user);
+                    setUser(user); 
+                    navigate("/HomePage");
+                  });
                 } else {
                   console.log("The verify failed");
                 }

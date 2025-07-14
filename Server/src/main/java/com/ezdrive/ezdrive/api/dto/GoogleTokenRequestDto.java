@@ -3,7 +3,7 @@ package com.ezdrive.ezdrive.api.dto;
 import lombok.Getter;
 import lombok.Setter;
 
-public class GoogleTokenRequest 
+public class GoogleTokenRequestDto 
 {
     @Getter
     @Setter
