@@ -82,6 +82,7 @@ public class QuestionService
             Elements liElements = doc.select("li");
             String[] answerTexts = new String[4];
             int correctAnswer = -1;
+            String answerText = "";
 
             for (int i = 0; i < Math.min(liElements.size(), 4); i++) {
                 Element li = liElements.get(i);
@@ -102,7 +103,7 @@ public class QuestionService
             return new Question(
                 null, title, category,
                 answerTexts[0], answerTexts[1], answerTexts[2], answerTexts[3],
-                correctAnswer
+                correctAnswer, answerText
             );
 
         } 

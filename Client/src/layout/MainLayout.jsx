@@ -1,6 +1,6 @@
 import Sidebar from "./Sidebar";
 import { Outlet } from "react-router-dom";
-import logo from "../assets/logo1.png";
+import logo from "../assets/logo1trimmed.png";
 import "../styles/MainLayout.css";
 
 export default function MainLayout() {

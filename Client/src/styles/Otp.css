@@ -35,10 +35,8 @@
   justify-content: center;
   gap: 5px;
 }
-.otp-squares input
-{
-    font-family: "Varela Round", sans-serif;
-    font-size: 25px;
-    text-align: center;
+.otp-squares input {
+  font-family: "Varela Round", sans-serif;
+  font-size: 25px;
+  text-align: center;
 }
-

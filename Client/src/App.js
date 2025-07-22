@@ -12,6 +12,7 @@ import ProfilePage from "./pages/ProfilePage";
 import ChatPage from "./pages/ChatPage";
 import GamesPage from "./components/Games";
 import TriviaGame from "./components/TriviaGame";
+import MemoryGame from "./components/MemoryGame";
 import MainLayout from "./layout/MainLayout";
 
 function App() {
@@ -45,6 +46,7 @@ function App() {
           <Route path="ChatPage" element={<ChatPage />} />
           <Route path="Games" element={<GamesPage />} />
           <Route path="TriviaGame" element={<TriviaGame />} />
+          <Route path="MemoryGame" element={<MemoryGame />} />
         </Route>
       </Routes>
     </BrowserRouter>

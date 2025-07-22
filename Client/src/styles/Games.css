@@ -51,7 +51,6 @@
   transform: scale(1.07);
   background: linear-gradient(90deg, #ff9800 0%, #ffd600 100%);
   box-shadow: 0 6px 24px 0 rgba(255, 214, 0, 0.25), 0 1.5px 8px 0 #ff9800;
-  background-color: #f79124;
 }
 
 .square-game h3 {
