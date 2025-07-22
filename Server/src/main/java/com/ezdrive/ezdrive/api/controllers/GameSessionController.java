@@ -1,20 +1,25 @@
 package com.ezdrive.ezdrive.api.controllers;
 
-import com.ezdrive.ezdrive.api.dto.GameResultResponseDto;
-import com.ezdrive.ezdrive.api.dto.GameSessionStartResponseDto;
-import com.ezdrive.ezdrive.api.dto.QuestionDto;
-import com.ezdrive.ezdrive.api.dto.SubmitAnswerRequestDto;
-import com.ezdrive.ezdrive.persistence.Entities.GameSession;
-import com.ezdrive.ezdrive.persistence.Entities.Question;
-import com.ezdrive.ezdrive.services.GameQuestionAnswerService;
-import com.ezdrive.ezdrive.services.GameSessionService;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import com.ezdrive.ezdrive.api.dto.GameResultResponseDto;
+import com.ezdrive.ezdrive.api.dto.GameSessionStartResponseDto;
+import com.ezdrive.ezdrive.api.dto.QuestionTriviaDto;
+import com.ezdrive.ezdrive.api.dto.SubmitAnswerRequestDto;
+import com.ezdrive.ezdrive.persistence.Entities.GameSession;
+import com.ezdrive.ezdrive.persistence.Entities.Question;
+import com.ezdrive.ezdrive.services.GameSessionService;
+import com.ezdrive.ezdrive.services.TriviaGameService;
 
 @RestController
 @RequestMapping("/game-sessions")
@@ -24,7 +29,7 @@ public class GameSessionController {
     private GameSessionService gameSessionService;
 
     @Autowired
-    private GameQuestionAnswerService gameQuestionAnswerService;
+    private TriviaGameService triviaGameService;
 
     @PostMapping("/start")
     public GameSessionStartResponseDto startSession(
@@ -34,10 +39,10 @@ public class GameSessionController {
 
         GameSession session = gameSessionService.createGameSession(userEmail, gameType, category);
 
-        List<Question> questions = gameQuestionAnswerService.generateQuestionsForSession(session.getId(), category);
+        List<Question> questions = triviaGameService.generateQuestionsForSession(session.getId(), category);
 
-        List<QuestionDto> questionDtos = questions.stream()
-            .map(q -> new QuestionDto(
+        List<QuestionTriviaDto> questionDtos = questions.stream()
+            .map(q -> new QuestionTriviaDto(
                 q.getQuestionId(),
                 q.getQuestionText(),
                 q.getCategory(),
@@ -52,7 +57,7 @@ public class GameSessionController {
 
     @PostMapping("/submit-answer")
     public ResponseEntity<Void> submitAnswer(@RequestBody SubmitAnswerRequestDto request) {
-        gameQuestionAnswerService.submitAnswer(
+        triviaGameService.submitAnswer(
             request.getSessionId(),
             request.getQuestionId(),
             request.getSelectedAnswer());
@@ -61,6 +66,6 @@ public class GameSessionController {
 
     @GetMapping("/result")
     public GameResultResponseDto getGameResult(@RequestParam Long sessionId) {
-        return gameQuestionAnswerService.getGameResult(sessionId);
+        return triviaGameService.getGameResult(sessionId);
     }
 }

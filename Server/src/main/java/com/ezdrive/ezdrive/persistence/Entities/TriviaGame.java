@@ -20,8 +20,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "game_question_answers")
-public class GameQuestionAnswer {
+@Table(name = "Trivia_Game")
+public class TriviaGame {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

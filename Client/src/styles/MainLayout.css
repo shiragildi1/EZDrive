@@ -3,8 +3,7 @@ html {
   font-family: "Varela Round", sans-serif;
   margin: 0;
   padding: 0;
-  height: 100%;
-  overflow: hidden;
+  height: 100vh;
 }
 .layout-wrapper {
   display: flex;
@@ -12,17 +11,16 @@ html {
   height: 100vh;
 }
 .main-header {
-  height: 12%;
+  height: 10%;
   display: flex;
   justify-content: flex-end;
   align-items: center;
   padding: 0 20px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  overflow: auto;
 }
 .logo {
-  margin-right: -60px;
-  margin-top: 25px;
-  height: 350px;
+  height: 100%;
   width: auto;
 }
 
@@ -30,12 +28,16 @@ html {
   display: flex;
   flex-direction: row-reverse;
   flex: 1;
-  height: 100%;
-  overflow: hidden;
+  flex-wrap: wrap;
+  width: 100vw; 
+  margin: 0;
+  min-height: 0;
+  overflow-y: auto;
+  box-sizing: border-box;
 }
 
 .main-content {
   flex: 1;
-  overflow: hidden;
+  overflow-y: auto;
   box-sizing: border-box;
 }

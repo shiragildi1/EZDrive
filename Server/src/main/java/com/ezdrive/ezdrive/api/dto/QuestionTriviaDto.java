@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class QuestionDto {
+public class QuestionTriviaDto {
     private Long questionId;
     private String questionText;
     private String category;

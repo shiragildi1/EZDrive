@@ -11,27 +11,29 @@
 .games-background h2 {
   color: #fff;
   font-family: "Varela Round", sans-serif;
-  font-size: 40px;
+  font-size: 100%;
   margin-bottom: 40px;
   text-shadow: 2px 2px 4px rgba(111, 104, 104, 0.4);
   direction: rtl;
 }
 .game-buttons {
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
   gap: 30px;
   align-items: center;
 }
 .square-game {
-  width: 280px;
-  height: 85px;
+  width: 20%;
+  height: 13%;
   border-radius: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #fff;
   font-family: "Varela Round", sans-serif;
-  font-size: 28px;
+  font-size: 100%;
   font-weight: bold;
   box-shadow: 0 4px 18px 0 rgba(49, 62, 75, 0.18);
   cursor: pointer;
@@ -49,11 +51,12 @@
   transform: scale(1.07);
   background: linear-gradient(90deg, #ff9800 0%, #ffd600 100%);
   box-shadow: 0 6px 24px 0 rgba(255, 214, 0, 0.25), 0 1.5px 8px 0 #ff9800;
+  background-color: #f79124;
 }
 
 .square-game h3 {
   margin: 0;
-  font-size: 30px;
+  font-size: 100%;
   font-weight: bold;
   direction: rtl;
 }

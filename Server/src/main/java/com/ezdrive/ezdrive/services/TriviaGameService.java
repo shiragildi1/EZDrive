@@ -7,18 +7,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ezdrive.ezdrive.api.dto.GameResultResponseDto;
-import com.ezdrive.ezdrive.persistence.Entities.GameQuestionAnswer;
 import com.ezdrive.ezdrive.persistence.Entities.GameSession;
 import com.ezdrive.ezdrive.persistence.Entities.Question;
-import com.ezdrive.ezdrive.persistence.Repositories.GameQuestionAnswerRepository;
+import com.ezdrive.ezdrive.persistence.Entities.TriviaGame;
 import com.ezdrive.ezdrive.persistence.Repositories.GameSessionRepository;
 import com.ezdrive.ezdrive.persistence.Repositories.QuestionRepository;
+import com.ezdrive.ezdrive.persistence.Repositories.TriviaGameRepository;
 
 @Service
-public class GameQuestionAnswerService {
+public class TriviaGameService {
 
     @Autowired
-    private GameQuestionAnswerRepository gameQuestionAnswerRepository;
+    private TriviaGameRepository triviaGameRepository;
 
     @Autowired
     private GameSessionRepository gameSessionRepository;
@@ -28,17 +28,17 @@ public class GameQuestionAnswerService {
 
     // שלב 1: יצירת 10 שאלות רנדומליות ושיוך לסשן
     public List<Question> generateQuestionsForSession(Long sessionId, String category) {
-        List<Question> questions = questionRepository.findRandom10ByCategory(category);
+        List<Question> questions = questionRepository.findRandom10ByCategoryForTrivia(category);
 
         GameSession session = gameSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new RuntimeException("Session not found"));
 
         for (Question q : questions) {
-            GameQuestionAnswer answer = new GameQuestionAnswer();
+            TriviaGame answer = new TriviaGame();
             answer.setGameSession(session);
             answer.setQuestion(q);
             // selectedAnswer = null, לא ענה עדיין
-            gameQuestionAnswerRepository.save(answer);
+            triviaGameRepository.save(answer);
         }
 
         return questions;
@@ -52,22 +52,22 @@ public class GameQuestionAnswerService {
         Question question = questionRepository.findById(questionId)
                 .orElseThrow(() -> new RuntimeException("Question not found"));
 
-        GameQuestionAnswer gameAnswer = gameQuestionAnswerRepository.findByGameSessionAndQuestion(session, question)
+        TriviaGame gameAnswer = triviaGameRepository.findByGameSessionAndQuestion(session, question)
                 .orElseThrow(() -> new RuntimeException("Answer entry not found"));
 
         gameAnswer.setSelectedAnswer(selectedAnswer);
         gameAnswer.setCorrect(selectedAnswer == question.getCorrectAnswer());
         gameAnswer.setAnsweredAt(LocalDateTime.now());
 
-        gameQuestionAnswerRepository.save(gameAnswer);
+        triviaGameRepository.save(gameAnswer);
     }
 
     // שלב 3: חישוב תוצאה סופית
     public GameResultResponseDto getGameResult(Long sessionId) {
-        List<GameQuestionAnswer> answers = gameQuestionAnswerRepository.findByGameSessionId(sessionId);
+        List<TriviaGame> answers = triviaGameRepository.findByGameSessionId(sessionId);
 
         int total = answers.size();
-        int correct = (int) answers.stream().filter(GameQuestionAnswer::isCorrect).count();
+        int correct = (int) answers.stream().filter(TriviaGame::isCorrect).count();
         int score = correct * 100 / total;
 
         return new GameResultResponseDto(total, correct, score);

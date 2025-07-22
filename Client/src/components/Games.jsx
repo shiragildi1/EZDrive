@@ -102,7 +102,7 @@ export default function GamesPage() {
 
   return (
     <div className="games-background">
-      <h2>בחרת ב{topicsMap[topic]}</h2>
+      <h2>{topicsMap[topic]}</h2>
       <div className="game-buttons">
         <button
           className="square-game"
