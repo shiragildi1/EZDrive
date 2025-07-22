@@ -1,0 +1,40 @@
+body,
+html {
+  font-family: "Varela Round", sans-serif;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  overflow: auto;
+}
+.layout-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+.main-header {
+  height: 10%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+}
+.logo {
+  height: 85%;
+  width: auto;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: row-reverse;
+  flex: 1;
+  width: 100vw;
+  overflow-y: auto;
+}
+
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
