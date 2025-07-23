@@ -40,7 +40,6 @@
   cursor: pointer;
   backdrop-filter: blur(8px);
   transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
-  direction: rtl;
 }
 
 .card-inner {
@@ -86,8 +85,11 @@
   margin: auto;
   object-fit: contain;
 }
-.text {
-  font-size: 11xp;
+.card-text {
+  font-size: 12px;
   direction: rtl;
-  align-self: center;
+  text-align: center;
+  display: flex;
+  margin-left: 3px;
+  margin-right: 3px;
 }

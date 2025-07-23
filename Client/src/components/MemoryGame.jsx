@@ -25,27 +25,47 @@ export default function memoryGame({ questions, sessionId, topic }) {
   const [gameOver, setGameOver] = useState(false);
   const [scoreResult, setScoreResult] = useState({ a: 0, b: 0 });
   // const [flippedCards, setFlippedCards] = useState([30]);
-  const [flippedCards, setFlippedCards] = useState(
-    Array(questions.length).fill(false)
+  const [flippedQuestionCards, setFlippedQuestionCards] = useState(
+    Array(questions.length / 2).fill(false)
+  );
+  const [flippedAnswerCards, setFlippedAnswerCards] = useState(
+    Array(questions.length / 2).fill(false)
   );
   const [isFlipped, setIsFlipped] = useState(false);
   //const cards = Array(questions.length).fill(null);
-  const questionCards = questions.filter((q) => q.question === true);
-  const answerCards = questions.filter((q) => q.question === false);
-  //cardPosition, question, text
-
-  // questions.forEach((q) => {
-  //   cards[q.cardPosition] = q;
-  // });
-  // console.log("Sorted:", cards);
+  const questionCards = questions.filter((q) => q.isQuestion === true);
+  const answerCards = questions.filter((q) => q.isQuestion === false);
+  const [questionFlipped, setQuestionFlipped] = useState(false);
+  const [answerFlipped, setAnswerFlipped] = useState(false);
 
   // const handleFlip = (i) => {
   //   setFlippedCards((prev) => (prev.includes(i) ? prev : [...prev, i]));
   // };
-  const handleFlip = (i) => {
-    setFlippedCards((prev) =>
-      prev.map((flipped, index) => (index === i ? !flipped : flipped))
+  const handleQuestionFlip = (i) => {
+    // Check if any card is already flipped
+    const alreadyFlipped = flippedQuestionCards.some((flipped) => flipped);
+
+    // If yes, do nothing
+    if (alreadyFlipped) return;
+
+    // Otherwise, flip the selected card
+    setFlippedQuestionCards((prev) =>
+      prev.map((flipped, index) => (index === i ? true : flipped))
     );
+    setQuestionFlipped(true);
+  };
+  const handleAnswerFlip = (i) => {
+    // Check if any card is already flipped
+    const alreadyFlipped = flippedAnswerCards.some((flipped) => flipped);
+
+    // If yes, do nothing
+    if (alreadyFlipped) return;
+
+    // Otherwise, flip the selected card
+    setFlippedAnswerCards((prev) =>
+      prev.map((flipped, index) => (index === i ? true : flipped))
+    );
+    setAnswerFlipped(true);
   };
   // const [cards, setCards] = useState({})
 
@@ -53,7 +73,28 @@ export default function memoryGame({ questions, sessionId, topic }) {
 
   console.log("Current question:");
 
-  function handleCardClick(cardPosition) {}
+  useEffect(() => {
+    if (questionFlipped && answerFlipped) {
+      // Call backend
+      checkAnswer(sessionId, questionFlipped, answerFlipped)
+        .then((response) => {
+          // Handle correct/incorrect result
+          console.log("Match result:", response.data);
+          // Optionally update score or status
+        })
+        .catch((error) => {
+          console.error("Error checking match:", error);
+        })
+        .finally(() => {
+          // Clear selected after some delay
+          setTimeout(() => {
+            setQuesitonFlipped(false);
+            setAnswerFlipped(false);
+            // Optionally flip back non-matching cards
+          }, 1000);
+        });
+    }
+  }, [questionFlipped, answerFlipped]);
 
   return (
     <div className="memory_game">
@@ -105,22 +146,22 @@ export default function memoryGame({ questions, sessionId, topic }) {
         </div> */}
       </div>
       <div className="questions-board">
-        {questionCards.map((card) => (
+        {questionCards.map((card, i) => (
           <div
             key={card.cardPosition}
             className="card"
-            onClick={() => handleFlip(card.cardPosition)}
+            onClick={() => handleQuestionFlip(i)}
           >
             <div
               className={`card-inner ${
-                flippedCards[card.cardPosition] ? "flipped" : ""
+                flippedQuestionCards[i] ? "flipped" : ""
               }`}
             >
               <div className="card-front">
                 <img src={logo} alt="EZDrive Logo" className="logo_img" />
               </div>
               <div className="card-back">
-                <span>{card.text}</span>
+                <span className="card-text">{card.text}</span>
               </div>
             </div>
           </div>
@@ -128,22 +169,20 @@ export default function memoryGame({ questions, sessionId, topic }) {
       </div>
 
       <div className="answer-board">
-        {answerCards.map((card) => (
+        {answerCards.map((card, i) => (
           <div
             key={card.cardPosition}
             className="card"
-            onClick={() => handleFlip(card.cardPosition)}
+            onClick={() => handleAnswerFlip(i)}
           >
             <div
-              className={`card-inner ${
-                flippedCards[card.cardPosition] ? "flipped" : ""
-              }`}
+              className={`card-inner ${flippedAnswerCards[i] ? "flipped" : ""}`}
             >
               <div className="card-front">
                 <img src={logo} alt="EZDrive Logo" className="logo_img" />
               </div>
               <div className="card-back">
-                <span className="text">{card.text}</span>
+                <span className="card-text">{card.text}</span>
               </div>
             </div>
           </div>

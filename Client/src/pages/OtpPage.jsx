@@ -6,21 +6,23 @@ import { sendCodeForOtp } from "../services/OtpService";
 import { sendEmailForOtp } from "../services/OtpService";
 import { saveUser } from "../services/authService";
 
+
 export default function OtpPage() {
-  const navigate = useNavigate();
+  const navigate= useNavigate();
   const [otp, setOtp] = useState(Array(6).fill(""));
   const inputsRef = useRef([]);
   const location = useLocation();
   const userEmail = location.state?.userEmail;
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Email: ", userEmail);
-    sendEmailForOtp(userEmail);
-    navigate("/OtpPage", { state: { userEmail: userEmail } });
-  };
+      e.preventDefault();
+      console.log("Email: ", userEmail);
+      sendEmailForOtp(userEmail);
+      navigate("/OtpPage", { state: { userEmail: userEmail } });
+    };
   //if there is a numaric and there is no the last inpute  pass the fucuse to the next.
-  function handleChange(e, idx) {
+  function handleChange(e, idx) 
+  {
     const value = e.target.value;
     if (!/^\d?$/.test(value)) return;
     const newOtp = [...otp];
@@ -29,17 +31,22 @@ export default function OtpPage() {
     if (value && idx < 5) {
       inputsRef.current[idx + 1].focus();
     }
-    if (value && idx == 5) {
-      sendCodeForOtp(newOtp.join(""), userEmail).then((data) => {
-        if (data.valid) {
-          console.log("Verification succeeded!");
-          saveUser(userEmail);
-          navigate("/HomePage");
-        } else {
-          console.log("The verify failed...");
-        }
+    if (value && idx == 5) 
+    {
+      sendCodeForOtp(newOtp.join(""), userEmail).then((data) => 
+      {
+          if (data.valid) 
+          {
+            console.log("Verification succeeded!");
+            saveUser(userEmail);
+            navigate("/HomePage");
+          } 
+          else 
+          {
+            console.log("The verify failed...");
+          }
       });
-    }
+    } 
   }
   function handleKeyDown(e, idx) {
     if (e.key === "Backspace" && !otp[idx] && idx > 0) {
@@ -82,9 +89,7 @@ export default function OtpPage() {
           <div className="send">
             <h5>לא קיבלתי קוד, </h5>
             <p className="sendAgain">
-              <a href="#" onClick={handleSubmit}>
-                שלח שוב
-              </a>
+              <a href="#" onClick={handleSubmit}>שלח שוב</a>
             </p>
           </div>
         </div>

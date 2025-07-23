@@ -1,5 +1,4 @@
 export function startTriviaSession(userEmail, category) {
-  console.log("email", userEmail, category);
   return fetch(
     `http://localhost:8080/game-sessions/start?userEmail=${userEmail}&gameType=trivia&category=${category}`,
     { method: "POST" }
@@ -15,7 +14,6 @@ export function submitAnswer({ sessionId, questionId, selectedAnswer }) {
 }
 
 export function getGameResult(sessionId) {
-  return fetch(
-    `http://localhost:8080/game-sessions/result?sessionId=${sessionId}`
-  ).then((res) => res.json());
+  return fetch(`http://localhost:8080/game-sessions/result?sessionId=${sessionId}`)
+    .then((res) => res.json());
 }

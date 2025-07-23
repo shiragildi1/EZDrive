@@ -7,6 +7,7 @@ import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import "../styles/Sidebar.css";
 
+
 export default function Sidebar() {
   const [open, setOpen] = useState(false);
 
@@ -16,18 +17,10 @@ export default function Sidebar() {
         <button className="menu-button" onClick={() => setOpen(!open)}>
           <MenuIcon />
         </button>
-        <NavLink to="/HomePage">
-          <HomeIcon /> {open && <span>עמוד בית</span>}
-        </NavLink>
-        <NavLink to="/rankingPage">
-          <ListIcon /> {open && <span>דירוג משתמשים</span>}
-        </NavLink>
-        <NavLink to="/profilePage">
-          <PersonIcon /> {open && <span>הפרופיל שלי</span>}
-        </NavLink>
-        <NavLink to="/chatPage">
-          <ChatIcon /> {open && <span>צ'אט</span>}
-        </NavLink>
+        <NavLink to="/HomePage"><HomeIcon /> {open && <span>עמוד בית</span>}</NavLink>
+        <NavLink to="/rankingPage"><ListIcon /> {open && <span>דירוג משתמשים</span>}</NavLink>
+        <NavLink to="/profilePage"><PersonIcon /> {open && <span>הפרופיל שלי</span>}</NavLink>
+        <NavLink to="/chatPage"><ChatIcon /> {open && <span>צ'אט</span>}</NavLink>
       </aside>
     </div>
   );

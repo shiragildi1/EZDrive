@@ -120,7 +120,7 @@ export default function GamesPage() {
         const formattedQuestions = data.questions.map((question) => {
           return {
             cardPosition: question.cardPosition,
-            question: question.question,
+            isQuestion: question.question,
             text: question.text,
           };
         });

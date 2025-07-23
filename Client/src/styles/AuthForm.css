@@ -1,5 +1,7 @@
-.container {
-  background-color: white;
+
+.container
+{
+  background-color: white
 }
 .login-form {
   width: 350px;
@@ -7,6 +9,7 @@
   text-align: center;
   /* font-family: sans-serif; */
   font-family: "Varela Round", sans-serif;
+  
 }
 .login-form h1 {
   font-size: 30px;
@@ -48,11 +51,10 @@ button {
   background-color: #ccc;
   margin: 0 10px;
 }
-.forgot,
-.entry {
+.forgot,.entry {
   font-size: 15px;
   color: #777;
-}
+} 
 .term {
   font-size: 13px;
   color: #777;

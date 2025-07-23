@@ -12,5 +12,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class GameSessionStartResponseDto {
     private GameSession session;
-    private List<QuestionDto> questions;
+    private List<QuestionTriviaDto> questions;
 }
