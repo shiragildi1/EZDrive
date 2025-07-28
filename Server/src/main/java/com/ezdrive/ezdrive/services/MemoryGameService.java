@@ -35,7 +35,7 @@ public class MemoryGameService {
         GameSession session = gameSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new RuntimeException("Session not found"));
 
-        List<Integer> cardPositions = IntStream.range(0,20)
+        List<Integer> cardPositions = IntStream.range(0,24)
         .boxed()
         .collect(Collectors.toList());
         Collections.shuffle(cardPositions); // Randomize the card order
@@ -60,50 +60,38 @@ public class MemoryGameService {
         return questions;
     }
 
-    /*
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    */
     
     // שלב 2: בדיקה האם הזוג נכון
-    public void checkAnswer(Long sessionId, Long questionId, int selectedQuestionCard, int selectedAnswerCard) {
+    public boolean checkAnswer(Long sessionId, String userEmail, int selectedQuestionCard, int selectedAnswerCard) {
+         System.out.println("From client: "+userEmail+" "+selectedQuestionCard);
         GameSession session = gameSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new RuntimeException("Session not found"));
 
-        Question question = questionRepository.findById(questionId)
-                .orElseThrow(() -> new RuntimeException("Question not found"));
-
-        MemoryGame gameAnswer = memoryGameRepository.findByGameSessionAndQuestion(session, question)
+        MemoryGame gameAnswer = memoryGameRepository.findByGameSessionAndQuestionCard(session.getId(), selectedQuestionCard)
                 .orElseThrow(() -> new RuntimeException("Answer entry not found"));
 
-        if(gameAnswer.getQuestionCard() == selectedQuestionCard && gameAnswer.getAnswerCard() == selectedAnswerCard)
+        if(gameAnswer.getAnswerCard() == selectedAnswerCard)
         {
             gameAnswer.setFlipped(true);
+            gameAnswer.setPlayerAnsweredEmail(userEmail);
             gameAnswer.setAnsweredAt(LocalDateTime.now());
         }
 
-
         memoryGameRepository.save(gameAnswer);
+       
+        System.out.println(gameAnswer.isFlipped());
+        return gameAnswer.getAnswerCard() == selectedAnswerCard;
     }
 
-    // שלב 3: חישוב תוצאה סופית
-    // public eResultResponseDto GamgetGameResult(Long sessionId) {
+    // //שלב 3: חישוב תוצאה סופית
+    // public MemoryGameResultResponseDto GamgetGameResult(Long sessionId) {
     //     List<MemoryGame> answers = memoryGameRepository.findByGameSessionId(sessionId);
 
     //     int total = answers.size();
-    //     int correct = (int) answers.stream().filter(GameQuestionAnswer::isCorrect).count();
-    //     int score = correct * 100 / total;
+    //     int correctPlayer1 = (int) answers.stream().filter(answer -> "pessyisraeli@gmail.com".equals(answer.getPlayerAnswered().getEmail())).count();
+    //     int correctPlayer2 = (int) answers.stream().filter(answer -> "shiragiladi1@gmail.com".equals(answer.getPlayerAnswered().getEmail())).count();
+    //     //int score = correct * 100 / total;
 
-    //     return new GameResultResponseDto(total, correct, score);
+    //     return new MemoryGameResultResponseDto(total, correctPlayer1, correctPlayer2);
     // }
 }

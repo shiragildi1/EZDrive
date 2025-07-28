@@ -7,8 +7,8 @@ import lombok.Setter;
 @Setter
 public class CheckAnswerRequestDto {
     private Long sessionId;
-    private Long questionId;
-    private int selectedCard1; 
-    private int selectedCard2; 
+    private String userEmail;
+    private int selectedQuestionCard; 
+    private int selectedAnswerCard; 
 }
 

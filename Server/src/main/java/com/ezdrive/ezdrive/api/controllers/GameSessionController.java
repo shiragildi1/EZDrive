@@ -12,20 +12,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ezdrive.ezdrive.api.dto.GameResultResponseDto;
-import com.ezdrive.ezdrive.api.dto.GameSessionStartResponseDto;
-import com.ezdrive.ezdrive.api.dto.QuestionTriviaDto;
-import com.ezdrive.ezdrive.api.dto.SubmitAnswerRequestDto;
-import com.ezdrive.ezdrive.persistence.Entities.GameSession;
-import com.ezdrive.ezdrive.persistence.Entities.Question;
-import com.ezdrive.ezdrive.services.GameSessionService;
-import com.ezdrive.ezdrive.services.TriviaGameService;
 import com.ezdrive.ezdrive.api.dto.CheckAnswerRequestDto;
 import com.ezdrive.ezdrive.api.dto.GameResultResponseDto;
 import com.ezdrive.ezdrive.api.dto.GameSessionStartResponseDto;
 import com.ezdrive.ezdrive.api.dto.MemoryGameSessionStartResponseDto;
 import com.ezdrive.ezdrive.api.dto.MemoryQuestionDto;
-import com.ezdrive.ezdrive.api.dto.QuestionDto;
+import com.ezdrive.ezdrive.api.dto.QuestionTriviaDto;
 import com.ezdrive.ezdrive.api.dto.SubmitAnswerRequestDto;
 import com.ezdrive.ezdrive.persistence.Entities.GameSession;
 import com.ezdrive.ezdrive.persistence.Entities.Question;
@@ -33,6 +25,7 @@ import com.ezdrive.ezdrive.persistence.Repositories.MemoryGameRepository;
 import com.ezdrive.ezdrive.persistence.Repositories.QuestionRepository;
 import com.ezdrive.ezdrive.services.GameSessionService;
 import com.ezdrive.ezdrive.services.MemoryGameService;
+import com.ezdrive.ezdrive.services.TriviaGameService;
 
 
 
@@ -131,12 +124,14 @@ public class GameSessionController {
 
     //Memory game
     @PostMapping("/check-answer")
-    public ResponseEntity<Void> checkAnswer(@RequestBody CheckAnswerRequestDto request) {
-        memoryGameService.checkAnswer(
+    public ResponseEntity<Boolean> checkAnswer(@RequestBody CheckAnswerRequestDto request) {
+        boolean isCorrect = memoryGameService.checkAnswer(
             request.getSessionId(),
-            request.getQuestionId(),
-            request.getSelectedCard1(),
-            request.getSelectedCard2());
-        return ResponseEntity.ok().build();
+            request.getUserEmail(),
+            request.getSelectedQuestionCard(),
+            request.getSelectedAnswerCard()
+        );
+        return ResponseEntity.ok(isCorrect);
     }
+
 }

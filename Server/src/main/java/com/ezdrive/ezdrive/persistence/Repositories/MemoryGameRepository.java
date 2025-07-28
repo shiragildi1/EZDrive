@@ -23,4 +23,7 @@ public interface MemoryGameRepository extends JpaRepository<MemoryGame, Long> {
 
     @Query(value = "SELECT answer_card FROM memory_game WHERE question_id = :questionId and game_session_id = :gameSessionId", nativeQuery = true)
     int findAnswerCardPositionByGameSesstionAndQuestion(Long gameSessionId, Long questionId);
+
+    @Query(value = "SELECT * FROM memory_game WHERE game_session_id = :gameSessionId and question_card = :questionCard", nativeQuery = true)
+    Optional <MemoryGame> findByGameSessionAndQuestionCard(Long gameSessionId, int questionCard);
 }

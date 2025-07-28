@@ -119,7 +119,7 @@ export default function GamesPage() {
         console.log("response from startMemorySession:", data);
         const formattedQuestions = data.questions.map((question) => {
           return {
-            cardPosition: question.cardPosition,
+            cardId: question.cardId,
             isQuestion: question.question,
             text: question.text,
           };

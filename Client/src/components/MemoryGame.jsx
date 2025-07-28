@@ -1,111 +1,274 @@
 import React, { useState, useEffect } from "react";
-import { submitAnswer, getGameResult } from "../services/GameMemoryService";
+import { checkAnswer } from "../services/GameMemoryService";
+import { getCurrentUser } from "../services/userService"; // פונקציה שמביאה את היוזר מהסשן
+import { useUserContext } from "../context/UserContext";
 import "../styles/MemoryGame.css";
 import logo from "../assets/logo1.png";
 
-export default function memoryGame({ questions, sessionId, topic }) {
-  const [mockquestions, setQuestions] = useState([
-    { text: "🐶 Dog1", position: 2 },
-    { text: "🐱 Cat1", position: 0 },
-    { text: "🐱 Cat", position: 3 },
-    { text: "🐶 Dog", position: 1 },
-    { text: "🐶 Dog2", position: 4 },
-    { text: "🐶 Dog3", position: 5 },
-    { text: "🐶 Dog4", position: 6 },
-    { text: "🐶 Dog5", position: 7 },
-    { text: "🐶 Dog2", position: 8 },
-    { text: "🐶 Dog3", position: 9 },
-    { text: "🐶 Dog4", position: 10 },
-    { text: "🐶 Dog5", position: 11 },
-  ]);
-  const [current, setCurrent] = useState(0);
+function shuffleArray(array) {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
 
+export default function memoryGame({ questions, sessionId, topic }) {
+  const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState(null);
   const [showResult, setShowResult] = useState(false);
   const [gameOver, setGameOver] = useState(false);
+  const [timer, setTimer] = useState(30);
   const [scoreResult, setScoreResult] = useState({ a: 0, b: 0 });
-  // const [flippedCards, setFlippedCards] = useState([30]);
+  const { setUser } = useUserContext();
+  useEffect(() => {
+    getCurrentUser()
+      .then((user) => {
+        setUser(user);
+        console.log("User loaded from session - MemoryGame:", user);
+      })
+      .catch(() => {
+        setUser(null);
+        console.log("No user found in session- MemoryGame.");
+      });
+  }, []);
+  const { user } = useUserContext();
+  const userEmail = user?.email || "guest@example.com";
+  console.log("Email: ", userEmail);
+
+  const [justMatched, setJustMatched] = useState([]);
+  const [found, setFound] = useState(Array(questions.length).fill(false));
+  const [currentQuestion, setCurrentQuestion] = useState(-1);
+  const [currentAnswer, setCurrentAnswer] = useState(-1);
+  const [cardStatus, setCardStatus] = useState(
+    Array(questions.length).fill(null)
+  );
   const [flippedQuestionCards, setFlippedQuestionCards] = useState(
     Array(questions.length / 2).fill(false)
   );
   const [flippedAnswerCards, setFlippedAnswerCards] = useState(
     Array(questions.length / 2).fill(false)
   );
-  const [isFlipped, setIsFlipped] = useState(false);
-  //const cards = Array(questions.length).fill(null);
-  const questionCards = questions.filter((q) => q.isQuestion === true);
-  const answerCards = questions.filter((q) => q.isQuestion === false);
+  console.log("Questions length:", questions.length);
+
+  const [questionCards, setQuestionCards] = useState([]);
+  const [answerCards, setAnswerCards] = useState([]);
+
+  useEffect(() => {
+    setQuestionCards(shuffleArray(questions.slice(0, 12)));
+    setAnswerCards(shuffleArray(questions.slice(12, 24)));
+  }, []);
   const [questionFlipped, setQuestionFlipped] = useState(false);
   const [answerFlipped, setAnswerFlipped] = useState(false);
 
-  // const handleFlip = (i) => {
-  //   setFlippedCards((prev) => (prev.includes(i) ? prev : [...prev, i]));
-  // };
   const handleQuestionFlip = (i) => {
-    // Check if any card is already flipped
-    const alreadyFlipped = flippedQuestionCards.some((flipped) => flipped);
-
-    // If yes, do nothing
-    if (alreadyFlipped) return;
+    const alreadyFlipped = flippedQuestionCards.some((flipped) => flipped); // Check if any card is already flipped
+    if (alreadyFlipped) return; // If yes, do nothing
 
     // Otherwise, flip the selected card
     setFlippedQuestionCards((prev) =>
       prev.map((flipped, index) => (index === i ? true : flipped))
     );
     setQuestionFlipped(true);
+    console.log("qu:" + questionCards[i].cardId);
+    setCurrentQuestion(questionCards[i].cardId);
   };
   const handleAnswerFlip = (i) => {
-    // Check if any card is already flipped
-    const alreadyFlipped = flippedAnswerCards.some((flipped) => flipped);
-
-    // If yes, do nothing
-    if (alreadyFlipped) return;
+    const alreadyFlipped = flippedAnswerCards.some((flipped) => flipped); // Check if any card is already flipped
+    if (alreadyFlipped) return; // If yes, do nothing
 
     // Otherwise, flip the selected card
     setFlippedAnswerCards((prev) =>
       prev.map((flipped, index) => (index === i ? true : flipped))
     );
     setAnswerFlipped(true);
+    setCurrentAnswer(answerCards[i].cardId);
   };
-  // const [cards, setCards] = useState({})
-
-  //cards = [{question_text: "מה המהירות המותרת", position: 3, pair_position: 12}, {...}]
-
-  console.log("Current question:");
 
   useEffect(() => {
     if (questionFlipped && answerFlipped) {
-      // Call backend
-      checkAnswer(sessionId, questionFlipped, answerFlipped)
-        .then((response) => {
-          // Handle correct/incorrect result
-          console.log("Match result:", response.data);
-          // Optionally update score or status
-        })
-        .catch((error) => {
-          console.error("Error checking match:", error);
-        })
-        .finally(() => {
-          // Clear selected after some delay
-          setTimeout(() => {
-            setQuesitonFlipped(false);
-            setAnswerFlipped(false);
-            // Optionally flip back non-matching cards
-          }, 1000);
-        });
+      console.log("Q: " + currentQuestion + " A: " + currentAnswer);
+      checkAnswer({
+        sessionId,
+        userEmail,
+        selectedQuestionCard: currentQuestion,
+        selectedAnswerCard: currentAnswer,
+      }).then((isCorrect) => {
+        setTimeout(() => {
+          setCardStatus((prev) =>
+            prev.map((status, i) =>
+              i === currentQuestion || i === currentAnswer
+                ? isCorrect
+                  ? "correct"
+                  : "incorrect"
+                : status
+            )
+          );
+          if (!isCorrect) {
+            // Flip cards back after showing incorrect
+            setTimeout(() => {
+              setCardStatus((prev) =>
+                prev.map((status) =>
+                  status === "disabled" ? "disabled" : null
+                )
+              );
+              setFlippedQuestionCards((prev) =>
+                prev.map((flip, i) =>
+                  i ===
+                  questionCards.findIndex((q) => q.cardId === currentQuestion)
+                    ? false
+                    : flip
+                )
+              );
+
+              setFlippedAnswerCards((prev) =>
+                prev.map((flip, i) =>
+                  i === answerCards.findIndex((a) => a.cardId === currentAnswer)
+                    ? false
+                    : flip
+                )
+              );
+            }, 3000); // flip back after 1 sec of red
+          }
+          if (isCorrect) {
+            setJustMatched([currentQuestion, currentAnswer]);
+            setShowResult(true);
+
+            setTimeout(() => {
+              setShowResult(false);
+              setJustMatched([]);
+              setCardStatus((prev) =>
+                prev.map((status, i) =>
+                  i === currentQuestion || i === currentAnswer
+                    ? "disabled"
+                    : status
+                )
+              );
+              setFlippedQuestionCards((prev) =>
+                prev.map((flip, i) =>
+                  i ===
+                  questionCards.findIndex((q) => q.cardId === currentQuestion)
+                    ? false
+                    : flip
+                )
+              );
+
+              setFlippedAnswerCards((prev) =>
+                prev.map((flip, i) =>
+                  i === answerCards.findIndex((a) => a.cardId === currentAnswer)
+                    ? false
+                    : flip
+                )
+              );
+            }, 3000); // green flash for 1 second
+
+            setFound((prev) => {
+              const updated = [...prev];
+              updated[currentQuestion] = true;
+              updated[currentAnswer] = true;
+              return updated;
+            });
+          }
+
+          console.log("Received from backend:", isCorrect);
+          1;
+        }, 750);
+        setTimeout(() => {
+          setQuestionFlipped(false);
+          setAnswerFlipped(false);
+        }, 1000); // same delay as feedback trigger
+      });
     }
   }, [questionFlipped, answerFlipped]);
 
   return (
     <div className="memory_game">
-      {/* <div className="header">
+      {showResult && <div className="score-popup">+1</div>}
+      <div className="header">
         <div className="player_A"></div>
         <div className="score"> </div>
         <div className="player_B"></div>
-      </div> */}
+      </div>
 
       <div className="board">
-        {/* <div className="board-section">
+        <div className="questions-board">
+          {questionCards.map((card, i) => (
+            <div
+              key={card.cardId}
+              className={`card ${
+                justMatched.includes(card.cardId)
+                  ? "correct"
+                  : cardStatus[card.cardId] === "incorrect"
+                  ? "incorrect"
+                  : cardStatus[card.cardId] === "disabled"
+                  ? "disabled"
+                  : ""
+              }`}
+              onClick={() => handleQuestionFlip(i)}
+            >
+              <div
+                className={`card-inner ${
+                  flippedQuestionCards[i] ? "flipped" : ""
+                }`}
+              >
+                <div className="card-front">
+                  <img src={logo} alt="EZDrive Logo" className="logo_img" />
+                </div>
+                <div className="card-back">
+                  {cardStatus[card.cardId] === "disabled" && (
+                    <img src={logo} alt="EZDrive Logo" className="logo_img" />
+                  )}
+                  {cardStatus[card.cardId] != "disabled" && (
+                    <span className="card-text">{card.text}</span>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="answer-board">
+          {answerCards.map((card, i) => (
+            <div
+              key={card.cardId}
+              className={`card ${
+                justMatched.includes(card.cardId)
+                  ? "correct"
+                  : cardStatus[card.cardId] === "incorrect"
+                  ? "incorrect"
+                  : cardStatus[card.cardId] === "disabled"
+                  ? "disabled"
+                  : ""
+              }`}
+              onClick={() => handleAnswerFlip(i)}
+            >
+              <div
+                className={`card-inner ${
+                  flippedAnswerCards[i] ? "flipped" : ""
+                }`}
+              >
+                <div className="card-front">
+                  <img src={logo} alt="EZDrive Logo" className="logo_img" />
+                </div>
+                <div className="card-back">
+                  {cardStatus[card.cardId] === "disabled" && (
+                    <img src={logo} alt="EZDrive Logo" className="logo_img" />
+                  )}
+                  {cardStatus[card.cardId] != "disabled" && (
+                    <span className="card-text">{card.text}</span>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+{
+  /* <div className="board-section">
           <h2>שאלות</h2>
           <div className="questions-board">
             {cards.map((card, i) => (
@@ -143,51 +306,5 @@ export default function memoryGame({ questions, sessionId, topic }) {
               </div>
             ))}
           </div>
-        </div> */}
-      </div>
-      <div className="questions-board">
-        {questionCards.map((card, i) => (
-          <div
-            key={card.cardPosition}
-            className="card"
-            onClick={() => handleQuestionFlip(i)}
-          >
-            <div
-              className={`card-inner ${
-                flippedQuestionCards[i] ? "flipped" : ""
-              }`}
-            >
-              <div className="card-front">
-                <img src={logo} alt="EZDrive Logo" className="logo_img" />
-              </div>
-              <div className="card-back">
-                <span className="card-text">{card.text}</span>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="answer-board">
-        {answerCards.map((card, i) => (
-          <div
-            key={card.cardPosition}
-            className="card"
-            onClick={() => handleAnswerFlip(i)}
-          >
-            <div
-              className={`card-inner ${flippedAnswerCards[i] ? "flipped" : ""}`}
-            >
-              <div className="card-front">
-                <img src={logo} alt="EZDrive Logo" className="logo_img" />
-              </div>
-              <div className="card-back">
-                <span className="card-text">{card.text}</span>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+        </div> */
 }

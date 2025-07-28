@@ -10,5 +10,5 @@ import lombok.Setter;
 public class MemoryQuestionDto {
     private String text;
     private boolean question;
-    private int cardPosition;
+    private int cardId;
 }
