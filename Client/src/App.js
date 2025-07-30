@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
 import { useUserContext } from "./context/UserContext";
-import { getCurrentUser } from "./services/userService"; // פונקציה שמביאה את היוזר מהסשן
+import { getCurrentUser } from "./services/userService"; 
 
 import SignUpPage from "./pages/SignUpPage";
 import SignInPage from "./pages/SignInPage";
@@ -12,6 +12,7 @@ import ProfilePage from "./pages/ProfilePage";
 import ChatPage from "./pages/ChatPage";
 import GamesPage from "./components/Games";
 import TriviaGame from "./components/TriviaGame";
+import EndOfTriviaPage from "./pages/EndOfTriviaPage";
 import MemoryGame from "./components/MemoryGame";
 import MainLayout from "./layout/MainLayout";
 
@@ -46,6 +47,7 @@ function App() {
           <Route path="ChatPage" element={<ChatPage />} />
           <Route path="Games" element={<GamesPage />} />
           <Route path="TriviaGame" element={<TriviaGame />} />
+          <Route path="EndOfTriviaPage" element={<EndOfTriviaPage />} />
           <Route path="MemoryGame" element={<MemoryGame />} />
         </Route>
       </Routes>

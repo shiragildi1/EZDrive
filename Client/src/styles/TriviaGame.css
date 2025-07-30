@@ -141,10 +141,11 @@
 }
 
 .trivia-option.wrong {
-  background: linear-gradient(90deg, #ff2d2d 0%, #ff9800 100%);
+  background: linear-gradient(90deg, #ff2d2d 0%, #d90000 100%);
   color: #fff;
-  box-shadow: 0 0 18px 0 #ff2d2d99;
+  box-shadow: 0 0 18px 0 #d9000099;
 }
+
 
 .trivia-title {
   font-family: "Varela Round", sans-serif;

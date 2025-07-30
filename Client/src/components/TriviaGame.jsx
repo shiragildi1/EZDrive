@@ -1,23 +1,38 @@
 import React, { useState, useEffect } from "react";
 import { submitAnswer, getGameResult } from "../services/GameTriviaService";
 import "../styles/TriviaGame.css";
+import EndOfTriviaPage from "../pages/EndOfTriviaPage";
 
 export default function TriviaGame({ questions, sessionId, topic }) {
-  const [current, setCurrent] = useState(0);
-  const [selected, setSelected] = useState(null);
-  const [showResult, setShowResult] = useState(false);
-  const [timer, setTimer] = useState(30);
-  const [gameOver, setGameOver] = useState(false);
-  const [scoreResult, setScoreResult] = useState(null);
+  // State variables to manage the game state
 
+  // Current question index
+  const [current, setCurrent] = useState(0);
+  // State to track the selected answer and whether to show the result
+  const [selected, setSelected] = useState(null);
+  // State to control the visibility of the result
+  const [showResult, setShowResult] = useState(false);
+  // Timer for the trivia game
+  const [timer, setTimer] = useState(50);
+  // State to track if the game is over and to store the score result
+  const [gameOver, setGameOver] = useState(false);
+  // State to store the score result
+  const [scoreResult, setScoreResult] = useState(null);
+  //question object for the current question
   const question = questions[current];
 
-  console.log("Current question:", question);
+  const [correctAnswerIndex, setCorrectAnswerIndex] = useState(null);
 
+  const [isCorrect, setIsCorrect] = useState(null);
+
+  // Log the current question for debugging
+  // console.log("Current question:", question);
+
+  // If there are no questions or options, show a loading message
   if (!question || !Array.isArray(question.options)) {
     return <div>טוען שאלות- קצת סבלנות ומתחילים</div>;
   }
-
+  // Effect to handle the timer countdown
   useEffect(() => {
     if (gameOver) return;
 
@@ -36,46 +51,51 @@ export default function TriviaGame({ questions, sessionId, topic }) {
     return () => clearInterval(intervalId);
   }, [current, gameOver]);
 
-  async function handleAnswer(optionText) {
-    setSelected(optionText);
+  // Function to handle the answer selection
+  async function handleAnswer(selectedAnswerIndex) {
+    setSelected(selectedAnswerIndex); // זה האינדקס של התשובה שנבחרה (0-based)
     setShowResult(true);
 
-    const selectedAnswerIndex = question.options.indexOf(optionText) + 1;
-
-    await submitAnswer({
+    const result = await submitAnswer({
       sessionId,
       questionId: question.questionId,
-      selectedAnswer: optionText ? selectedAnswerIndex : null,
+      selectedAnswer:
+        selectedAnswerIndex != null ? selectedAnswerIndex + 1 : null, // המרה ל־1-based לשרת
     });
+
+    setCorrectAnswerIndex(result.correctAnswerIndex - 1); // נניח שהתשובה מהשרת היא 1-based
+    setIsCorrect(result.isCorrect);
 
     setTimeout(async () => {
       setShowResult(false);
       setSelected(null);
+      setCorrectAnswerIndex(null);
+      setIsCorrect(null);
 
       if (current < questions.length - 1) {
         setCurrent((prev) => prev + 1);
-        setTimer(30);
+        setTimer(50);
       } else {
-        const result = await getGameResult(sessionId);
-        setScoreResult(result);
+        const finalResult = await getGameResult(sessionId);
+        setScoreResult(finalResult);
         setGameOver(true);
       }
     }, 2000);
   }
 
+  // If the game is over and we have a score result, show the end page
   if (gameOver && scoreResult) {
     return (
-      <div className="trivia-background">
-        <div className="trivia-header-row">
-          <div className="trivia-header-content">
-            <div className="trivia-title">סיימת את המשחק!</div>
-            <div className="trivia-subtitle">התוצאה שלך: {scoreResult.score} נקודות</div>
-          </div>
-        </div>
-      </div>
+      <EndOfTriviaPage
+        score={scoreResult.score}
+        numberOfQuestions={scoreResult.numberOfCorrectAnswers}
+        testLength={scoreResult.totalTimeSession}
+        sessionId={sessionId}
+      />
     );
   }
 
+  // Render the trivia game interface
   return (
     <div className="trivia-background">
       <div className="trivia-header-row">
@@ -97,18 +117,26 @@ export default function TriviaGame({ questions, sessionId, topic }) {
       <div className="trivia-options">
         {question.options.map((opt, idx) => {
           let className = "trivia-option";
-          const correctText = question.options[question.correctAnswer - 1];
 
           if (showResult) {
-            if (opt === correctText) className += " correct";
-            else if (opt === selected) className += " wrong";
+            if (idx === correctAnswerIndex) {
+              className += " correct";
+            }
+
+            if (
+              selected !== null &&
+              idx === selected &&
+              idx !== correctAnswerIndex
+            ) {
+              className += " wrong";
+            }
           }
 
           return (
             <button
               key={idx}
               className={className}
-              onClick={() => !showResult && handleAnswer(opt)}
+              onClick={() => !showResult && handleAnswer(idx)}
               disabled={showResult}
             >
               {opt}

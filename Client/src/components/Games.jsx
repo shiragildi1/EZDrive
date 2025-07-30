@@ -36,7 +36,7 @@ export default function GamesPage() {
     const userEmail = "m.giladi1@gmail.com";
     const category = topicsMap[topic];
 
-    startTriviaSession(userEmail, category)
+    startTriviaSession({ userEmail, category })
       .then((data) => {
         console.log("response from startTriviaSession:", data);
 

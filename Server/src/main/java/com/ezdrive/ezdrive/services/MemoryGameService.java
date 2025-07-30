@@ -31,7 +31,7 @@ public class MemoryGameService {
     // שלב 1: יצירת 10 שאלות רנדומליות ושיוך לסשן
     public List<Question> generateQuestionsForMemorySession(Long sessionId, String category) {
         List<Question> questions = questionRepository.findRandom10ByCategoryForMemory(category);
-
+        String correctAnswer;
         GameSession session = gameSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new RuntimeException("Session not found"));
 

@@ -44,7 +44,7 @@ public class GameSession {
     @Column(name = "score")
     private Integer score;
 
-    // תאריך/שעה של תחילת המשחק או סיומו
+    
     @Column(name = "played_at")
     private LocalDateTime playedAt;
 }
