@@ -15,11 +15,11 @@ function shuffleArray(array) {
 }
 
 export default function memoryGame({ questions, sessionId, topic }) {
-  const [current, setCurrent] = useState(0);
-  const [selected, setSelected] = useState(null);
+  const [playerA, setPlayerA] = useState("pessyisraeli@gmail.com");
+  const [playerB, setPlayerB] = useState("pessyisraeli@gmail.com");
+  const [currentPlayer, setCurrentPlayer] = useState("pessy@example.com");
   const [showResult, setShowResult] = useState(false);
   const [gameOver, setGameOver] = useState(false);
-  const [timer, setTimer] = useState(30);
   const [scoreResult, setScoreResult] = useState({ a: 0, b: 0 });
   const { setUser } = useUserContext();
   useEffect(() => {
@@ -183,128 +183,89 @@ export default function memoryGame({ questions, sessionId, topic }) {
   }, [questionFlipped, answerFlipped]);
 
   return (
-    <div className="memory_game">
-      {showResult && <div className="score-popup">+1</div>}
-      <div className="header">
-        <div className="player_A"></div>
+    <div className="board-wrapper">
+      <div className="player_A">Player A</div>
+      <div className="memory_game">
+        {showResult && <div className="score-popup">+1</div>}
+        {/* <div className="header">
         <div className="score"> </div>
-        <div className="player_B"></div>
-      </div>
+       </div> */}
 
-      <div className="board">
-        <div className="questions-board">
-          {questionCards.map((card, i) => (
-            <div
-              key={card.cardId}
-              className={`card ${
-                justMatched.includes(card.cardId)
-                  ? "correct"
-                  : cardStatus[card.cardId] === "incorrect"
-                  ? "incorrect"
-                  : cardStatus[card.cardId] === "disabled"
-                  ? "disabled"
-                  : ""
-              }`}
-              onClick={() => handleQuestionFlip(i)}
-            >
+        <div className="board">
+          <div className="questions-board">
+            {questionCards.map((card, i) => (
               <div
-                className={`card-inner ${
-                  flippedQuestionCards[i] ? "flipped" : ""
+                key={card.cardId}
+                className={`card ${
+                  justMatched.includes(card.cardId)
+                    ? "correct"
+                    : cardStatus[card.cardId] === "incorrect"
+                    ? "incorrect"
+                    : cardStatus[card.cardId] === "disabled"
+                    ? "disabled"
+                    : ""
                 }`}
+                onClick={() => handleQuestionFlip(i)}
               >
-                <div className="card-front">
-                  <img src={logo} alt="EZDrive Logo" className="logo_img" />
-                </div>
-                <div className="card-back">
-                  {cardStatus[card.cardId] === "disabled" && (
+                <div
+                  className={`card-inner ${
+                    flippedQuestionCards[i] ? "flipped" : ""
+                  }`}
+                >
+                  <div className="card-front">
                     <img src={logo} alt="EZDrive Logo" className="logo_img" />
-                  )}
-                  {cardStatus[card.cardId] != "disabled" && (
-                    <span className="card-text">{card.text}</span>
-                  )}
+                  </div>
+                  <div className="card-back">
+                    {cardStatus[card.cardId] === "disabled" && (
+                      <img src={logo} alt="EZDrive Logo" className="logo_img" />
+                    )}
+                    {cardStatus[card.cardId] != "disabled" && (
+                      <span className="card-text">{card.text}</span>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
 
-        <div className="answer-board">
-          {answerCards.map((card, i) => (
-            <div
-              key={card.cardId}
-              className={`card ${
-                justMatched.includes(card.cardId)
-                  ? "correct"
-                  : cardStatus[card.cardId] === "incorrect"
-                  ? "incorrect"
-                  : cardStatus[card.cardId] === "disabled"
-                  ? "disabled"
-                  : ""
-              }`}
-              onClick={() => handleAnswerFlip(i)}
-            >
+          <div className="answer-board">
+            {answerCards.map((card, i) => (
               <div
-                className={`card-inner ${
-                  flippedAnswerCards[i] ? "flipped" : ""
+                key={card.cardId}
+                className={`card ${
+                  justMatched.includes(card.cardId)
+                    ? "correct"
+                    : cardStatus[card.cardId] === "incorrect"
+                    ? "incorrect"
+                    : cardStatus[card.cardId] === "disabled"
+                    ? "disabled"
+                    : ""
                 }`}
+                onClick={() => handleAnswerFlip(i)}
               >
-                <div className="card-front">
-                  <img src={logo} alt="EZDrive Logo" className="logo_img" />
-                </div>
-                <div className="card-back">
-                  {cardStatus[card.cardId] === "disabled" && (
+                <div
+                  className={`card-inner ${
+                    flippedAnswerCards[i] ? "flipped" : ""
+                  }`}
+                >
+                  <div className="card-front">
                     <img src={logo} alt="EZDrive Logo" className="logo_img" />
-                  )}
-                  {cardStatus[card.cardId] != "disabled" && (
-                    <span className="card-text">{card.text}</span>
-                  )}
+                  </div>
+                  <div className="card-back">
+                    {cardStatus[card.cardId] === "disabled" && (
+                      <img src={logo} alt="EZDrive Logo" className="logo_img" />
+                    )}
+                    {cardStatus[card.cardId] != "disabled" && (
+                      <span className="card-text">{card.text}</span>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
+      <div className="player_B">Player B</div>
     </div>
   );
-}
-{
-  /* <div className="board-section">
-          <h2>שאלות</h2>
-          <div className="questions-board">
-            {cards.map((card, i) => (
-              <div key={i} className="card" onClick={() => handleFlip(i)}>
-                <div
-                  className={`card-inner ${flippedCards[i] ? "flipped" : ""}`}
-                >
-                  <div className="card-front">
-                    <img src={logo} alt="EZDrive Logo" className="logo_img" />
-                  </div>
-                  <div className="card-back">
-                    <span>{card.text}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="board-section">
-          <h2>תשובות</h2>
-          <div className="answer-board">
-            {cards.map((card, i) => (
-              <div key={i} className="card" onClick={() => handleFlip(i)}>
-                <div
-                  className={`card-inner ${flippedCards[i] ? "flipped" : ""}`}
-                >
-                  <div className="card-front">
-                    <img src={logo} alt="EZDrive Logo" className="logo_img" />
-                  </div>
-                  <div className="card-back">
-                    <span>{card.text}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div> */
 }

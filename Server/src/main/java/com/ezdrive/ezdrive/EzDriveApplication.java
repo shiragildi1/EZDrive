@@ -2,7 +2,9 @@ package com.ezdrive.ezdrive;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 
+import org.springframework.context.ApplicationContext;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -11,17 +13,24 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.ezdrive.ezdrive.rmi.RMIGameService;
 import com.ezdrive.ezdrive.rmi.RMIGameServiceImpl;
+import com.ezdrive.ezdrive.services.MemoryGameService;
 
 @SpringBootApplication
 public class EzDriveApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(EzDriveApplication.class, args);
-       try {
-            RMIGameService stub = new RMIGameServiceImpl();
-            LocateRegistry.createRegistry(1099).rebind("GameService", stub);
+        try 
+        {
+            RMIGameService service = new RMIGameServiceImpl();
+            Registry registry = LocateRegistry.createRegistry(1099);
+            // registry.bind("RMIGameService", service); //return Exceptioon if user already exist.
+            registry.rebind("RMIGameService", service);
             System.out.println("GameService is live");
-        } catch (RemoteException e) {
+            System.out.println("RMI service is running...");
+        } 
+        catch (Exception e) 
+        {
             e.printStackTrace();
         }
 	}
@@ -39,6 +48,12 @@ public WebMvcConfigurer corsConfigurer() {
         }
     };
 }
-
-
+@Bean(name = "rmiGameService")
+public RMIGameServiceImpl rmiGameService(ApplicationContext context) throws RemoteException {
+    return new RMIGameServiceImpl(context);
 }
+
+};
+
+
+

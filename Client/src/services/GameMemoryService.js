@@ -1,9 +1,9 @@
 import axios from "axios";
 
-export function startMemorySession(userEmail, category) {
-  console.log("email", userEmail, category);
+export function startMemorySession(userEmail, userEmail2, category) {
+  console.log("email", userEmail, userEmail2, category);
   return fetch(
-    `http://localhost:8080/game-sessions/startMemory?userEmail=${userEmail}&gameType=memory&category=${category}`,
+    `http://localhost:8080/game-sessions/startMemory?userEmail=${userEmail}&userEmail2=${userEmail2}&gameType=memory&category=${category}`,
     { method: "POST" }
   ).then((res) => res.json());
 }

@@ -1,5 +1,6 @@
 package com.ezdrive.ezdrive.api.controllers;
 
+import java.rmi.RemoteException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,8 +24,8 @@ import com.ezdrive.ezdrive.persistence.Entities.GameSession;
 import com.ezdrive.ezdrive.persistence.Entities.Question;
 import com.ezdrive.ezdrive.persistence.Repositories.MemoryGameRepository;
 import com.ezdrive.ezdrive.persistence.Repositories.QuestionRepository;
+import com.ezdrive.ezdrive.rmi.RMIGameServiceImpl;
 import com.ezdrive.ezdrive.services.GameSessionService;
-import com.ezdrive.ezdrive.services.MemoryGameService;
 import com.ezdrive.ezdrive.services.TriviaGameService;
 
 
@@ -40,7 +41,8 @@ public class GameSessionController {
     private TriviaGameService triviaGameService;
 
     @Autowired
-    private MemoryGameService memoryGameService;
+    private RMIGameServiceImpl memoryGameService;
+   // private MemoryGameService memoryGameService;
 
     @Autowired
     private MemoryGameRepository memoryGameRepository;
@@ -86,19 +88,25 @@ public class GameSessionController {
     public GameResultResponseDto getGameResult(@RequestParam Long sessionId) {
         return triviaGameService.getGameResult(sessionId);
     }
-
-
-
+    //----------------------------------------memory---------------------------------
 
     @PostMapping("/startMemory")
     public MemoryGameSessionStartResponseDto startMemorySession(
         @RequestParam String userEmail,
+        @RequestParam String userEmail2,
         @RequestParam String gameType,
         @RequestParam String category) {
 
-        GameSession session = gameSessionService.createGameSession(userEmail, gameType, category);
+        GameSession session = gameSessionService.createMemoryGameSession(userEmail, userEmail2, gameType, category);
 
-        List<Question> pairs = memoryGameService.generateQuestionsForMemorySession(session.getId(), category);
+        List<Question> pairs =null ;
+        try{
+            pairs = memoryGameService.generateQuestionsForMemorySession(session.getId(), category);
+        }
+        catch(RemoteException e)
+        {
+            System.out.println("Error");
+        }
            
         //question list
         List<MemoryQuestionDto> memoryQuestionDtos = pairs.stream()
@@ -125,12 +133,18 @@ public class GameSessionController {
     //Memory game
     @PostMapping("/check-answer")
     public ResponseEntity<Boolean> checkAnswer(@RequestBody CheckAnswerRequestDto request) {
-        boolean isCorrect = memoryGameService.checkAnswer(
+        boolean isCorrect = false;
+        try{ isCorrect = memoryGameService.checkAnswer(
             request.getSessionId(),
             request.getUserEmail(),
             request.getSelectedQuestionCard(),
             request.getSelectedAnswerCard()
-        );
+        );}
+        catch(RemoteException e)
+        {
+            System.out.println("Error");
+        }
+        
         return ResponseEntity.ok(isCorrect);
     }
 

@@ -112,9 +112,10 @@ export default function GamesPage() {
   const handleStartMemory = () => {
     setLoadingMemory(true); //start to load questions
     const userEmail = "pessyisraeli@gmail.com";
+    const userEmail2 = "pessyisraeli@gmail.com";
     const category = topicsMap[topic];
 
-    startMemorySession(userEmail, category)
+    startMemorySession(userEmail, userEmail2, category)
       .then((data) => {
         console.log("response from startMemorySession:", data);
         const formattedQuestions = data.questions.map((question) => {
