@@ -31,41 +31,22 @@ public class AuthController
     @Autowired
     private AuthService authService;
 
-    // @PostMapping("/google")
-    // public ResponseEntity<?> googleLogin(@RequestBody GoogleTokenRequestDto request) {
-    //     try 
-    //     {
-    //         boolean isValid = authService.registerGoogleUser(request.getToken());
-    //         return ResponseEntity.ok(Collections.singletonMap("valid", isValid));
-    //     } 
-    //     catch (Exception e) 
-    //     {
-    //         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-    //             .body(Collections.singletonMap("error", e.getMessage()));
-    //     }
-    // }
 
-    @PostMapping("/google")
-    public ResponseEntity<?> googleLogin(@RequestBody GoogleTokenRequestDto request, HttpServletRequest req) {
-        HttpSession session = req.getSession(false);
-        if (session != null) {
-            session.invalidate();
-        }
-        session = req.getSession(true);
-        
-        try 
-        {
-            User user = authService.registerGoogleUser(request.getToken());
-            session.setAttribute("user", user);//keep user in session 
-
-            return ResponseEntity.ok(Collections.singletonMap("valid", true));
-        } 
-        catch (Exception e)
-        {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(Collections.singletonMap("error", e.getMessage()));
-        }
+@PostMapping("/google")
+public ResponseEntity<?> googleLogin(@RequestBody GoogleTokenRequestDto request, HttpServletRequest req) {
+    HttpSession session = req.getSession(); // יוצר סשן חדש אם אין
+    try {
+        User user = authService.registerGoogleUser(request.getToken());
+        session.setAttribute("user", user); // שומר את המשתמש בסשן
+        return ResponseEntity.ok(user); // מחזיר את המשתמש
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                             .body(Collections.singletonMap("error", e.getMessage()));
     }
+}
+
+
+
 
 
 

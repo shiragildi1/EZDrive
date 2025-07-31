@@ -25,6 +25,7 @@ public class AuthService
 
     private GoogleIdToken.Payload verifyToken(String idTokenString) throws Exception
     {
+        System.out.println("clientId from @Value: " + clientId);
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory())
                 .setAudience(Collections.singletonList(clientId))
                 .build();

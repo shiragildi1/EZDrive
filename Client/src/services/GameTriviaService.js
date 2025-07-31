@@ -24,8 +24,15 @@ export function getGameResult(sessionId) {
   ).then((res) => res.json());
 }
 
+// export function getGameSummary(sessionId) {
+//   return fetch(
+//     `http://localhost:8080/game-sessions/summary/${sessionId}`
+//   ).then((res) => res.json());
+// }
+
 export function getGameSummary(sessionId) {
   return fetch(
-    `http://localhost:8080/game-sessions/summary/${sessionId}`
+    `http://localhost:8080/game-sessions/summary?sessionId=${sessionId}`
   ).then((res) => res.json());
 }
+

@@ -12,5 +12,6 @@ export function sendCodeForOtp(code, email) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, code }),
+    credentials: "include",
   }).then((res) => res.json())
 }
