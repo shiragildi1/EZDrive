@@ -13,8 +13,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .cors(Customizer.withDefaults()) // משתמש בקונפיגורציית CORS שלך (CorsConfig)
-            .csrf(csrf -> csrf.disable())    // ❗ ביטול CSRF לגמרי (לתקופת הפיתוח)
+            .cors(Customizer.withDefaults()) 
+            .csrf(csrf -> csrf.disable())    
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/api/auth/**",
