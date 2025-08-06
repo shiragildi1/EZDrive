@@ -1,5 +1,6 @@
 package com.ezdrive.ezdrive.api.controllers;
 
+import java.rmi.RemoteException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,17 +19,21 @@ import com.ezdrive.ezdrive.api.dto.GameResultResponseDto;
 import com.ezdrive.ezdrive.api.dto.GameSessionStartRequestDto;
 import com.ezdrive.ezdrive.api.dto.GameSessionStartResponseDto;
 import com.ezdrive.ezdrive.api.dto.MemoryGameSessionStartResponseDto;
+import com.ezdrive.ezdrive.api.dto.MemoryGameStartRequestDto;
 import com.ezdrive.ezdrive.api.dto.MemoryQuestionDto;
 import com.ezdrive.ezdrive.api.dto.QuestionFeedbackDto;
 import com.ezdrive.ezdrive.api.dto.QuestionTriviaDto;
 import com.ezdrive.ezdrive.api.dto.SubmitAnswerRequestDto;
 import com.ezdrive.ezdrive.persistence.Entities.GameSession;
 import com.ezdrive.ezdrive.persistence.Entities.Question;
+import com.ezdrive.ezdrive.persistence.Entities.User;
 import com.ezdrive.ezdrive.persistence.Repositories.MemoryGameRepository;
 import com.ezdrive.ezdrive.persistence.Repositories.QuestionRepository;
+import com.ezdrive.ezdrive.rmi.RMIGameServiceImpl;
 import com.ezdrive.ezdrive.services.GameSessionService;
-import com.ezdrive.ezdrive.services.MemoryGameService;
 import com.ezdrive.ezdrive.services.TriviaGameService;
+
+import jakarta.servlet.http.HttpSession;
 
 
 
@@ -43,27 +48,31 @@ public class GameSessionController {
     private TriviaGameService triviaGameService;
 
     @Autowired
-    private MemoryGameService memoryGameService;
+    private RMIGameServiceImpl memoryGameService;
 
     @Autowired
     private MemoryGameRepository memoryGameRepository;
     
     @Autowired
     private QuestionRepository questionRepository;
-
+    //--------------------------------------game session---------------------------------------------------
 //--------------------------------------trivia--------------------------------------------------------
     @PostMapping("/start")
-    public GameSessionStartResponseDto startSession(@RequestBody GameSessionStartRequestDto request) {
-        String userEmail = request.getUserEmail();
-    String gameType = request.getGameType();
-    String category = request.getCategory();
+    public GameSessionStartResponseDto startSession(@RequestBody GameSessionStartRequestDto request, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            throw new RuntimeException("User not found in session");
+        }
+        String userEmail =  user.getEmail();
+        String gameType = request.getGameType();
+        String category = request.getCategory();
 
-        GameSession session = gameSessionService.createGameSession(userEmail, gameType, category);
+        GameSession gameSession = gameSessionService.createGameSession(userEmail, gameType, category);
 
-        List<Question> questions = triviaGameService.generateQuestionsForSession(session.getId(), category);
+        List<Question> questions = triviaGameService.generateQuestionsForSession(gameSession.getId(), category);
 
         List<QuestionTriviaDto> questionDtos = questions.stream()
-            .map(q -> new QuestionTriviaDto(
+        .map(q -> new QuestionTriviaDto(
                 q.getQuestionId(),
                 q.getQuestionText(),
                 q.getCategory(),
@@ -72,8 +81,7 @@ public class GameSessionController {
                 q.getAnswer3(),
                 q.getAnswer4()))
             .collect(Collectors.toList());
-
-        return new GameSessionStartResponseDto(session, questionDtos);
+        return new GameSessionStartResponseDto(gameSession, questionDtos);
     }
 
     @PostMapping("/submit-answer")
@@ -88,13 +96,11 @@ public class GameSessionController {
 
     @GetMapping("/result")
     public GameResultResponseDto getGameResult(@RequestParam Long sessionId) {
-         System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         return triviaGameService.getGameResult(sessionId);    
     }
 
    @GetMapping("/summary")
     public ResponseEntity<List<QuestionFeedbackDto>> getFeedback(@RequestParam Long sessionId) {
-        System.out.println("-----------------------------");
         List<QuestionFeedbackDto> summary = triviaGameService.getSessionFeedback(sessionId);
         
         return ResponseEntity.ok(summary);
@@ -104,44 +110,68 @@ public class GameSessionController {
 
     @PostMapping("/startMemory")
     public MemoryGameSessionStartResponseDto startMemorySession(
-        @RequestParam String userEmail,
-        @RequestParam String gameType,
-        @RequestParam String category) {
+        @RequestBody MemoryGameStartRequestDto request,
+        HttpSession session) {
 
-        GameSession session = gameSessionService.createGameSession(userEmail, gameType, category);
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            throw new RuntimeException("User not logged in");
+        }
 
-        List<Question> pairs = memoryGameService.generateQuestionsForMemorySession(session.getId(), category);
-           
-       
+        String userEmail = user.getEmail();
+        String userEmail2 = user.getEmail();
+
+        GameSession gameSession = gameSessionService.createMemoryGameSession(userEmail, userEmail2, request.getGameType(), request.getCategory());
+
+        List<Question> pairs = null;
+        try {
+            pairs = memoryGameService.generateQuestionsForMemorySession(gameSession.getId(), request.getCategory());
+        } catch(RemoteException e) {
+            System.out.println("Error");
+        }
+
+        //question list
         List<MemoryQuestionDto> memoryQuestionDtos = pairs.stream()
             .map(p -> new MemoryQuestionDto(
                 p.getQuestionText(),
                 true,
-                memoryGameRepository.findQuestionCardPositionByGameSesstionAndQuestion(session.getId(),p.getQuestionId())))
+                memoryGameRepository.findQuestionCardPositionByGameSesstionAndQuestion(gameSession.getId(),p.getQuestionId())))
             .collect(Collectors.toList());
 
-        //answer list   
+        //answer list
         List<MemoryQuestionDto> memoryAnswerDtos = pairs.stream()
             .map(p -> new MemoryQuestionDto(
                 questionRepository.findCorrectAnswerByQuestion(p.getQuestionId()),
                 false,
-                memoryGameRepository.findAnswerCardPositionByGameSesstionAndQuestion(session.getId(),p.getQuestionId())))
+                memoryGameRepository.findAnswerCardPositionByGameSesstionAndQuestion(gameSession.getId(),p.getQuestionId())))
             .collect(Collectors.toList());
 
-            //combine lists
-            memoryQuestionDtos.addAll(memoryAnswerDtos);
+        //combine lists
+        memoryQuestionDtos.addAll(memoryAnswerDtos);
 
-        return new MemoryGameSessionStartResponseDto(session, memoryQuestionDtos);
+        return new MemoryGameSessionStartResponseDto(gameSession, memoryQuestionDtos);
     }
 
     //Memory game
     @PostMapping("/check-answer")
-    public ResponseEntity<Void> checkAnswer(@RequestBody CheckAnswerRequestDto request) {
-        memoryGameService.checkAnswer(
-            request.getSessionId(),
-            request.getQuestionId(),
-            request.getSelectedCard1(),
-            request.getSelectedCard2());
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Boolean> checkAnswer(@RequestBody CheckAnswerRequestDto request, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return ResponseEntity.status(401).build();
+        }
+
+        boolean isCorrect = false;
+        try {
+            isCorrect = memoryGameService.checkAnswer(
+                request.getSessionId(),
+                user.getEmail(), // ⬅️ מהסשן
+                request.getSelectedQuestionCard(),
+                request.getSelectedAnswerCard()
+            );
+        } catch (RemoteException e) {
+            System.out.println("Error");
+        }
+
+        return ResponseEntity.ok(isCorrect);
     }
 }

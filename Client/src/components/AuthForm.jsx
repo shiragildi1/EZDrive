@@ -12,7 +12,6 @@ export default function AuthForm({ title, buttonText, bottomText, link }) {
   const navigate = useNavigate();
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Email: ", email);
     sendEmailForOtp(email);
     navigate("/OtpPage", { state: { userEmail: email } });
   };
@@ -50,6 +49,7 @@ export default function AuthForm({ title, buttonText, bottomText, link }) {
                 // אם יש צורך לוודא שה-session אכן נשמר
                 const me = await getCurrentUser();
                 setUser(me);
+                console.log("User loaded from session - AuthForm:", me);
 
                 navigate("/HomePage");
               })

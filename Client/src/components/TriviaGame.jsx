@@ -1,9 +1,26 @@
 import React, { useState, useEffect } from "react";
 import { submitAnswer, getGameResult } from "../services/GameTriviaService";
+import { getCurrentUser } from "../services/userService";
+import { useUserContext } from "../context/UserContext";
 import "../styles/TriviaGame.css";
 import EndOfTriviaPage from "../pages/EndOfTriviaPage";
 
 export default function TriviaGame({ questions, sessionId, topic }) {
+  const { setUser } = useUserContext();
+  useEffect(() => {
+    getCurrentUser()
+      .then((user) => {
+        setUser(user);
+        console.log("User loaded from session - TriviaGame:", user);
+      })
+      .catch(() => {
+        setUser(null);
+        console.log("No user found in session- TriviaGame.");
+      });
+  }, []);
+  const { user } = useUserContext();
+  // const userEmail = user?.email || "guest@example.com";
+  // console.log("Email: ", userEmail);
   // State variables to manage the game state
 
   // Current question index

@@ -17,7 +17,7 @@ export default function OtpPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Email: ", userEmail);
+    // console.log("Email: ", userEmail);
     sendEmailForOtp(userEmail);
     navigate("/OtpPage", { state: { userEmail: userEmail } });
   };
@@ -41,6 +41,7 @@ export default function OtpPage() {
           getCurrentUser().then((user) => {
             console.log("User after Email login:", user);
             setUser(user);
+            console.log("User loaded from session - OtpPage:", user);
             navigate("/HomePage");
           });
         } else {

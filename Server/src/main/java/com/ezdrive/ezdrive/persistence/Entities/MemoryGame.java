@@ -50,8 +50,8 @@ public class MemoryGame {
     private boolean isFlipped;
 
     //מי הפך את הזוג
-    // @Column(name = "player_answered")
-    // private User playerAnswered;
+    @Column(name = "player_answered")
+    private String playerAnsweredEmail;
 
     // מתי ענה על השאלה (או פג הזמן)
     @Column(name = "answered_at")

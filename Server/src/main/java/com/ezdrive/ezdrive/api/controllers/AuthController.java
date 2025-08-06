@@ -32,22 +32,21 @@ public class AuthController
     private AuthService authService;
 
 
-@PostMapping("/google")
-public ResponseEntity<?> googleLogin(@RequestBody GoogleTokenRequestDto request, HttpServletRequest req) {
-    HttpSession session = req.getSession(); // יוצר סשן חדש אם אין
-    try {
-        User user = authService.registerGoogleUser(request.getToken());
-        session.setAttribute("user", user); // שומר את המשתמש בסשן
-        return ResponseEntity.ok(user); // מחזיר את המשתמש
-    } catch (Exception e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                             .body(Collections.singletonMap("error", e.getMessage()));
+    @PostMapping("/google")
+    public ResponseEntity<?> googleLogin(@RequestBody GoogleTokenRequestDto request, HttpServletRequest req) {
+        HttpSession session = req.getSession(); // יוצר סשן חדש אם אין
+        try {
+            User user = authService.registerGoogleUser(request.getToken());
+            session.setAttribute("user", user); 
+            System.out.println("New session ID: " + session.getId());
+            System.out.println("User logged in: " + user.getEmail());
+            
+            return ResponseEntity.ok(user);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                .body(Collections.singletonMap("error", e.getMessage()));
+        }
     }
-}
-
-
-
-
 
 
     @PostMapping("/email")
@@ -73,5 +72,3 @@ public ResponseEntity<?> googleLogin(@RequestBody GoogleTokenRequestDto request,
         }
     }   
 }       
-
-

@@ -33,10 +33,9 @@ export default function GamesPage() {
 
   const handleStartTrivia = () => {
     setLoading(true); //start to load questions
-    const userEmail = "m.giladi1@gmail.com";
     const category = topicsMap[topic];
 
-    startTriviaSession({ userEmail, category })
+    startTriviaSession({ category })
       .then((data) => {
         console.log("response from startTriviaSession:", data);
 
@@ -111,16 +110,15 @@ export default function GamesPage() {
   //------------------------------------------------------------------------------
   const handleStartMemory = () => {
     setLoadingMemory(true); //start to load questions
-    const userEmail = "m.giladi1@gmail.com";
     const category = topicsMap[topic];
 
-    startMemorySession(userEmail, category)
+    startMemorySession(category)
       .then((data) => {
         console.log("response from startMemorySession:", data);
         const formattedQuestions = data.questions.map((question) => {
           return {
-            cardPosition: question.cardPosition,
-            question: question.question,
+            cardId: question.cardId,
+            isQuestion: question.question,
             text: question.text,
           };
         });

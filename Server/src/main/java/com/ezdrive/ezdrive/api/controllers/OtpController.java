@@ -52,15 +52,12 @@ public class OtpController
 
             if (isValid) {
                 HttpSession session = req.getSession(false);
-                System.out.println("OTP FALSE: " + session);
                 if (session != null) session.invalidate();
                 session = req.getSession(true);
-                System.out.println("OTP TRUE: " + session);
 
                 User user = userService.findByEmail(request.getEmail())
                                     .orElseThrow(() -> new RuntimeException("User not found"));
                 session.setAttribute("user", user);
-
                 System.out.println("New session ID: " + session.getId());
                 System.out.println("User logged in: " + user.getEmail());
 

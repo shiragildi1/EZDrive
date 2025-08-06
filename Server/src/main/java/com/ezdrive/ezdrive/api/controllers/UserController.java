@@ -17,8 +17,8 @@ public class UserController
     public ResponseEntity<?> getCurrentUser(HttpSession session) {
         User user = (User) session.getAttribute("user");
 
-        System.out.println("Session ID:" + session.getId());
-        System.out.println("Session User:" + user);
+        // System.out.println("Session ID:" + session.getId());
+        // System.out.println("Session User:" + user);
 
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)

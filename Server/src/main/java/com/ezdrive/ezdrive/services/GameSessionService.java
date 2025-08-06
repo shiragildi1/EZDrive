@@ -35,4 +35,28 @@ public class GameSessionService {
 
         return gameSession;
     }
+
+     public GameSession createMemoryGameSession(String userEmail, String userEmail2, String gameType, String category) {
+        User user = userRepository.findByEmail(userEmail)
+            .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + userEmail));
+
+  
+       User user2 = userRepository.findByEmail(userEmail2)
+            .orElseThrow(() -> new IllegalArgumentException("User2 not found with email: " + userEmail2));
+    
+        GameSession gameSession = new GameSession();
+        gameSession.setUser(user);
+       
+            gameSession.setUser2(user2);
+        
+        gameSession.setGameType(gameType);
+        gameSession.setCategory(category);
+        gameSession.setPlayedAt(LocalDateTime.now());
+        gameSession.setScore(0); // Initialize score to 0, can be updated later during the game
+
+        // Save the game session to the database
+        gameSessionRepository.save(gameSession);
+
+        return gameSession;
+    }
 }
