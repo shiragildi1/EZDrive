@@ -8,9 +8,11 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class MemoryGameResultResponseDto {
-    private int totalQuestions;
-    private int correctAnswersPlayer1;
-    private int correctAnswersPlayer2;
-    //private int score; // יכול להיות באחוזים או מספר נקי
+    private int totalQuestions;             
+    private int correctAnswersPlayer1;      
+    private int correctAnswersPlayer2;      
+    private String totalTime;               
+    private int score;                      
 }
+
 

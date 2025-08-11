@@ -12,7 +12,6 @@ export default function AuthForm({ title, buttonText, bottomText, link }) {
   const navigate = useNavigate();
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Email: ", email);
     sendEmailForOtp(email);
     navigate("/OtpPage", { state: { userEmail: email } });
   };
@@ -38,24 +37,24 @@ export default function AuthForm({ title, buttonText, bottomText, link }) {
         <GoogleLogin
           onSuccess={(credentialResponse) => {
             console.log("id_token:", credentialResponse.credential);
-            console.log("Client ID from env:", process.env.REACT_APP_GOOGLE_CLIENT_ID);
+            console.log(
+              "Client ID from env:",
+              process.env.REACT_APP_GOOGLE_CLIENT_ID
+            );
 
             sendGoogleToken(credentialResponse.credential)
-              .then((data) => {
-                if (data.valid) {
-                  console.log("Verification succeeded!");
+              .then(async (user) => {
+                console.log("Verification succeeded!", user);
 
-                  getCurrentUser().then((user) => {
-                    console.log("User after Google login:", user);
-                    setUser(user); 
-                    navigate("/HomePage");
-                  });
-                } else {
-                  console.log("The verify failed");
-                }
+                // אם יש צורך לוודא שה-session אכן נשמר
+                const me = await getCurrentUser();
+                setUser(me);
+                console.log("User loaded from session - AuthForm:", me);
+
+                navigate("/HomePage");
               })
-              .catch((err) => {
-                console.error("Error sending token to server:", err);
+              .catch((e) => {
+                console.error("Login with Google failed", e);
               });
           }}
           onError={() => {

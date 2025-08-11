@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { data, useSearchParams } from "react-router-dom";
 import { startTriviaSession } from "../services/GameTriviaService";
 import TriviaGame from "./TriviaGame";
-import { startMemorySession } from "../services/GameMemoryService";
+import { startMemorySession } from "../services/GameMemoryServiceRMI";
 import MemoryGame from "./MemoryGame";
 import GameExplanation from "./GameExplanation";
 import HeadToHeadExplanation from "../data/HeadToHeadExplanationData";
@@ -10,8 +10,14 @@ import simulationExplanation from "../data/SimulationExplanationData";
 import triviaExplanation from "../data/TriviaExplanationData";
 import "../styles/Games.css";
 import memoryExplanation from "../data/MemoryExplanationData";
+import {
+  joinMemoryGame,
+  getMemoryGameState,
+} from "../services/GameMemoryServiceRMI";
+import { useUserContext } from "../context/UserContext";
 
 export default function GamesPage() {
+  const { user } = useUserContext();
   const [searchParams] = useSearchParams();
   const topic = searchParams.get("topic");
 
@@ -23,6 +29,10 @@ export default function GamesPage() {
   const [loading, setLoading] = useState(false);
   const [loadingMemory, setLoadingMemory] = useState(false);
   const [selectedGame, setSelectedGame] = useState(null);
+  // memory game join flow
+  const [joinSessionId, setJoinSessionId] = useState("");
+  const [joining, setJoining] = useState(false);
+  const [waitingForOpponent, setWaitingForOpponent] = useState(false);
 
   const topicsMap = {
     traffic: "חוקי התנועה",
@@ -33,10 +43,9 @@ export default function GamesPage() {
 
   const handleStartTrivia = () => {
     setLoading(true); //start to load questions
-    const userEmail = "pessyisraeli@gmail.com";
     const category = topicsMap[topic];
 
-    startTriviaSession(userEmail, category)
+    startTriviaSession({ category })
       .then((data) => {
         console.log("response from startTriviaSession:", data);
 
@@ -55,7 +64,7 @@ export default function GamesPage() {
         });
 
         setQuestions(formattedQuestions); // שמור את השאלות בפורמט החדש
-        setSessionId(data.session.id); // שמור את מזהה הסשן
+        setSessionId(data.sessionId); // שמור את מזהה הסשן
         setShowTrivia(true);
         console.log("formattedQuestions:", formattedQuestions); // עבור למצב משחק
       })
@@ -72,7 +81,7 @@ export default function GamesPage() {
       case "trivia":
         return triviaExplanation;
       case "memory":
-        return memoryExplanation; ////change
+        return memoryExplanation;
       case "headToHead":
         return HeadToHeadExplanation;
       case "simulation":
@@ -109,34 +118,100 @@ export default function GamesPage() {
     );
   }
   //------------------------------------------------------------------------------
-  const handleStartMemory = () => {
-    setLoadingMemory(true); //start to load questions
-    const userEmail = "pessyisraeli@gmail.com";
-    const userEmail2 = "pessyisraeli@gmail.com";
+  // --- זיכרון מול שחקן אחר ---
+
+  // שחקן ראשון - יצירת משחק חדש
+  const handleStartMemory = async () => {
+    console.log("handle2221");
+    setLoadingMemory(true);
+    setWaitingForOpponent(true);
     const category = topicsMap[topic];
+    try {
+      // שולח בקשה ל-backend ליצור משחק חדש ומקבל מזהה סשן
+      // const sessionId = await startMemorySession(category);
+      // setSessionId(sessionId);
+      // מתחיל polling לבדוק אם המשחק מוכן (כלומר, אם שחקן שני הצטרף)
+      const data = await startMemorySession(category);
+      console.log("handle3: ", data);
+      if (data == null) {
+        throw new Error("No session returned form startMemory session");
+      }
+      setSessionId(data.sessionId);
+      const interval = setInterval(async () => {
+        try {
+          console.log("han23456dle1:", data.sessionId);
+          // מקבל את מצב המשחק והשאלות מה-backend
+          const ready = await getMemoryGameState(data.sessionId);
+          console.log("Polling response:", { ready });
+          if (ready) {
+            console.log("handle2");
+            clearInterval(interval);
+            // ממפה את השאלות לפורמט אחיד עבור הקומפוננטה
 
-    startMemorySession(userEmail, userEmail2, category)
-      .then((data) => {
-        console.log("response from startMemorySession:", data);
-        const formattedQuestions = data.questions.map((question) => {
-          return {
-            cardId: question.cardId,
-            isQuestion: question.question,
-            text: question.text,
-          };
-        });
+            // כל שאלה הופכת לאובייקט עם cardId, isQuestion, text
+            const formattedQuestions = data.questions.map((question) => ({
+              cardId: question.cardId,
+              isQuestion: question.question,
+              text: question.text,
+            }));
+            console.log("handle 4 Formatted questions:", formattedQuestions);
+            setQuestions(formattedQuestions); // שומר את השאלות המעובדות ב-state
+            setShowMemory(true); // עובר למצב משחק זיכרון
+            setSessionId(data.sessionId); // שומר את מזהה הסשן
+            setWaitingForOpponent(false); // מפסיק להציג את מסך ההמתנה
+          }
+        } catch (err) {
+          console.error("[Memory] שגיאה ב-polling:", err);
+        }
+      }, 2000);
+    } catch (err) {
+      console.error("[Memory] שגיאה ביצירת משחק:", err);
+      setWaitingForOpponent(false);
+    } finally {
+      setLoadingMemory(false);
+    }
+  };
 
-        setQuestions(formattedQuestions); // שמור בפורמט החדש
-        setSessionId(data.session.id); // שמור את מזהה הסשן
-        setShowMemory(true);
-      })
+  // שחקן שני - מצטרף למשחק קיים
+  const handleJoinMemory = async () => {
+    if (!joinSessionId) return;
+    setJoining(true);
+    setWaitingForOpponent(true);
+    try {
+      // שולח בקשה ל-backend להצטרף למשחק קיים
+      const data = await joinMemoryGame(joinSessionId);
+      console.log("handleJoinMemory response:", data);
+      setSessionId(joinSessionId);
+      // מתחיל polling לבדוק אם המשחק מוכן (כלומר, אם שני שחקנים מחוברים)
+      const interval = setInterval(async () => {
+        try {
+          // מקבל את מצב המשחק והשאלות מה-backend
+          const ready = await getMemoryGameState(joinSessionId);
+          console.log("Polling join response:", ready);
+          if (ready) {
+            clearInterval(interval);
+            // ממפה את השאלות לפורמט אחיד עבור הקומפוננטה
 
-      .catch((err) => {
-        console.error("שגיאה ב-startMemorySession:", err);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+            const formattedQuestions = data.questions.map((question) => ({
+              cardId: question.cardId,
+              isQuestion: question.question,
+              text: question.text,
+            }));
+            setQuestions(formattedQuestions); // שומר את השאלות המעובדות ב-state
+            setShowMemory(true); // עובר למצב משחק זיכרון
+
+            setWaitingForOpponent(false); // מפסיק להציג את מסך ההמתנה
+          }
+        } catch (err) {
+          console.error("[Memory] שגיאה ב-polling:", err);
+        }
+      }, 2000);
+    } catch (err) {
+      console.error("[Memory] שגיאה בהצטרפות למשחק:", err);
+      setWaitingForOpponent(false);
+    } finally {
+      setJoining(false);
+    }
   };
   if (showMemory) {
     return (
@@ -145,6 +220,22 @@ export default function GamesPage() {
         sessionId={sessionId}
         topic={topicsMap[topic]}
       />
+    );
+  }
+  // מחכה ליריב
+  if (waitingForOpponent) {
+    return (
+      <div className="waiting-modal">
+        <div className="waiting-for-opponent">מחפש לך יריב...</div>
+        {sessionId && (
+          <div className="waiting-session-id">
+            מזהה משחק שלך:{" "}
+            <span style={{ fontWeight: "bold" }}>{sessionId}</span>
+            <br />
+            שלח את המספר הזה לחבר כדי שיצטרף!
+          </div>
+        )}
+      </div>
     );
   }
   //-------------------------------------------------------------------------------
@@ -171,6 +262,24 @@ export default function GamesPage() {
         >
           <h3>זכרון</h3>
         </button>
+        {/* UI for joining memory game as second player */}
+        <div style={{ marginTop: 10 }}>
+          <input
+            type="text"
+            placeholder="הכנס מזהה משחק להצטרפות (sessionId)"
+            value={joinSessionId}
+            onChange={(e) => setJoinSessionId(e.target.value)}
+            style={{ direction: "ltr", width: 200 }}
+            disabled={joining}
+          />
+          <button
+            onClick={handleJoinMemory}
+            disabled={joining || !joinSessionId}
+            style={{ marginRight: 8 }}
+          >
+            הצטרף למשחק קיים
+          </button>
+        </div>
         <button
           className="square-game"
           onClick={() => {

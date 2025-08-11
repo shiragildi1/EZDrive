@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.ezdrive.ezdrive.persistence.Entities.GameSession;
@@ -26,4 +27,7 @@ public interface MemoryGameRepository extends JpaRepository<MemoryGame, Long> {
 
     @Query(value = "SELECT * FROM memory_game WHERE game_session_id = :gameSessionId and question_card = :questionCard", nativeQuery = true)
     Optional <MemoryGame> findByGameSessionAndQuestionCard(Long gameSessionId, int questionCard);
+
+    @Query("SELECT COUNT(t) FROM MemoryGame t WHERE t.gameSession.id = :sessionId AND t.isFlipped = true")
+    int countCorrectAnswers(@Param("sessionId") Long sessionId);
 }

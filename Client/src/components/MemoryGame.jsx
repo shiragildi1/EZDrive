@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { checkAnswer } from "../services/GameMemoryService";
-import { getCurrentUser } from "../services/userService"; // פונקציה שמביאה את היוזר מהסשן
+import { checkAnswer } from "../services/GameMemoryServiceRMI";
+import { getCurrentUser } from "../services/userService";
 import { useUserContext } from "../context/UserContext";
 import "../styles/MemoryGame.css";
 import logo from "../assets/logo1.png";
@@ -15,12 +15,12 @@ function shuffleArray(array) {
 }
 
 export default function memoryGame({ questions, sessionId, topic }) {
-  const [playerA, setPlayerA] = useState("pessyisraeli@gmail.com");
-  const [playerB, setPlayerB] = useState("pessyisraeli@gmail.com");
-  const [currentPlayer, setCurrentPlayer] = useState("pessy@example.com");
+  //const [playerA, setPlayerA] = useState("pessyisraeli@gmail.com");
+  //const [playerB, setPlayerB] = useState("pessyisraeli@gmail.com");
+  //const [currentPlayer, setCurrentPlayer] = useState("pessy@example.com");
   const [showResult, setShowResult] = useState(false);
-  const [gameOver, setGameOver] = useState(false);
-  const [scoreResult, setScoreResult] = useState({ a: 0, b: 0 });
+  //const [gameOver, setGameOver] = useState(false);
+  //const [scoreResult, setScoreResult] = useState({ a: 0, b: 0 });
   const { setUser } = useUserContext();
   useEffect(() => {
     getCurrentUser()
@@ -35,30 +35,39 @@ export default function memoryGame({ questions, sessionId, topic }) {
   }, []);
   const { user } = useUserContext();
   const userEmail = user?.email || "guest@example.com";
-  console.log("Email: ", userEmail);
 
-  const [justMatched, setJustMatched] = useState([]);
+  const [questionMatched, setQuestionMatched] = useState([]);
+  const [answerMatched, setAnswerMatched] = useState([]);
   const [found, setFound] = useState(Array(questions.length).fill(false));
   const [currentQuestion, setCurrentQuestion] = useState(-1);
   const [currentAnswer, setCurrentAnswer] = useState(-1);
-  const [cardStatus, setCardStatus] = useState(
-    Array(questions.length).fill(null)
-  );
+  const [questionStatus, setQuestionStatus] = useState({});
+  const [answerStatus, setAnswerStatus] = useState({});
   const [flippedQuestionCards, setFlippedQuestionCards] = useState(
     Array(questions.length / 2).fill(false)
   );
   const [flippedAnswerCards, setFlippedAnswerCards] = useState(
     Array(questions.length / 2).fill(false)
   );
-  console.log("Questions length:", questions.length);
-
   const [questionCards, setQuestionCards] = useState([]);
   const [answerCards, setAnswerCards] = useState([]);
 
   useEffect(() => {
-    setQuestionCards(shuffleArray(questions.slice(0, 12)));
-    setAnswerCards(shuffleArray(questions.slice(12, 24)));
-  }, []);
+    // Slice and sort the first 12
+    const sortedQuestions = questions
+      .slice(0, 12)
+      .sort((a, b) => a.cardId - b.cardId);
+
+    // Slice and sort the last 12
+    const sortedAnswers = questions
+      .slice(12, 24)
+      .sort((a, b) => a.cardId - b.cardId);
+
+    setQuestionCards(sortedQuestions);
+    setAnswerCards(sortedAnswers);
+  }, [questions]);
+  console.log("Question Cards:", questionCards);
+
   const [questionFlipped, setQuestionFlipped] = useState(false);
   const [answerFlipped, setAnswerFlipped] = useState(false);
 
@@ -70,9 +79,9 @@ export default function memoryGame({ questions, sessionId, topic }) {
     setFlippedQuestionCards((prev) =>
       prev.map((flipped, index) => (index === i ? true : flipped))
     );
+    //updateOpponentFlippedCards(sessionId,i);
     setQuestionFlipped(true);
-    console.log("qu:" + questionCards[i].cardId);
-    setCurrentQuestion(questionCards[i].cardId);
+    setCurrentQuestion(i);
   };
   const handleAnswerFlip = (i) => {
     const alreadyFlipped = flippedAnswerCards.some((flipped) => flipped); // Check if any card is already flipped
@@ -83,12 +92,13 @@ export default function memoryGame({ questions, sessionId, topic }) {
       prev.map((flipped, index) => (index === i ? true : flipped))
     );
     setAnswerFlipped(true);
-    setCurrentAnswer(answerCards[i].cardId);
+    setCurrentAnswer(i);
   };
 
   useEffect(() => {
     if (questionFlipped && answerFlipped) {
       console.log("Q: " + currentQuestion + " A: " + currentAnswer);
+      console.log("User loaded from session - MemoryGame:", user);
       checkAnswer({
         sessionId,
         userEmail,
@@ -96,72 +106,63 @@ export default function memoryGame({ questions, sessionId, topic }) {
         selectedAnswerCard: currentAnswer,
       }).then((isCorrect) => {
         setTimeout(() => {
-          setCardStatus((prev) =>
-            prev.map((status, i) =>
-              i === currentQuestion || i === currentAnswer
-                ? isCorrect
-                  ? "correct"
-                  : "incorrect"
-                : status
-            )
-          );
+          setQuestionStatus((prev) => ({
+            ...prev,
+            [currentQuestion]: isCorrect ? "correct" : "incorrect",
+          }));
+          setAnswerStatus((prev) => ({
+            ...prev,
+            [currentAnswer]: isCorrect ? "correct" : "incorrect",
+          }));
+
           if (!isCorrect) {
             // Flip cards back after showing incorrect
             setTimeout(() => {
-              setCardStatus((prev) =>
-                prev.map((status) =>
-                  status === "disabled" ? "disabled" : null
-                )
-              );
+              setQuestionStatus((prev) => ({
+                ...prev,
+                [currentQuestion]: null,
+              }));
+              setAnswerStatus((prev) => ({
+                ...prev,
+                [currentAnswer]: null,
+              }));
+
               setFlippedQuestionCards((prev) =>
-                prev.map((flip, i) =>
-                  i ===
-                  questionCards.findIndex((q) => q.cardId === currentQuestion)
-                    ? false
-                    : flip
-                )
+                prev.map((flip, i) => (i === currentQuestion ? false : flip))
               );
 
               setFlippedAnswerCards((prev) =>
-                prev.map((flip, i) =>
-                  i === answerCards.findIndex((a) => a.cardId === currentAnswer)
-                    ? false
-                    : flip
-                )
+                prev.map((flip, i) => (i === currentAnswer ? false : flip))
               );
             }, 3000); // flip back after 1 sec of red
           }
           if (isCorrect) {
-            setJustMatched([currentQuestion, currentAnswer]);
+            setQuestionMatched(questionCards[currentQuestion].cardId);
+            setAnswerMatched(answerCards[currentAnswer].cardId);
             setShowResult(true);
 
             setTimeout(() => {
               setShowResult(false);
-              setJustMatched([]);
-              setCardStatus((prev) =>
-                prev.map((status, i) =>
-                  i === currentQuestion || i === currentAnswer
-                    ? "disabled"
-                    : status
-                )
-              );
+              setQuestionMatched();
+              setAnswerMatched();
+
+              setQuestionStatus((prev) => ({
+                ...prev,
+                [currentQuestion]: "disabled",
+              }));
+              setAnswerStatus((prev) => ({
+                ...prev,
+                [currentAnswer]: "disabled",
+              }));
+
               setFlippedQuestionCards((prev) =>
-                prev.map((flip, i) =>
-                  i ===
-                  questionCards.findIndex((q) => q.cardId === currentQuestion)
-                    ? false
-                    : flip
-                )
+                prev.map((flip, i) => (i === currentQuestion ? false : flip))
               );
 
               setFlippedAnswerCards((prev) =>
-                prev.map((flip, i) =>
-                  i === answerCards.findIndex((a) => a.cardId === currentAnswer)
-                    ? false
-                    : flip
-                )
+                prev.map((flip, i) => (i === currentAnswer ? false : flip))
               );
-            }, 3000); // green flash for 1 second
+            }, 3000); // green flash for 3 seconds
 
             setFound((prev) => {
               const updated = [...prev];
@@ -197,11 +198,11 @@ export default function memoryGame({ questions, sessionId, topic }) {
               <div
                 key={card.cardId}
                 className={`card ${
-                  justMatched.includes(card.cardId)
+                  questionMatched === card.cardId
                     ? "correct"
-                    : cardStatus[card.cardId] === "incorrect"
+                    : questionStatus[card.cardId] === "incorrect"
                     ? "incorrect"
-                    : cardStatus[card.cardId] === "disabled"
+                    : questionStatus[card.cardId] === "disabled"
                     ? "disabled"
                     : ""
                 }`}
@@ -216,10 +217,10 @@ export default function memoryGame({ questions, sessionId, topic }) {
                     <img src={logo} alt="EZDrive Logo" className="logo_img" />
                   </div>
                   <div className="card-back">
-                    {cardStatus[card.cardId] === "disabled" && (
+                    {questionStatus[card.cardId] === "disabled" && (
                       <img src={logo} alt="EZDrive Logo" className="logo_img" />
                     )}
-                    {cardStatus[card.cardId] != "disabled" && (
+                    {questionStatus[card.cardId] != "disabled" && (
                       <span className="card-text">{card.text}</span>
                     )}
                   </div>
@@ -233,11 +234,11 @@ export default function memoryGame({ questions, sessionId, topic }) {
               <div
                 key={card.cardId}
                 className={`card ${
-                  justMatched.includes(card.cardId)
+                  answerMatched === card.cardId
                     ? "correct"
-                    : cardStatus[card.cardId] === "incorrect"
+                    : answerStatus[card.cardId] === "incorrect"
                     ? "incorrect"
-                    : cardStatus[card.cardId] === "disabled"
+                    : answerStatus[card.cardId] === "disabled"
                     ? "disabled"
                     : ""
                 }`}
@@ -252,10 +253,10 @@ export default function memoryGame({ questions, sessionId, topic }) {
                     <img src={logo} alt="EZDrive Logo" className="logo_img" />
                   </div>
                   <div className="card-back">
-                    {cardStatus[card.cardId] === "disabled" && (
+                    {answerStatus[card.cardId] === "disabled" && (
                       <img src={logo} alt="EZDrive Logo" className="logo_img" />
                     )}
-                    {cardStatus[card.cardId] != "disabled" && (
+                    {answerStatus[card.cardId] != "disabled" && (
                       <span className="card-text">{card.text}</span>
                     )}
                   </div>

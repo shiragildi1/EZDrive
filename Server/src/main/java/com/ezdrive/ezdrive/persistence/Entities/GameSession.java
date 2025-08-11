@@ -1,5 +1,6 @@
 package com.ezdrive.ezdrive.persistence.Entities;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
@@ -10,19 +11,18 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Getter
 @Setter
-@Table(name = "game_sessions")
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "game_sessions")
 public class GameSession {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -50,7 +50,7 @@ public class GameSession {
     @Column(name = "score")
     private Integer score;
 
-    // תאריך/שעה של תחילת המשחק או סיומו
+    
     @Column(name = "played_at")
     private LocalDateTime playedAt;
 }

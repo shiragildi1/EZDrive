@@ -115,9 +115,8 @@
   outline: none;
   background: linear-gradient(90deg, #ff5e3a 0%, #ff9800 100%);
   color: #fff;
-  font-size: 1.5rem;
+  font-size: 20px;
   font-family: "Varela Round", sans-serif;
-  font-weight: bold;
   box-shadow: 0 2px 12px 0 #0006;
   cursor: pointer;
   transition: transform 0.15s, background 0.2s, box-shadow 0.2s;
@@ -141,16 +140,16 @@
 }
 
 .trivia-option.wrong {
-  background: linear-gradient(90deg, #ff2d2d 0%, #ff9800 100%);
+  background: linear-gradient(90deg, #ff2d2d 0%, #d90000 100%);
   color: #fff;
-  box-shadow: 0 0 18px 0 #ff2d2d99;
+  box-shadow: 0 0 18px 0 #d9000099;
 }
+
 
 .trivia-title {
   font-family: "Varela Round", sans-serif;
-  font-size: 2.3rem;
+  font-size: 30px;
   color: #fff;
-  font-weight: bold;
   text-align: center;
   margin-bottom: 0.2em;
   text-shadow: 0 2px 8px #000a;
@@ -158,22 +157,9 @@
 
 .trivia-subtitle {
   font-family: "Varela Round", sans-serif;
-  font-size: 2rem;
+  font-size: 20px;
   color: #fff;
-  font-weight: bold;
   text-align: center;
   margin-bottom: 0.5em;
   text-shadow: 0 2px 8px #000a;
-}
-
-@media (max-width: 600px) {
-  .trivia-question-box {
-    padding: 18px 6px;
-    min-width: 0;
-  }
-  .trivia-option {
-    min-width: 120px;
-    font-size: 1.1rem;
-    padding: 0 10px;
-  }
 }

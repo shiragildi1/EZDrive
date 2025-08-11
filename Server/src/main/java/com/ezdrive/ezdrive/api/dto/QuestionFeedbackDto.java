@@ -7,11 +7,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class GameResultResponseDto {
-    private int score;
-    private int numberOfCorrectAnswers;
-    private String totalTimeSession;
+@NoArgsConstructor
+public class QuestionFeedbackDto {
+    private String question;
+    private String userAnswer;
+    private String correctAnswer;
+    private boolean isCorrect;
 }
-

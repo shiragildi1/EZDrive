@@ -1,9 +1,18 @@
-export function getCurrentUser() {
-  return fetch("http://localhost:8080/api/user/me", {
-    method: "GET",
-    credentials: "include", 
-  }).then((res) => {
-    if (!res.ok) throw new Error("User not logged in");
-    return res.json();
-  });
+export async function getCurrentUser() {
+  try {
+    const res = await fetch("http://localhost:8080/api/user/me", {
+      method: "GET",
+      credentials: "include",
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`getCurrentUser failed: ${res.status} - ${text}`);
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error("getCurrentUser error:", error.message);
+    throw error;
+  }
 }

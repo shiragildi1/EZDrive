@@ -1,0 +1,75 @@
+.popup-backdrop-TriviaAnswer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup-box-TriviaAnswer {
+  background-color: #181c22;
+  color: white;
+  padding: 50px;
+  border-radius: 20px;
+  width: 50%;
+  text-align: center;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.close-button-TriviaAnswer {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.answers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-auto-rows: 300px; /* גובה קבוע לכל ריבוע */
+  gap: 30px;
+  margin-top: 20px;
+  text-align: right;
+  justify-items: center;
+}
+
+.answer-box {
+  width: 100%;
+  padding: 10px;
+  font-size: 0.85rem;
+  border-radius: 8px;
+  direction: rtl;
+  box-sizing: border-box;
+  overflow-y: auto;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  scroll-behavior: smooth;
+}
+
+.answer-box.correct {
+  background-color: #3aa63a;
+  color: white;
+}
+
+.answer-box.wrong {
+  background-color: #c92e2e;
+  color: white;
+}
+
+.question-text {
+  font-weight: bold;
+  margin-bottom: 10px;
+}

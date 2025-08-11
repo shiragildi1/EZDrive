@@ -4,56 +4,36 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-import org.springframework.context.ApplicationContext;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.context.ApplicationContext;
 
-import com.ezdrive.ezdrive.rmi.RMIGameService;
 import com.ezdrive.ezdrive.rmi.RMIGameServiceImpl;
-import com.ezdrive.ezdrive.services.MemoryGameService;
 
 @SpringBootApplication
 public class EzDriveApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(EzDriveApplication.class, args);
-        try 
-        {
-            RMIGameService service = new RMIGameServiceImpl();
+    public static void main(String[] args) {
+        // מגדיר את כתובת ה־host ל־RMI
+        System.setProperty("java.rmi.server.hostname", "127.0.0.1");
+
+        // מפעיל את Spring
+        ApplicationContext context = SpringApplication.run(EzDriveApplication.class, args);
+
+        try {
+            // יוצר ידנית את שירות ה־RMI עם ApplicationContext
+            RMIGameServiceImpl rmiService = new RMIGameServiceImpl(context);
+
+            // יוצר registry
             Registry registry = LocateRegistry.createRegistry(1099);
-            // registry.bind("RMIGameService", service); //return Exceptioon if user already exist.
-            registry.rebind("RMIGameService", service);
-            System.out.println("GameService is live");
-            System.out.println("RMI service is running...");
-        } 
-        catch (Exception e) 
-        {
+
+            // רושם את השירות תחת השם "RMIGameService"
+            registry.rebind("RMIGameService", rmiService);
+
+            System.out.println("✅ RMI service registered successfully.");
+        } catch (RemoteException e) {
+            System.err.println("❌ RMI service failed to start: " + e.getMessage());
             e.printStackTrace();
         }
-	}
-
-@Bean
-public WebMvcConfigurer corsConfigurer() {
-    return new WebMvcConfigurer() {
-        @Override
-        public void addCorsMappings(CorsRegistry registry) {
-            registry.addMapping("/**")
-                    .allowedOrigins("http://localhost:3000") 
-                    .allowedMethods("*")
-                    .allowedHeaders("*")
-                    .allowCredentials(true);
-        }
-    };
+    }
 }
-@Bean(name = "rmiGameService")
-public RMIGameServiceImpl rmiGameService(ApplicationContext context) throws RemoteException {
-    return new RMIGameServiceImpl(context);
-}
-
-};
-
-
-

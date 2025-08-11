@@ -38,17 +38,18 @@ public class GameSessionService {
 
      public GameSession createMemoryGameSession(String userEmail, String userEmail2, String gameType, String category) {
         User user = userRepository.findByEmail(userEmail)
-    .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + userEmail));
+            .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + userEmail));
 
-  
-       User user2 = userRepository.findByEmail(userEmail2)
-            .orElseThrow(() -> new IllegalArgumentException("User2 not found with email: " + userEmail2));
-    
         GameSession gameSession = new GameSession();
         gameSession.setUser(user);
-       
+        // אפשר ליצור session בלי user2 (שחקן שני)
+        if (userEmail2 != null) {
+            User user2 = userRepository.findByEmail(userEmail2)
+                .orElseThrow(() -> new IllegalArgumentException("User2 not found with email: " + userEmail2));
             gameSession.setUser2(user2);
-        
+        } else {
+            gameSession.setUser2(null);
+        }
         gameSession.setGameType(gameType);
         gameSession.setCategory(category);
         gameSession.setPlayedAt(LocalDateTime.now());
