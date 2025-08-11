@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { checkAnswer } from "../services/GameMemoryService";
-import { getCurrentUser } from "../services/userService"; 
+import { checkAnswer } from "../services/GameMemoryServiceRMI";
+import { getCurrentUser } from "../services/userService";
 import { useUserContext } from "../context/UserContext";
 import "../styles/MemoryGame.css";
 import logo from "../assets/logo1.png";
@@ -88,6 +88,7 @@ export default function memoryGame({ questions, sessionId, topic }) {
   useEffect(() => {
     if (questionFlipped && answerFlipped) {
       console.log("Q: " + currentQuestion + " A: " + currentAnswer);
+      console.log("User loaded from session - MemoryGame:", user);
       checkAnswer({
         sessionId,
         userEmail,

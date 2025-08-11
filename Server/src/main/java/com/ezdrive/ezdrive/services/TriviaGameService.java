@@ -78,11 +78,14 @@ public class TriviaGameService {
         GameSession session = gameSessionRepository.findById(sessionId)
         .orElseThrow(() -> new RuntimeException("Session not found"));
 
-        Duration duration = Duration.between(session.getPlayedAt(), LocalDateTime.now());
+        //update session score
+        session.setScore(score);
+        gameSessionRepository.save(session);
+        
 
+        Duration duration = Duration.between(session.getPlayedAt(), LocalDateTime.now());
         long minutes = duration.toMinutes();
         long seconds = duration.minusMinutes(minutes).getSeconds();
-
         String totalTimeFormatted = String.format("%02d:%02d", minutes, seconds);
 
         return new GameResultResponseDto(score, numberOfCorrectAnswers, totalTimeFormatted);

@@ -1,5 +1,6 @@
 package com.ezdrive.ezdrive.services;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.stream.IntStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ezdrive.ezdrive.api.dto.MemoryGameResultResponseDto;
 import com.ezdrive.ezdrive.persistence.Entities.GameSession;
 import com.ezdrive.ezdrive.persistence.Entities.MemoryGame;
 import com.ezdrive.ezdrive.persistence.Entities.Question;
@@ -31,7 +33,6 @@ public class MemoryGameService {
     // שלב 1: יצירת 10 שאלות רנדומליות ושיוך לסשן
     public List<Question> generateQuestionsForMemorySession(Long sessionId, String category) {
         List<Question> questions = questionRepository.findRandom10ByCategoryForMemory(category);
-        String correctAnswer;
         GameSession session = gameSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new RuntimeException("Session not found"));
 
@@ -40,10 +41,8 @@ public class MemoryGameService {
         .collect(Collectors.toList());
         Collections.shuffle(cardPositions); // Randomize the card order
 
-
-
         for (Question q : questions) {
-            MemoryGame answer = new MemoryGame();//////////////////
+            MemoryGame answer = new MemoryGame();
             answer.setGameSession(session);
             answer.setQuestion(q);
             
@@ -83,15 +82,31 @@ public class MemoryGameService {
         return gameAnswer.getAnswerCard() == selectedAnswerCard;
     }
 
-    // //שלב 3: חישוב תוצאה סופית
-    // public MemoryGameResultResponseDto GamgetGameResult(Long sessionId) {
-    //     List<MemoryGame> answers = memoryGameRepository.findByGameSessionId(sessionId);
+    //שלב 3: חישוב תוצאה סופית
+    public MemoryGameResultResponseDto getGameResultMemory(Long sessionId) {
 
-    //     int total = answers.size();
-    //     int correctPlayer1 = (int) answers.stream().filter(answer -> "pessyisraeli@gmail.com".equals(answer.getPlayerAnswered().getEmail())).count();
-    //     int correctPlayer2 = (int) answers.stream().filter(answer -> "shiragiladi1@gmail.com".equals(answer.getPlayerAnswered().getEmail())).count();
-    //     //int score = correct * 100 / total;
+        int numberOfCorrectAnswers = memoryGameRepository.countCorrectAnswers(sessionId);
+        int score = (numberOfCorrectAnswers * 100) / 10;
 
-    //     return new MemoryGameResultResponseDto(total, correctPlayer1, correctPlayer2);
-    // }
+        GameSession session = gameSessionRepository.findById(sessionId)
+        .orElseThrow(() -> new RuntimeException("Session not found"));
+
+        //update session score
+        session.setScore(score);
+        gameSessionRepository.save(session);
+        
+
+        Duration duration = Duration.between(session.getPlayedAt(), LocalDateTime.now());
+        long minutes = duration.toMinutes();
+        long seconds = duration.minusMinutes(minutes).getSeconds();
+        String totalTimeFormatted = String.format("%02d:%02d", minutes, seconds);
+
+        // Get all answers for the session
+        List<MemoryGame> answers = memoryGameRepository.findByGameSessionId(sessionId);
+
+        int total = answers.size();
+        int correctPlayer1 = (int) answers.stream().filter(answer -> "pessyisraeli@gmail.com".equals(answer.getPlayerAnsweredEmail())).count();
+        int correctPlayer2 = (int) answers.stream().filter(answer -> "shiragiladi1@gmail.com".equals(answer.getPlayerAnsweredEmail())).count();
+        return new MemoryGameResultResponseDto(total, correctPlayer1, correctPlayer2, totalTimeFormatted, score);
+    }
 }

@@ -53,7 +53,7 @@ export function submitAnswer({ sessionId, questionId, selectedAnswer }) {
   return fetch("http://localhost:8080/game-sessions/submit-answer", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    credentials: "include", // חובה גם כאן
+    credentials: "include", 
     body: JSON.stringify({ sessionId, questionId, selectedAnswer }),
   }).then((res) => res.json());
 }
@@ -63,7 +63,7 @@ export function getGameResult(sessionId) {
     `http://localhost:8080/game-sessions/result?sessionId=${sessionId}`,
     {
       method: "GET",
-      credentials: "include", // גם כאן
+      credentials: "include", 
     }
   ).then((res) => res.json());
 }
@@ -73,7 +73,7 @@ export function getGameSummary(sessionId) {
     `http://localhost:8080/game-sessions/summary?sessionId=${sessionId}`,
     {
       method: "GET",
-      credentials: "include", // גם כאן
+      credentials: "include", 
     }
   ).then((res) => res.json());
 }

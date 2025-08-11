@@ -1,5 +1,6 @@
 package com.ezdrive.ezdrive.persistence.Entities;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
@@ -22,7 +23,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @Table(name = "game_sessions")
 public class GameSession {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

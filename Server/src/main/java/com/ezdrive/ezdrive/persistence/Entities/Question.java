@@ -1,5 +1,7 @@
 package com.ezdrive.ezdrive.persistence.Entities;
 
+
+import java.io.Serializable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -18,7 +20,9 @@ import lombok.Setter;
 @Table(name = "questions")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Question {
+
+public class Question implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

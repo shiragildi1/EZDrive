@@ -1,6 +1,9 @@
+
 package com.ezdrive.ezdrive.api.controllers;
 
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,6 +21,7 @@ import com.ezdrive.ezdrive.api.dto.CheckAnswerRequestDto;
 import com.ezdrive.ezdrive.api.dto.GameResultResponseDto;
 import com.ezdrive.ezdrive.api.dto.GameSessionStartRequestDto;
 import com.ezdrive.ezdrive.api.dto.GameSessionStartResponseDto;
+import com.ezdrive.ezdrive.api.dto.MemoryGameResultResponseDto;
 import com.ezdrive.ezdrive.api.dto.MemoryGameSessionStartResponseDto;
 import com.ezdrive.ezdrive.api.dto.MemoryGameStartRequestDto;
 import com.ezdrive.ezdrive.api.dto.MemoryQuestionDto;
@@ -29,7 +33,7 @@ import com.ezdrive.ezdrive.persistence.Entities.Question;
 import com.ezdrive.ezdrive.persistence.Entities.User;
 import com.ezdrive.ezdrive.persistence.Repositories.MemoryGameRepository;
 import com.ezdrive.ezdrive.persistence.Repositories.QuestionRepository;
-import com.ezdrive.ezdrive.rmi.RMIGameServiceImpl;
+import com.ezdrive.ezdrive.rmi.RMIGameService;
 import com.ezdrive.ezdrive.services.GameSessionService;
 import com.ezdrive.ezdrive.services.TriviaGameService;
 
@@ -40,6 +44,7 @@ import jakarta.servlet.http.HttpSession;
 @RestController
 @RequestMapping("/game-sessions")
 public class GameSessionController {
+    private RMIGameService memoryGameService;
 
     @Autowired
     private GameSessionService gameSessionService;
@@ -48,15 +53,28 @@ public class GameSessionController {
     private TriviaGameService triviaGameService;
 
     @Autowired
-    private RMIGameServiceImpl memoryGameService;
-
-    @Autowired
     private MemoryGameRepository memoryGameRepository;
     
     @Autowired
     private QuestionRepository questionRepository;
+
+    private RMIGameService getRmiService() {
+    if (memoryGameService == null) {
+        try {
+            Registry registry = LocateRegistry.getRegistry("127.0.0.1", 1099);
+            memoryGameService = (RMIGameService) registry.lookup("RMIGameService");
+            System.out.println("Connected to RMI service");
+        } catch (Exception e) {
+            System.err.println("Failed to connect to RMI service: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("RMI service not connected");
+        }
+    }
+    return memoryGameService;
+}
+
     //--------------------------------------game session---------------------------------------------------
-//--------------------------------------trivia--------------------------------------------------------
+    //--------------------------------------trivia--------------------------------------------------------
     @PostMapping("/start")
     public GameSessionStartResponseDto startSession(@RequestBody GameSessionStartRequestDto request, HttpSession session) {
         User user = (User) session.getAttribute("user");
@@ -106,51 +124,73 @@ public class GameSessionController {
         return ResponseEntity.ok(summary);
     }
 
-//----------------------------------------------memory-----------------------------------------------------
+    //----------------------------------------------memory-----------------------------------------------------
 
     @PostMapping("/startMemory")
-    public MemoryGameSessionStartResponseDto startMemorySession(
-        @RequestBody MemoryGameStartRequestDto request,
-        HttpSession session) {
-
+    public MemoryGameSessionStartResponseDto startMemorySession(@RequestBody MemoryGameStartRequestDto request, HttpSession session) {
         User user = (User) session.getAttribute("user");
-        if (user == null) {
-            throw new RuntimeException("User not logged in");
-        }
-
-        String userEmail = user.getEmail();
-        String userEmail2 = user.getEmail();
-
-        GameSession gameSession = gameSessionService.createMemoryGameSession(userEmail, userEmail2, request.getGameType(), request.getCategory());
-
-        List<Question> pairs = null;
+        // שחקן ראשון יוצר סשן חדש
+        GameSession gameSession = gameSessionService.createMemoryGameSession(user.getEmail(), null, request.getGameType(), request.getCategory());
         try {
-            pairs = memoryGameService.generateQuestionsForMemorySession(gameSession.getId(), request.getCategory());
-        } catch(RemoteException e) {
-            System.out.println("Error");
+            getRmiService().joinGame(gameSession.getId(), user.getEmail());
+            // Generate questions for the memory game session
+            List<Question> questions = getRmiService().generateQuestionsForMemorySession(gameSession.getId(), request.getCategory());
+            System.out.println("Generated questions for memory game session: " + questions);
+                  
+            //question list
+            List<MemoryQuestionDto> memoryQuestionDtos = questions.stream()
+                .map(p -> new MemoryQuestionDto(
+                    p.getQuestionText(),
+                    true,
+                    memoryGameRepository.findQuestionCardPositionByGameSesstionAndQuestion(gameSession.getId(),p.getQuestionId())))
+                .collect(Collectors.toList());
+
+            //answer list
+            List<MemoryQuestionDto> memoryAnswerDtos = questions.stream()
+                .map(p -> new MemoryQuestionDto(
+                    questionRepository.findCorrectAnswerByQuestion(p.getQuestionId()),
+                    false,
+                    memoryGameRepository.findAnswerCardPositionByGameSesstionAndQuestion(gameSession.getId(),p.getQuestionId())))
+                .collect(Collectors.toList());
+
+                //Combine question and answer lists
+                memoryQuestionDtos.addAll(memoryAnswerDtos);
+            System.out.println("Memory question DTOs: " + memoryQuestionDtos);
+                return new MemoryGameSessionStartResponseDto(gameSession, memoryQuestionDtos);
+        } catch (RemoteException e) {
+            return new MemoryGameSessionStartResponseDto(null, null);
         }
-
-        //question list
-        List<MemoryQuestionDto> memoryQuestionDtos = pairs.stream()
-            .map(p -> new MemoryQuestionDto(
-                p.getQuestionText(),
-                true,
-                memoryGameRepository.findQuestionCardPositionByGameSesstionAndQuestion(gameSession.getId(),p.getQuestionId())))
-            .collect(Collectors.toList());
-
-        //answer list
-        List<MemoryQuestionDto> memoryAnswerDtos = pairs.stream()
-            .map(p -> new MemoryQuestionDto(
-                questionRepository.findCorrectAnswerByQuestion(p.getQuestionId()),
-                false,
-                memoryGameRepository.findAnswerCardPositionByGameSesstionAndQuestion(gameSession.getId(),p.getQuestionId())))
-            .collect(Collectors.toList());
-
-        //combine lists
-        memoryQuestionDtos.addAll(memoryAnswerDtos);
-
-        return new MemoryGameSessionStartResponseDto(gameSession, memoryQuestionDtos);
     }
+
+    @PostMapping("/join-memory")
+    public ResponseEntity<Void> joinMemoryGame(@RequestParam Long sessionId, HttpSession session) {
+    User user = (User) session.getAttribute("user");
+    if (user == null) {
+        return ResponseEntity.status(401).build();
+    }
+
+    try {
+        getRmiService().joinGame(sessionId, user.getEmail());
+        return ResponseEntity.ok().build();
+    } catch (RemoteException e) {
+        return ResponseEntity.status(500).build();
+    }
+}
+
+    // Endpoint for polling memory game state (for frontend polling)
+    @GetMapping("/memory-state")
+    public ResponseEntity<Boolean> getMemoryGameState(@RequestParam Long sessionId) {
+        try {
+            // The RMI service should provide a method to get the game state for polling
+            // For example: getGameState(sessionId) returns a POJO or Map with readiness and player info
+            boolean state = getRmiService().getGameState(sessionId);
+            System.out.println("Memory game state  in controllerfor session " + sessionId + ": " + state);
+            return ResponseEntity.ok(state);
+        } catch (RemoteException e) {
+            return ResponseEntity.ok(false);
+        }
+    }
+
 
     //Memory game
     @PostMapping("/check-answer")
@@ -162,9 +202,9 @@ public class GameSessionController {
 
         boolean isCorrect = false;
         try {
-            isCorrect = memoryGameService.checkAnswer(
+            isCorrect = getRmiService().checkAnswer(
                 request.getSessionId(),
-                user.getEmail(), // ⬅️ מהסשן
+                user.getEmail(), 
                 request.getSelectedQuestionCard(),
                 request.getSelectedAnswerCard()
             );
@@ -173,5 +213,15 @@ public class GameSessionController {
         }
 
         return ResponseEntity.ok(isCorrect);
+    }
+
+    @GetMapping("/result-memory")
+    public MemoryGameResultResponseDto getGameResultMemory(@RequestParam Long sessionId) {
+        try {
+            return getRmiService().getGameResultMemory(sessionId);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to get memory game result: " + e.getMessage());
+        }
     }
 }

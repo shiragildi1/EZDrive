@@ -6,11 +6,13 @@ import com.ezdrive.ezdrive.persistence.Entities.GameSession;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class MemoryGameSessionStartResponseDto {
     private GameSession session;
     private List<MemoryQuestionDto> questions;

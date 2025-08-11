@@ -1,9 +1,9 @@
 package com.ezdrive.ezdrive.api.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -12,4 +12,5 @@ import lombok.AllArgsConstructor;
 public class MemoryGameStartRequestDto {
     private String gameType;
     private String category;
+    private Long sessionId;
 }
