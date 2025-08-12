@@ -1,23 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { checkAnswer } from "../services/GameMemoryServiceRMI";
 import { getCurrentUser } from "../services/userService";
+import { flipQuestion, flipAnswer } from "../services/GameMemoryServiceRMI";
+import { getMemoryGameState } from "../services/GameMemoryServiceRMI";
 import { useUserContext } from "../context/UserContext";
 import "../styles/MemoryGame.css";
 import logo from "../assets/logo1.png";
 
-function shuffleArray(array) {
-  const shuffled = [...array];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-  return shuffled;
-}
-
 export default function memoryGame({ questions, sessionId, topic }) {
   //const [playerA, setPlayerA] = useState("pessyisraeli@gmail.com");
   //const [playerB, setPlayerB] = useState("pessyisraeli@gmail.com");
-  //const [currentPlayer, setCurrentPlayer] = useState("pessy@example.com");
+  const [currentPlayer, setCurrentPlayer] = useState(null);
   const [showResult, setShowResult] = useState(false);
   //const [gameOver, setGameOver] = useState(false);
   //const [scoreResult, setScoreResult] = useState({ a: 0, b: 0 });
@@ -66,12 +59,24 @@ export default function memoryGame({ questions, sessionId, topic }) {
     setQuestionCards(sortedQuestions);
     setAnswerCards(sortedAnswers);
   }, [questions]);
-  console.log("Question Cards:", questionCards);
 
   const [questionFlipped, setQuestionFlipped] = useState(false);
   const [answerFlipped, setAnswerFlipped] = useState(false);
 
+  const updateQuestionFlip = (i) => {
+    setFlippedQuestionCards((prev) =>
+      prev.map((flipped, index) => (index === i ? true : flipped))
+    );
+  };
+  const updateAnswerFlip = (i) => {
+    setFlippedAnswerCards((prev) =>
+      prev.map((flipped, index) => (index === i ? true : flipped))
+    );
+  };
   const handleQuestionFlip = (i) => {
+    if (currentPlayer != userEmail) {
+      return;
+    }
     const alreadyFlipped = flippedQuestionCards.some((flipped) => flipped); // Check if any card is already flipped
     if (alreadyFlipped) return; // If yes, do nothing
 
@@ -82,8 +87,14 @@ export default function memoryGame({ questions, sessionId, topic }) {
     //updateOpponentFlippedCards(sessionId,i);
     setQuestionFlipped(true);
     setCurrentQuestion(i);
+    console.log("Might flip: ", sessionId, " i: ", i);
+    flipQuestion({ sessionId, selectedQuestionCard: i });
   };
+
   const handleAnswerFlip = (i) => {
+    if (currentPlayer != userEmail) {
+      return;
+    }
     const alreadyFlipped = flippedAnswerCards.some((flipped) => flipped); // Check if any card is already flipped
     if (alreadyFlipped) return; // If yes, do nothing
 
@@ -93,12 +104,11 @@ export default function memoryGame({ questions, sessionId, topic }) {
     );
     setAnswerFlipped(true);
     setCurrentAnswer(i);
+    flipAnswer({ sessionId, selectedAnswerCard: i });
   };
 
   useEffect(() => {
     if (questionFlipped && answerFlipped) {
-      console.log("Q: " + currentQuestion + " A: " + currentAnswer);
-      console.log("User loaded from session - MemoryGame:", user);
       checkAnswer({
         sessionId,
         userEmail,
@@ -178,10 +188,41 @@ export default function memoryGame({ questions, sessionId, topic }) {
         setTimeout(() => {
           setQuestionFlipped(false);
           setAnswerFlipped(false);
+          setCurrentQuestion(-1);
+          setCurrentAnswer(-1);
         }, 1000); // same delay as feedback trigger
       });
     }
   }, [questionFlipped, answerFlipped]);
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      try {
+        const gameState = await getMemoryGameState(sessionId);
+        setCurrentPlayer(gameState.currentPlayer);
+        if (currentPlayer != userEmail) {
+          console.log("Flipped: ", gameState.flippedQuestion);
+          console.log("FlippedA: ", gameState.flippedAnswer);
+          // Update local state based on backend game state
+          if (currentQuestion != gameState.flippedQuestion) {
+            if (gameState.flippedQuestion != -1)
+              updateQuestionFlip(gameState.flippedQuestion);
+          }
+          if (currentAnswer != gameState.flippedAnswer) {
+            if (gameState.flippedAnswer != -1) {
+              updateAnswerFlip(gameState.flippedAnswer);
+            }
+          }
+          //setFound(gameState.matchedCards);
+          //setCurrentPlayer(gameState.currentPlayer);
+        }
+      } catch (err) {
+        console.error("Polling error in MemoryGameState:", err);
+      }
+    }, 1000); // poll every second
+
+    return () => clearInterval(interval); // cleanup on unmount
+  }, [sessionId]);
 
   return (
     <div className="board-wrapper">

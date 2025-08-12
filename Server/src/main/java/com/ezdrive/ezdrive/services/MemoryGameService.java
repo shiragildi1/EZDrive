@@ -67,7 +67,6 @@ public class MemoryGameService {
     
     // שלב 2: בדיקה האם הזוג נכון
     public boolean checkAnswer(Long sessionId, String userEmail, int selectedQuestionCard, int selectedAnswerCard) {
-         System.out.println("From client: "+userEmail+" "+selectedQuestionCard);
         GameSession session = gameSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new RuntimeException("Session not found"));
 
@@ -82,8 +81,6 @@ public class MemoryGameService {
         }
 
         memoryGameRepository.save(gameAnswer);
-       
-        System.out.println(gameAnswer.isFlipped());
         return gameAnswer.getAnswerCard() == selectedAnswerCard;
     }
 

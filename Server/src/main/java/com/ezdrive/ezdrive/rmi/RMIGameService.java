@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.ezdrive.ezdrive.api.dto.MemoryGameResultResponseDto;
 import com.ezdrive.ezdrive.api.dto.MemoryGameSessionStartResponseDto;
+import com.ezdrive.ezdrive.api.dto.MemoryStateDto;
 import com.ezdrive.ezdrive.persistence.Entities.Question;
 
 public interface RMIGameService extends Remote{
@@ -16,7 +17,10 @@ public interface RMIGameService extends Remote{
     /**
      * Returns a map with game state for polling: { ready: boolean, players: List<String>, currentPlayer: String }
      */
-   boolean getGameState(Long sessionId) throws RemoteException;
+   boolean getGameStatus(Long sessionId) throws RemoteException;
+   MemoryStateDto getGameState(Long sessionId) throws RemoteException;
+   void flipQuestion(Long sessionId, int questionIndex) throws RemoteException;
+   void flipAnswer(Long sessionId, int answerIndex) throws RemoteException;
    MemoryGameSessionStartResponseDto retrieveQuestionsForMemorySession(Long sessionId) throws RemoteException;
 
 }

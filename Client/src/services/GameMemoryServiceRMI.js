@@ -64,7 +64,43 @@ export function checkAnswer({
     });
 }
 
+export async function getMemoryGameStatus(sessionId) {
+  const response = await fetch(
+    `http://localhost:8080/game-sessions/memory-status?sessionId=${sessionId}`,
+    {
+      method: "GET",
+      credentials: "include",
+    }
+  );
+  if (!response.ok) {
+    throw new Error("Failed to get memory game status");
+  }
+  //מצפה לתשובה: { ready, questions }
+  return await response.json();
+}
+
+export function flipQuestion({ sessionId, selectedQuestionCard }) {
+  console.log("Going to update question: ", sessionId);
+  return fetch(
+    `http://localhost:8080/game-sessions/flip-question?sessionId=${sessionId}&questionIndex=${selectedQuestionCard}`,
+    {
+      method: "POST",
+      credentials: "include",
+    }
+  );
+}
+export function flipAnswer({ sessionId, selectedAnswerCard }) {
+  console.log("Going to update: ", sessionId);
+  return fetch(
+    `http://localhost:8080/game-sessions/flip-answer?sessionId=${sessionId}&answerIndex=${selectedAnswerCard}`,
+    {
+      method: "POST",
+      credentials: "include",
+    }
+  );
+}
 export async function getMemoryGameState(sessionId) {
+  console.log("HKHHGGJ: ", sessionId);
   const response = await fetch(
     `http://localhost:8080/game-sessions/memory-state?sessionId=${sessionId}`,
     {

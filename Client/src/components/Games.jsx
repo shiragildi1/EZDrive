@@ -12,7 +12,7 @@ import "../styles/Games.css";
 import memoryExplanation from "../data/MemoryExplanationData";
 import {
   joinMemoryGame,
-  getMemoryGameState,
+  getMemoryGameStatus,
 } from "../services/GameMemoryServiceRMI";
 import { useUserContext } from "../context/UserContext";
 
@@ -122,7 +122,6 @@ export default function GamesPage() {
 
   // שחקן ראשון - יצירת משחק חדש
   const handleStartMemory = async () => {
-    console.log("handle2221");
     setLoadingMemory(true);
     setWaitingForOpponent(true);
     const category = topicsMap[topic];
@@ -132,19 +131,16 @@ export default function GamesPage() {
       // setSessionId(sessionId);
       // מתחיל polling לבדוק אם המשחק מוכן (כלומר, אם שחקן שני הצטרף)
       const data = await startMemorySession(category);
-      console.log("handle3: ", data);
       if (data == null) {
         throw new Error("No session returned form startMemory session");
       }
       setSessionId(data.sessionId);
       const interval = setInterval(async () => {
         try {
-          console.log("han23456dle1:", data.sessionId);
           // מקבל את מצב המשחק והשאלות מה-backend
-          const ready = await getMemoryGameState(data.sessionId);
+          const ready = await getMemoryGameStatus(data.sessionId);
           console.log("Polling response:", { ready });
           if (ready) {
-            console.log("handle2");
             clearInterval(interval);
             // ממפה את השאלות לפורמט אחיד עבור הקומפוננטה
 
@@ -154,7 +150,6 @@ export default function GamesPage() {
               isQuestion: question.question,
               text: question.text,
             }));
-            console.log("handle 4 Formatted questions:", formattedQuestions);
             setQuestions(formattedQuestions); // שומר את השאלות המעובדות ב-state
             setShowMemory(true); // עובר למצב משחק זיכרון
             setSessionId(data.sessionId); // שומר את מזהה הסשן
@@ -180,13 +175,12 @@ export default function GamesPage() {
     try {
       // שולח בקשה ל-backend להצטרף למשחק קיים
       const data = await joinMemoryGame(joinSessionId);
-      console.log("handleJoinMemory response:", data);
       setSessionId(joinSessionId);
       // מתחיל polling לבדוק אם המשחק מוכן (כלומר, אם שני שחקנים מחוברים)
       const interval = setInterval(async () => {
         try {
           // מקבל את מצב המשחק והשאלות מה-backend
-          const ready = await getMemoryGameState(joinSessionId);
+          const ready = await getMemoryGameStatus(joinSessionId);
           console.log("Polling join response:", ready);
           if (ready) {
             clearInterval(interval);
