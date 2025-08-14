@@ -32,6 +32,7 @@ import com.ezdrive.ezdrive.api.dto.SubmitAnswerRequestDto;
 import com.ezdrive.ezdrive.persistence.Entities.GameSession;
 import com.ezdrive.ezdrive.persistence.Entities.Question;
 import com.ezdrive.ezdrive.persistence.Entities.User;
+import com.ezdrive.ezdrive.persistence.Repositories.GameSessionRepository;
 import com.ezdrive.ezdrive.persistence.Repositories.MemoryGameRepository;
 import com.ezdrive.ezdrive.persistence.Repositories.QuestionRepository;
 import com.ezdrive.ezdrive.rmi.RMIGameService;
@@ -49,6 +50,9 @@ public class GameSessionController {
 
     @Autowired
     private GameSessionService gameSessionService;
+
+    @Autowired
+    private GameSessionRepository gameSessionRepository;
 
     @Autowired
     private TriviaGameService triviaGameService;
@@ -162,20 +166,28 @@ public class GameSessionController {
 
     @PostMapping("/join-memory")
     public MemoryGameSessionStartResponseDto joinMemoryGame(@RequestParam Long sessionId, HttpSession session) {
-    User user = (User) session.getAttribute("user");
-    if (user == null) {
-       return new MemoryGameSessionStartResponseDto(null,null);
-    }
-
-    try {
-        getRmiService().joinGame(sessionId, user.getEmail());
         
-        MemoryGameSessionStartResponseDto response = memoryGameService.retrieveQuestionsForMemorySession(sessionId);
-        return response;
-    } catch (RemoteException e) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
         return new MemoryGameSessionStartResponseDto(null,null);
+        }
+
+        GameSession gameSession = gameSessionRepository.findById(sessionId)
+            .orElseThrow(() -> new RuntimeException("Session not found"));
+
+        gameSession.setUser2(user);
+        gameSessionRepository.save(gameSession);
+        System.out.println("User 2 controller: "+ user.getEmail());
+        System.out.println(gameSession.getUser2());
+        try {
+            getRmiService().joinGame(sessionId, user.getEmail());
+            
+            MemoryGameSessionStartResponseDto response = memoryGameService.retrieveQuestionsForMemorySession(sessionId);
+            return response;
+        } catch (RemoteException e) {
+            return new MemoryGameSessionStartResponseDto(null,null);
+        }
     }
-}
     @PostMapping("/flip-question")
     public ResponseEntity<Void> flipQuestion(@RequestParam Long sessionId, @RequestParam int questionIndex) {
         try {
@@ -212,7 +224,6 @@ public class GameSessionController {
 @GetMapping("/memory-state")
 public MemoryStateDto getMemoryGameState(@RequestParam Long sessionId)
 {
-    System.out.println("get game state back: " + sessionId);
     try {
         MemoryStateDto state = getRmiService().getGameState(sessionId);
         return state;
@@ -233,6 +244,7 @@ public MemoryStateDto getMemoryGameState(@RequestParam Long sessionId)
             isCorrect = getRmiService().checkAnswer(
                 request.getSessionId(),
                 user.getEmail(), 
+                request.getCurrentPlayer(),
                 request.getSelectedQuestionCard(),
                 request.getSelectedAnswerCard()
             );

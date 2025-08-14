@@ -4,16 +4,16 @@ import { getCurrentUser } from "../services/userService";
 import { flipQuestion, flipAnswer } from "../services/GameMemoryServiceRMI";
 import { getMemoryGameState } from "../services/GameMemoryServiceRMI";
 import { useUserContext } from "../context/UserContext";
+import { getGameResult } from "../services/GameMemoryServiceRMI";
+import EndOMemoryPage from "../pages/EndOMemoryPage";
 import "../styles/MemoryGame.css";
 import logo from "../assets/logo1.png";
 
 export default function memoryGame({ questions, sessionId, topic }) {
-  //const [playerA, setPlayerA] = useState("pessyisraeli@gmail.com");
-  //const [playerB, setPlayerB] = useState("pessyisraeli@gmail.com");
   const [currentPlayer, setCurrentPlayer] = useState(null);
   const [showResult, setShowResult] = useState(false);
   //const [gameOver, setGameOver] = useState(false);
-  //const [scoreResult, setScoreResult] = useState({ a: 0, b: 0 });
+  const [scoreResult, setScoreResult] = useState({ user1: 0, user2: 0 });
   const { setUser } = useUserContext();
   useEffect(() => {
     getCurrentUser()
@@ -67,11 +67,15 @@ export default function memoryGame({ questions, sessionId, topic }) {
     setFlippedQuestionCards((prev) =>
       prev.map((flipped, index) => (index === i ? true : flipped))
     );
+    setQuestionFlipped(true);
+    setCurrentQuestion(i);
   };
   const updateAnswerFlip = (i) => {
     setFlippedAnswerCards((prev) =>
       prev.map((flipped, index) => (index === i ? true : flipped))
     );
+    setAnswerFlipped(true);
+    setCurrentAnswer(i);
   };
   const handleQuestionFlip = (i) => {
     if (currentPlayer != userEmail) {
@@ -87,7 +91,6 @@ export default function memoryGame({ questions, sessionId, topic }) {
     //updateOpponentFlippedCards(sessionId,i);
     setQuestionFlipped(true);
     setCurrentQuestion(i);
-    console.log("Might flip: ", sessionId, " i: ", i);
     flipQuestion({ sessionId, selectedQuestionCard: i });
   };
 
@@ -109,89 +112,90 @@ export default function memoryGame({ questions, sessionId, topic }) {
 
   useEffect(() => {
     if (questionFlipped && answerFlipped) {
-      checkAnswer({
-        sessionId,
-        userEmail,
-        selectedQuestionCard: currentQuestion,
-        selectedAnswerCard: currentAnswer,
-      }).then((isCorrect) => {
-        setTimeout(() => {
-          setQuestionStatus((prev) => ({
-            ...prev,
-            [currentQuestion]: isCorrect ? "correct" : "incorrect",
-          }));
-          setAnswerStatus((prev) => ({
-            ...prev,
-            [currentAnswer]: isCorrect ? "correct" : "incorrect",
-          }));
+      setTimeout(() => {
+        checkAnswer({
+          sessionId,
+          userEmail,
+          currentPlayer,
+          selectedQuestionCard: currentQuestion,
+          selectedAnswerCard: currentAnswer,
+        }).then((isCorrect) => {
+          setTimeout(() => {
+            setQuestionStatus((prev) => ({
+              ...prev,
+              [currentQuestion]: isCorrect ? "correct" : "incorrect",
+            }));
+            setAnswerStatus((prev) => ({
+              ...prev,
+              [currentAnswer]: isCorrect ? "correct" : "incorrect",
+            }));
 
-          if (!isCorrect) {
-            // Flip cards back after showing incorrect
-            setTimeout(() => {
-              setQuestionStatus((prev) => ({
-                ...prev,
-                [currentQuestion]: null,
-              }));
-              setAnswerStatus((prev) => ({
-                ...prev,
-                [currentAnswer]: null,
-              }));
+            if (!isCorrect) {
+              // Flip cards back after showing incorrect
+              setTimeout(() => {
+                setQuestionStatus((prev) => ({
+                  ...prev,
+                  [currentQuestion]: null,
+                }));
+                setAnswerStatus((prev) => ({
+                  ...prev,
+                  [currentAnswer]: null,
+                }));
 
-              setFlippedQuestionCards((prev) =>
-                prev.map((flip, i) => (i === currentQuestion ? false : flip))
-              );
+                setFlippedQuestionCards((prev) =>
+                  prev.map((flip, i) => (i === currentQuestion ? false : flip))
+                );
 
-              setFlippedAnswerCards((prev) =>
-                prev.map((flip, i) => (i === currentAnswer ? false : flip))
-              );
-            }, 3000); // flip back after 1 sec of red
-          }
-          if (isCorrect) {
-            setQuestionMatched(questionCards[currentQuestion].cardId);
-            setAnswerMatched(answerCards[currentAnswer].cardId);
-            setShowResult(true);
+                setFlippedAnswerCards((prev) =>
+                  prev.map((flip, i) => (i === currentAnswer ? false : flip))
+                );
+              }, 3000); // flip back after 1 sec of red
+            }
+            if (isCorrect) {
+              setQuestionMatched(questionCards[currentQuestion].cardId);
+              setAnswerMatched(answerCards[currentAnswer].cardId);
+              setShowResult(true);
 
-            setTimeout(() => {
-              setShowResult(false);
-              setQuestionMatched();
-              setAnswerMatched();
+              setTimeout(() => {
+                setShowResult(false);
+                setQuestionMatched();
+                setAnswerMatched();
 
-              setQuestionStatus((prev) => ({
-                ...prev,
-                [currentQuestion]: "disabled",
-              }));
-              setAnswerStatus((prev) => ({
-                ...prev,
-                [currentAnswer]: "disabled",
-              }));
+                setQuestionStatus((prev) => ({
+                  ...prev,
+                  [currentQuestion]: "disabled",
+                }));
+                setAnswerStatus((prev) => ({
+                  ...prev,
+                  [currentAnswer]: "disabled",
+                }));
 
-              setFlippedQuestionCards((prev) =>
-                prev.map((flip, i) => (i === currentQuestion ? false : flip))
-              );
+                setFlippedQuestionCards((prev) =>
+                  prev.map((flip, i) => (i === currentQuestion ? false : flip))
+                );
 
-              setFlippedAnswerCards((prev) =>
-                prev.map((flip, i) => (i === currentAnswer ? false : flip))
-              );
-            }, 3000); // green flash for 3 seconds
+                setFlippedAnswerCards((prev) =>
+                  prev.map((flip, i) => (i === currentAnswer ? false : flip))
+                );
+              }, 3000); // green flash for 3 seconds
 
-            setFound((prev) => {
-              const updated = [...prev];
-              updated[currentQuestion] = true;
-              updated[currentAnswer] = true;
-              return updated;
-            });
-          }
-
-          console.log("Received from backend:", isCorrect);
-          1;
-        }, 750);
-        setTimeout(() => {
-          setQuestionFlipped(false);
-          setAnswerFlipped(false);
-          setCurrentQuestion(-1);
-          setCurrentAnswer(-1);
-        }, 1000); // same delay as feedback trigger
-      });
+              setFound((prev) => {
+                const updated = [...prev];
+                updated[currentQuestion] = true;
+                updated[currentAnswer] = true;
+                return updated;
+              });
+            }
+            1;
+          }, 750);
+          setTimeout(() => {
+            setQuestionFlipped(false);
+            setAnswerFlipped(false);
+            setCurrentQuestion(-1);
+            setCurrentAnswer(-1);
+          }, 1000); // same delay as feedback trigger
+        });
+      }, 1000);
     }
   }, [questionFlipped, answerFlipped]);
 
@@ -200,9 +204,7 @@ export default function memoryGame({ questions, sessionId, topic }) {
       try {
         const gameState = await getMemoryGameState(sessionId);
         setCurrentPlayer(gameState.currentPlayer);
-        if (currentPlayer != userEmail) {
-          console.log("Flipped: ", gameState.flippedQuestion);
-          console.log("FlippedA: ", gameState.flippedAnswer);
+        if (gameState.currentPlayer != userEmail) {
           // Update local state based on backend game state
           if (currentQuestion != gameState.flippedQuestion) {
             if (gameState.flippedQuestion != -1)
@@ -214,7 +216,27 @@ export default function memoryGame({ questions, sessionId, topic }) {
             }
           }
           //setFound(gameState.matchedCards);
-          //setCurrentPlayer(gameState.currentPlayer);
+        }
+        if (gameState.gameOver) {
+          clearInterval(interval);
+          console.log("Game over detected in MemoryGameState");
+          const finalResult = await getGameResult(sessionId);
+          const opponentEmail = Object.keys(finalResult.scores).find(
+            (email) => email !== userEmail
+          );
+          setScoreResult(
+            finalResult.scores[userEmail],
+            finalResult.scores[opponentEmail]
+          );
+          console.log("Game over! Final result:", finalResult);
+
+          return (
+            <EndOMemoryPage
+              score1={scoreResult.finalResult.scores[userEmail]}
+              score2={scoreResult.finalResult.scores[opponentEmail]}
+              sessionId={sessionId}
+            />
+          );
         }
       } catch (err) {
         console.error("Polling error in MemoryGameState:", err);

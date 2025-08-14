@@ -37,6 +37,7 @@ export async function joinMemoryGame(sessionId) {
 
 export function checkAnswer({
   sessionId,
+  currentPlayer,
   selectedQuestionCard,
   selectedAnswerCard,
 }) {
@@ -46,6 +47,7 @@ export function checkAnswer({
     credentials: "include",
     body: JSON.stringify({
       sessionId,
+      currentPlayer,
       selectedQuestionCard,
       selectedAnswerCard,
     }),
@@ -100,7 +102,6 @@ export function flipAnswer({ sessionId, selectedAnswerCard }) {
   );
 }
 export async function getMemoryGameState(sessionId) {
-  console.log("HKHHGGJ: ", sessionId);
   const response = await fetch(
     `http://localhost:8080/game-sessions/memory-state?sessionId=${sessionId}`,
     {
@@ -113,4 +114,13 @@ export async function getMemoryGameState(sessionId) {
   }
   //מצפה לתשובה: { ready, questions }
   return await response.json();
+}
+export function getGameResult(sessionId) {
+  return fetch(
+    `http://localhost:8080/game-sessions/result-memory?sessionId=${sessionId}`,
+    {
+      method: "GET",
+      credentials: "include",
+    }
+  ).then((res) => res.json());
 }

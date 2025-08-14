@@ -1,6 +1,5 @@
 package com.ezdrive.ezdrive.persistence.Entities;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
@@ -11,9 +10,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 import lombok.Setter;
 
 @Entity
@@ -50,6 +49,8 @@ public class GameSession {
     @Column(name = "score")
     private Integer score;
 
+    @Column(name = "score2")
+    private Integer score2;
     
     @Column(name = "played_at")
     private LocalDateTime playedAt;

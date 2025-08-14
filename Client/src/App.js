@@ -12,11 +12,11 @@ import ChatPage from "./pages/ChatPage";
 import GamesPage from "./components/Games";
 import TriviaGame from "./components/TriviaGame";
 import EndOfTriviaPage from "./pages/EndOfTriviaPage";
+import EndOfMemeoryPage from "./pages/EndOfMemoryPage";
 import MemoryGame from "./components/MemoryGame";
 import MainLayout from "./layout/MainLayout";
 
 function App() {
-
   return (
     <BrowserRouter>
       <Routes>
@@ -34,6 +34,7 @@ function App() {
           <Route path="Games" element={<GamesPage />} />
           <Route path="TriviaGame" element={<TriviaGame />} />
           <Route path="EndOfTriviaPage" element={<EndOfTriviaPage />} />
+          <Route path="EndOfMemoryPage" element={<EndOfMemoryPage />} />
           <Route path="MemoryGame" element={<MemoryGame />} />
         </Route>
       </Routes>

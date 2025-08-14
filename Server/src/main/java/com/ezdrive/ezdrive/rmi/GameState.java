@@ -22,8 +22,10 @@ public class GameState implements Serializable{
     private String currentPlayer;
     private Map<String, Integer> scores = new HashMap<>();
     private Long sessionId;
+    private boolean gameOver = false;
 
     public GameState(Long sessionId, String player1, String player2) {
+        System.out.println("Game state constructor: " + player1);
         this.sessionId = sessionId;
         this.currentPlayer = player1;
         scores.put(player1, 0);
@@ -37,6 +39,7 @@ public class GameState implements Serializable{
     public void switchTurn() {
         List<String> players = new ArrayList<>(scores.keySet());
         if (players.size() == 2) {
+            System.out.println("Game State current player: " + currentPlayer);
             currentPlayer = currentPlayer.equals(players.get(0)) ? players.get(1) : players.get(0);
             System.out.println("[GameState] Turn switched. Current player: " + currentPlayer);
             currentQuestion = -1;
@@ -47,21 +50,13 @@ public class GameState implements Serializable{
     public void addPoint(String playerEmail) {
         int newScore = scores.getOrDefault(playerEmail, 0) + 1;
         scores.put(playerEmail, newScore);
+        currentQuestion = -1;
+        currentAnswer = -1;
         System.out.println("[GameState] Player " + playerEmail + " scored a point. New score: " + newScore);
     }
 
     public int getScore(String playerEmail) {
         return scores.getOrDefault(playerEmail, 0);
     }
-    
-    public void flipQuestion( int index)
-    {
-        currentQuestion = index;
-    }
-    public void flipAnswer( int index)
-    {
-        currentAnswer = index;
-    }
-
     
 }

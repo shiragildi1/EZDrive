@@ -139,7 +139,6 @@ export default function GamesPage() {
         try {
           // מקבל את מצב המשחק והשאלות מה-backend
           const ready = await getMemoryGameStatus(data.sessionId);
-          console.log("Polling response:", { ready });
           if (ready) {
             clearInterval(interval);
             // ממפה את השאלות לפורמט אחיד עבור הקומפוננטה
@@ -181,7 +180,6 @@ export default function GamesPage() {
         try {
           // מקבל את מצב המשחק והשאלות מה-backend
           const ready = await getMemoryGameStatus(joinSessionId);
-          console.log("Polling join response:", ready);
           if (ready) {
             clearInterval(interval);
             // ממפה את השאלות לפורמט אחיד עבור הקומפוננטה

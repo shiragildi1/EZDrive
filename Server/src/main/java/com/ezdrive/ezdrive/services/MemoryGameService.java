@@ -1,9 +1,9 @@
 package com.ezdrive.ezdrive.services;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -66,49 +66,42 @@ public class MemoryGameService {
 
     
     // שלב 2: בדיקה האם הזוג נכון
-    public boolean checkAnswer(Long sessionId, String userEmail, int selectedQuestionCard, int selectedAnswerCard) {
+    public boolean checkAnswer(Long sessionId, String userEmail, String currentPlayer, int selectedQuestionCard, int selectedAnswerCard) {
         GameSession session = gameSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new RuntimeException("Session not found"));
 
         MemoryGame gameAnswer = memoryGameRepository.findByGameSessionAndQuestionCard(session.getId(), selectedQuestionCard)
                 .orElseThrow(() -> new RuntimeException("Answer entry not found"));
 
-        if(gameAnswer.getAnswerCard() == selectedAnswerCard)
+        if(userEmail.equals(currentPlayer))
         {
-            gameAnswer.setFlipped(true);
-            gameAnswer.setPlayerAnsweredEmail(userEmail);
-            gameAnswer.setAnsweredAt(LocalDateTime.now());
+            if(gameAnswer.getAnswerCard() == selectedAnswerCard)
+            {
+                gameAnswer.setFlipped(true);
+                gameAnswer.setPlayerAnsweredEmail(userEmail);
+                gameAnswer.setAnsweredAt(LocalDateTime.now());
+            }
+            memoryGameRepository.save(gameAnswer);
         }
-
-        memoryGameRepository.save(gameAnswer);
         return gameAnswer.getAnswerCard() == selectedAnswerCard;
     }
 
     //שלב 3: חישוב תוצאה סופית
-    public MemoryGameResultResponseDto getGameResultMemory(Long sessionId) {
-
-        int numberOfCorrectAnswers = memoryGameRepository.countCorrectAnswers(sessionId);
-        int score = (numberOfCorrectAnswers * 100) / 10;
-
+    public MemoryGameResultResponseDto getGameResultMemory(Long sessionId,  Map<String, Integer> scores) {
         GameSession session = gameSessionRepository.findById(sessionId)
         .orElseThrow(() -> new RuntimeException("Session not found"));
 
-        //update session score
-        session.setScore(score);
+        String userEmail1 = session.getUser().getEmail();
+        String userEmail2 = session.getUser2().getEmail();
+
+        int score1 = scores.getOrDefault(userEmail1, 0);
+        int score2 = scores.getOrDefault(userEmail2, 0);
+
+        session.setScore(score1);
+        session.setScore2(score2);
+
         gameSessionRepository.save(session);
-        
-
-        Duration duration = Duration.between(session.getPlayedAt(), LocalDateTime.now());
-        long minutes = duration.toMinutes();
-        long seconds = duration.minusMinutes(minutes).getSeconds();
-        String totalTimeFormatted = String.format("%02d:%02d", minutes, seconds);
-
-        // Get all answers for the session
-        List<MemoryGame> answers = memoryGameRepository.findByGameSessionId(sessionId);
-
-        int total = answers.size();
-        int correctPlayer1 = (int) answers.stream().filter(answer -> "pessyisraeli@gmail.com".equals(answer.getPlayerAnsweredEmail())).count();
-        int correctPlayer2 = (int) answers.stream().filter(answer -> "shiragiladi1@gmail.com".equals(answer.getPlayerAnsweredEmail())).count();
-        return new MemoryGameResultResponseDto(total, correctPlayer1, correctPlayer2, totalTimeFormatted, score);
+               
+        return new MemoryGameResultResponseDto(scores);
     }
 }

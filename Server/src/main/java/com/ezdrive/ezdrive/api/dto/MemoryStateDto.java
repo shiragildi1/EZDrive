@@ -15,5 +15,6 @@ public class MemoryStateDto implements Serializable{
     private int flippedQuestion; 
     private int flippedAnswer; 
     private String currentPlayer;
+    private boolean gameOver;
 }
 
