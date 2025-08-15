@@ -179,15 +179,14 @@ public class GameSessionController {
 
     // Endpoint for polling memory game state (for frontend polling)
     @GetMapping("/memory-state")
-    public ResponseEntity<Boolean> getMemoryGameState(@RequestParam Long sessionId) {
+    public ResponseEntity<?> getMemoryGameState(@RequestParam Long sessionId) {
         try {
-            // The RMI service should provide a method to get the game state for polling
-            // For example: getGameState(sessionId) returns a POJO or Map with readiness and player info
-            boolean state = getRmiService().getGameState(sessionId);
-            System.out.println("Memory game state  in controllerfor session " + sessionId + ": " + state);
+            // The RMI service now returns a Map with all game state info
+            Object state = getRmiService().getGameState(sessionId);
+            System.out.println("Memory game state in controller for session " + sessionId + ": " + state);
             return ResponseEntity.ok(state);
         } catch (RemoteException e) {
-            return ResponseEntity.ok(false);
+            return ResponseEntity.status(500).body("Failed to get memory game state");
         }
     }
 

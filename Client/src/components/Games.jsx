@@ -33,6 +33,7 @@ export default function GamesPage() {
   const [joinSessionId, setJoinSessionId] = useState("");
   const [joining, setJoining] = useState(false);
   const [waitingForOpponent, setWaitingForOpponent] = useState(false);
+  const [data, setData] = useState(null);
 
   const topicsMap = {
     traffic: "חוקי התנועה",
@@ -141,7 +142,7 @@ export default function GamesPage() {
         try {
           console.log("han23456dle1:", data.session.id);
           // מקבל את מצב המשחק והשאלות מה-backend
-          const ready  = await getMemoryGameState(data.session.id);
+          const ready = await getMemoryGameState(data.session.id);
           console.log("Polling response:", { ready });
           if (ready) {
             console.log("handle2");
@@ -185,8 +186,8 @@ export default function GamesPage() {
       const interval = setInterval(async () => {
         try {
           // מקבל את מצב המשחק והשאלות מה-backend
-          const  ready = await getMemoryGameState(joinSessionId);
-          console.log("Polling join response:",  ready);
+          const ready = await getMemoryGameState(joinSessionId);
+          console.log("Polling join response:", ready);
           if (ready) {
             clearInterval(interval);
             // ממפה את השאלות לפורמט אחיד עבור הקומפוננטה

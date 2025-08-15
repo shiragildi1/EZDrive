@@ -1,0 +1,102 @@
+
+.profile-page {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(120deg, #181c22 60%, #23242a 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.profile-page-title {
+  color: whitesmoke;
+  font-size: 40px;
+  font-weight: bold;
+}
+
+.profile-page-subtitle {
+  color: whitesmoke;
+  font-size: 24px;
+  font-weight: bold;
+}
+.filter-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: row;
+  width: 50%;
+  margin: 0 auto;
+}
+.share-result,
+.everything,
+.last-month,
+.last-week {
+  background: #23242a;
+  font-family: "Varela Round", sans-serif;
+}
+
+.share-result:hover,
+.everything:hover,
+.last-month:hover,
+.last-week:hover {
+  background-color: #ff9800;
+  cursor: pointer;
+}
+
+/* עיצוב לעיגול ההישג */
+.circle-box {
+  width: 90px;
+  height: 90px;
+  position: relative;
+  display: inline-flex;
+}
+.circle-progress .MuiCircularProgress-circle {
+  stroke: #ff9800;
+}
+.circle-progress .MuiCircularProgress-root {
+  /* background: #2a2f37; */
+  border-radius: 50%;
+}
+.circle-center {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.circle-text {
+  color: #fff;
+  font-size: 22px;
+  font-weight: bold;
+}
+/* שורה של כרטיסי הישגים */
+.profile-achievements-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 50px;
+  margin-top: 32px;
+}
+
+.achievement-card {
+  background: #23242a;
+  border-radius: 18px;
+  padding: 18px 24px 16px 24px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 180px;
+  margin: 0 12px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+.achievement-title {
+  font-size: 22px;
+  font-weight: bold;
+  margin-top: 12px;
+}
+.achievement-label {
+  font-size: 16px;
+  margin-top: 8px;
+  color: #bdbdbd;
+}
