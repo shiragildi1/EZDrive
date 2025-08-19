@@ -101,7 +101,7 @@ public class MemoryGameService {
         session.setScore2(score2);
 
         gameSessionRepository.save(session);
-               
+
         return new MemoryGameResultResponseDto(scores);
     }
 }
