@@ -10,17 +10,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import org.springframework.context.ApplicationContext;
 
 import com.ezdrive.ezdrive.api.dto.MemoryGameResultResponseDto;
+import com.ezdrive.ezdrive.api.dto.MemoryGameSessionStartResponseDto;
+import com.ezdrive.ezdrive.api.dto.MemoryQuestionDto;
+import com.ezdrive.ezdrive.api.dto.MemoryStateDto;
 import com.ezdrive.ezdrive.persistence.Entities.Question;
+import com.ezdrive.ezdrive.persistence.Repositories.MemoryGameRepository;
+import com.ezdrive.ezdrive.persistence.Repositories.QuestionRepository;
 import com.ezdrive.ezdrive.services.MemoryGameService;
 
 
 public class RMIGameServiceImpl extends UnicastRemoteObject implements RMIGameService {
 
     private final MemoryGameService memoryGame;
+    private final MemoryGameRepository memoryGameRepository;
+    private final QuestionRepository questionRepository;
     private final Map<Long, GameState> gameStates = new ConcurrentHashMap<>();
     private final Map<Long, Set<String>> gamePlayers = new ConcurrentHashMap<>();
     // שמירת רשימת השאלות שנוצרה בפעם הראשונה לכל sessionId
@@ -29,11 +37,10 @@ public class RMIGameServiceImpl extends UnicastRemoteObject implements RMIGameSe
     public RMIGameServiceImpl(ApplicationContext springContext) throws RemoteException {
         super();
         this.memoryGame = springContext.getBean(MemoryGameService.class);
+        this.memoryGameRepository = springContext.getBean(MemoryGameRepository.class);
+        this.questionRepository = springContext.getBean(QuestionRepository.class);
     }
 
-
-
-    
     /**
      * מצרף שחקן למשחק קיים או יוצר GameState חדש אם זה השחקן השני.
      * שחקן ראשון: יתווסף ל-gamePlayers בלבד.
@@ -69,14 +76,35 @@ public class RMIGameServiceImpl extends UnicastRemoteObject implements RMIGameSe
         // if (!sessionQuestions.containsKey(sessionId)) {
             List<Question> questions = memoryGame.generateQuestionsForMemorySession(sessionId, category);
             sessionQuestions.put(sessionId, questions);
-            System.out.println("generate");
             return questions;
         // } else {
             // return sessionQuestions.get(sessionId);
         // }
     }
 
+    @Override
+    public synchronized MemoryGameSessionStartResponseDto retrieveQuestionsForMemorySession(Long sessionId) throws RemoteException
+    {
+         //question list
+            List<MemoryQuestionDto> memoryQuestionDtos = sessionQuestions.get(sessionId).stream()
+                .map(p -> new MemoryQuestionDto(
+                    p.getQuestionText(),
+                    true,
+                    memoryGameRepository.findQuestionCardPositionByGameSesstionAndQuestion(sessionId ,p.getQuestionId())))
+                .collect(Collectors.toList());
 
+            //answer list
+            List<MemoryQuestionDto> memoryAnswerDtos =  sessionQuestions.get(sessionId).stream()
+                .map(p -> new MemoryQuestionDto(
+                    questionRepository.findCorrectAnswerByQuestion(p.getQuestionId()),
+                    false,
+                    memoryGameRepository.findAnswerCardPositionByGameSesstionAndQuestion(sessionId,p.getQuestionId())))
+                .collect(Collectors.toList());
+
+                //Combine question and answer lists
+                memoryQuestionDtos.addAll(memoryAnswerDtos);
+                return new MemoryGameSessionStartResponseDto(sessionId, memoryQuestionDtos);
+    }
 
     /**
      * בודק אם המשחק מוכן (יש שני שחקנים ו-GameState מאותחל)
@@ -86,16 +114,8 @@ public class RMIGameServiceImpl extends UnicastRemoteObject implements RMIGameSe
         return players != null && players.size() == 2 && gameStates.containsKey(sessionId);
     }
 
-    /**
-     * מחזיר את רשימת השאלות שנשמרה עבור sessionId (אותו לוח לכל השחקנים)
-     */
-    public synchronized List<Question> getMemoryGameQuestions(Long sessionId) throws RemoteException {
-        return sessionQuestions.getOrDefault(sessionId, List.of());
-    }
-
     @Override
-    public synchronized boolean checkAnswer(Long sessionId, String userEmail, int selectedQuestionCard, int selectedAnswerCard) throws RemoteException {
-        System.out.println("Hiiiiiii");
+    public synchronized boolean checkAnswer(Long sessionId, String userEmail, String currentPlayer, int selectedQuestionCard, int selectedAnswerCard) throws RemoteException {
         GameState gameState = gameStates.get(sessionId);
 
         if (gameState == null) {
@@ -103,19 +123,20 @@ public class RMIGameServiceImpl extends UnicastRemoteObject implements RMIGameSe
             throw new RemoteException("Game state not initialized for session " + sessionId);
         }
 
-        if (!gameState.getCurrentPlayer().equals(userEmail)) {
-            System.out.println("It's not " + userEmail + "'s turn");
-            return false;
+        boolean isCorrect = this.memoryGame.checkAnswer(sessionId, userEmail, currentPlayer, selectedQuestionCard, selectedAnswerCard);
+        if(userEmail.equals(currentPlayer))
+        {
+            if (isCorrect) {
+                gameState.addPoint(userEmail);
+            } else {
+                System.out.println("switch turn");
+                gameState.switchTurn();
+            }
         }
-
-        boolean isCorrect = this.memoryGame.checkAnswer(sessionId, userEmail, selectedQuestionCard, selectedAnswerCard);
-
-        if (isCorrect) {
-            gameState.addPoint(userEmail);
-        } else {
-            gameState.switchTurn();
+        if(memoryGameRepository.areAllPairsFlipped(sessionId))
+        {
+            gameState.setGameOver(true);
         }
-
         return isCorrect;
     }
 
@@ -123,23 +144,50 @@ public class RMIGameServiceImpl extends UnicastRemoteObject implements RMIGameSe
      * Returns a map with game state for polling: { ready: boolean, players: List<String>, currentPlayer: String, questions: List<Question> }
      */
     @Override
-    public synchronized boolean getGameState(Long sessionId) throws RemoteException {
-       //HashMap<String, Object> result = new HashMap<>();
+    public synchronized boolean getGameStatus(Long sessionId) throws RemoteException {
         Set<String> players = gamePlayers.get(sessionId);
         boolean ready = players != null && players.size() == 2 && gameStates.containsKey(sessionId);
-        // result.put("ready", ready);
-        // result.put("players", players == null ? List.of() : new ArrayList<>(players));
-        // GameState gameState = gameStates.get(sessionId);
-        // result.put("currentPlayer", gameState != null ? gameState.getCurrentPlayer() : null);
-        // // Always return questions, so frontend can use them when ready
-        // List<Question> questions = sessionQuestions.get(sessionId);
-        // result.put("questions", questions == null ? List.of() : questions);
-    System.out.println("Game state for session " + sessionId + ": " + ready);
+        System.out.println("Game state for session " + sessionId + ": " + ready);
         return ready;
     }
 
     @Override
     public synchronized MemoryGameResultResponseDto getGameResultMemory(Long sessionId) throws RemoteException {
-        return memoryGame.getGameResultMemory(sessionId);
+        GameState gameState = gameStates.get(sessionId);
+        if (gameState == null) {
+            throw new RemoteException("Game state not found for session " + sessionId);
+        }
+
+        return memoryGame.getGameResultMemory(sessionId, gameState.getScores());
+    }
+
+    @Override
+    public synchronized void flipQuestion(Long sessionId, int questionIndex) throws RemoteException {
+        System.out.println("In flip question: " + questionIndex);
+        GameState gameState = gameStates.get(sessionId);
+        if(gameState != null){
+            gameState.setCurrentQuestion(questionIndex);
+        }
+    }
+
+    @Override
+    public synchronized void flipAnswer(Long sessionId, int answerIndex) throws RemoteException {
+        System.out.println("In flip answer: " + answerIndex);
+        GameState gameState = gameStates.get(sessionId);
+        if(gameState != null){
+            System.out.println("I was actually here");
+            gameState.setCurrentAnswer(answerIndex);
+        }
+    }
+
+    @Override
+    public synchronized MemoryStateDto getGameState(Long sessionId) throws RemoteException
+    {
+        GameState gameState = gameStates.get(sessionId);
+        if (gameState == null) {
+            throw new RemoteException("Game state not found for session " + sessionId);
+        }
+    
+        return new MemoryStateDto(gameState.getSessionId(), gameState.getCurrentQuestion(), gameState.getCurrentAnswer(), gameState.getCurrentPlayer(), gameState.isGameOver());
     }
 }

@@ -1,7 +1,5 @@
 package com.ezdrive.ezdrive.api.dto;
 
-import java.io.Serializable;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,9 +9,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-
-public class MemoryQuestionDto implements Serializable {
-    private String text;
-    private boolean question;
-    private int cardId;
+public class RankingStatsDto {
+    private String userEmail;
+    private Long totalScore;
+    private String profileImage;
 }

@@ -28,6 +28,6 @@ public interface MemoryGameRepository extends JpaRepository<MemoryGame, Long> {
     @Query(value = "SELECT * FROM memory_game WHERE game_session_id = :gameSessionId and question_card = :questionCard", nativeQuery = true)
     Optional <MemoryGame> findByGameSessionAndQuestionCard(Long gameSessionId, int questionCard);
 
-    @Query("SELECT COUNT(t) FROM MemoryGame t WHERE t.gameSession.id = :sessionId AND t.isFlipped = true")
-    int countCorrectAnswers(@Param("sessionId") Long sessionId);
+    @Query("SELECT COUNT(m) = 0 FROM MemoryGame m WHERE m.gameSession.id = :sessionId AND m.isFlipped = false")
+    boolean areAllPairsFlipped(@Param("sessionId") Long sessionId);
 }

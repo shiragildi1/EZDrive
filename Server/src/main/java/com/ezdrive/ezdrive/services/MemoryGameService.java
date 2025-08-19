@@ -1,9 +1,10 @@
 package com.ezdrive.ezdrive.services;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -36,10 +37,15 @@ public class MemoryGameService {
         GameSession session = gameSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new RuntimeException("Session not found"));
 
-        List<Integer> cardPositions = IntStream.range(0,24)
+        List<Integer> questionCardPositions = IntStream.range(0,12)
         .boxed()
         .collect(Collectors.toList());
-        Collections.shuffle(cardPositions); // Randomize the card order
+        Collections.shuffle(questionCardPositions); // Randomize the card order
+
+        List<Integer> answerCardPositions = IntStream.range(0,12)
+        .boxed()
+        .collect(Collectors.toList());
+        Collections.shuffle(answerCardPositions); 
 
         for (Question q : questions) {
             MemoryGame answer = new MemoryGame();
@@ -47,8 +53,8 @@ public class MemoryGameService {
             answer.setQuestion(q);
             
             // Randomly assign a question card and an answer card
-            int questionCard = cardPositions.remove(0); // First available position
-            int answerCard = cardPositions.remove(0);   // Second available position
+            int questionCard = questionCardPositions.remove(0); // First available position
+            int answerCard = answerCardPositions.remove(0);   // Second available position
 
             answer.setQuestionCard(questionCard);
             answer.setAnswerCard(answerCard);
@@ -61,52 +67,50 @@ public class MemoryGameService {
 
     
     // שלב 2: בדיקה האם הזוג נכון
-    public boolean checkAnswer(Long sessionId, String userEmail, int selectedQuestionCard, int selectedAnswerCard) {
-         System.out.println("From client: "+userEmail+" "+selectedQuestionCard);
+    public boolean checkAnswer(Long sessionId, String userEmail, String currentPlayer, int selectedQuestionCard, int selectedAnswerCard) {
         GameSession session = gameSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new RuntimeException("Session not found"));
 
         MemoryGame gameAnswer = memoryGameRepository.findByGameSessionAndQuestionCard(session.getId(), selectedQuestionCard)
                 .orElseThrow(() -> new RuntimeException("Answer entry not found"));
 
-        if(gameAnswer.getAnswerCard() == selectedAnswerCard)
+        if(userEmail.equals(currentPlayer))
         {
-            gameAnswer.setFlipped(true);
-            gameAnswer.setPlayerAnsweredEmail(userEmail);
-            gameAnswer.setAnsweredAt(LocalDateTime.now());
+            if(gameAnswer.getAnswerCard() == selectedAnswerCard)
+            {
+                gameAnswer.setFlipped(true);
+                gameAnswer.setPlayerAnsweredEmail(userEmail);
+                gameAnswer.setAnsweredAt(LocalDateTime.now());
+            }
+            memoryGameRepository.save(gameAnswer);
         }
-
-        memoryGameRepository.save(gameAnswer);
-       
-        System.out.println(gameAnswer.isFlipped());
         return gameAnswer.getAnswerCard() == selectedAnswerCard;
     }
 
     //שלב 3: חישוב תוצאה סופית
-    public MemoryGameResultResponseDto getGameResultMemory(Long sessionId) {
-
-        int numberOfCorrectAnswers = memoryGameRepository.countCorrectAnswers(sessionId);
-        int score = (numberOfCorrectAnswers * 100) / 10;
-
+    public MemoryGameResultResponseDto getGameResultMemory(Long sessionId,  Map<String, Integer> scores) {
         GameSession session = gameSessionRepository.findById(sessionId)
         .orElseThrow(() -> new RuntimeException("Session not found"));
 
-        //update session score
-        session.setScore(score);
+        String userEmail1 = session.getUser().getEmail();
+        String userEmail2 = session.getUser2().getEmail();
+
+        int score1 = scores.getOrDefault(userEmail1, 0);
+        int score2 = scores.getOrDefault(userEmail2, 0);
+
+        int totalPairs = 12;
+
+        int percentP1 = (int) Math.round((score1 * 100.0) / totalPairs);
+        int percentP2 = (int) Math.round((score2 * 100.0) / totalPairs);
+
+        session.setScore(percentP1);
+        session.setScore2(percentP2);
         gameSessionRepository.save(session);
-        
 
-        Duration duration = Duration.between(session.getPlayedAt(), LocalDateTime.now());
-        long minutes = duration.toMinutes();
-        long seconds = duration.minusMinutes(minutes).getSeconds();
-        String totalTimeFormatted = String.format("%02d:%02d", minutes, seconds);
+        Map<String, Integer> percentMap = new HashMap<>();
+        percentMap.put(userEmail1, percentP1);
+        percentMap.put(userEmail2, percentP2);
 
-        // Get all answers for the session
-        List<MemoryGame> answers = memoryGameRepository.findByGameSessionId(sessionId);
-
-        int total = answers.size();
-        int correctPlayer1 = (int) answers.stream().filter(answer -> "pessyisraeli@gmail.com".equals(answer.getPlayerAnsweredEmail())).count();
-        int correctPlayer2 = (int) answers.stream().filter(answer -> "shiragiladi1@gmail.com".equals(answer.getPlayerAnsweredEmail())).count();
-        return new MemoryGameResultResponseDto(total, correctPlayer1, correctPlayer2, totalTimeFormatted, score);
+        return new MemoryGameResultResponseDto(percentMap);
     }
 }

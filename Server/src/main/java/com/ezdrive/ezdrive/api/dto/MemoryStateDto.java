@@ -1,4 +1,6 @@
 package com.ezdrive.ezdrive.api.dto;
+import java.io.Serializable;
+
 import lombok.AllArgsConstructor;   
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,9 +10,10 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CheckAnswerRequestDto {
+public class MemoryStateDto implements Serializable{
     private Long sessionId;
+    private int flippedQuestion; 
+    private int flippedAnswer; 
     private String currentPlayer;
-    private int selectedQuestionCard; 
-    private int selectedAnswerCard; 
+    private boolean gameOver;
 }

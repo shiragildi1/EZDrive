@@ -1,4 +1,3 @@
-
 package com.ezdrive.ezdrive.api.controllers;
 
 import java.rmi.RemoteException;
@@ -25,12 +24,14 @@ import com.ezdrive.ezdrive.api.dto.MemoryGameResultResponseDto;
 import com.ezdrive.ezdrive.api.dto.MemoryGameSessionStartResponseDto;
 import com.ezdrive.ezdrive.api.dto.MemoryGameStartRequestDto;
 import com.ezdrive.ezdrive.api.dto.MemoryQuestionDto;
+import com.ezdrive.ezdrive.api.dto.MemoryStateDto;
 import com.ezdrive.ezdrive.api.dto.QuestionFeedbackDto;
 import com.ezdrive.ezdrive.api.dto.QuestionTriviaDto;
 import com.ezdrive.ezdrive.api.dto.SubmitAnswerRequestDto;
 import com.ezdrive.ezdrive.persistence.Entities.GameSession;
 import com.ezdrive.ezdrive.persistence.Entities.Question;
 import com.ezdrive.ezdrive.persistence.Entities.User;
+import com.ezdrive.ezdrive.persistence.Repositories.GameSessionRepository;
 import com.ezdrive.ezdrive.persistence.Repositories.MemoryGameRepository;
 import com.ezdrive.ezdrive.persistence.Repositories.QuestionRepository;
 import com.ezdrive.ezdrive.rmi.RMIGameService;
@@ -50,6 +51,9 @@ public class GameSessionController {
     private GameSessionService gameSessionService;
 
     @Autowired
+    private GameSessionRepository gameSessionRepository;
+
+    @Autowired
     private TriviaGameService triviaGameService;
 
     @Autowired
@@ -63,7 +67,6 @@ public class GameSessionController {
         try {
             Registry registry = LocateRegistry.getRegistry("127.0.0.1", 1099);
             memoryGameService = (RMIGameService) registry.lookup("RMIGameService");
-            System.out.println("Connected to RMI service");
         } catch (Exception e) {
             System.err.println("Failed to connect to RMI service: " + e.getMessage());
             e.printStackTrace();
@@ -103,12 +106,18 @@ public class GameSessionController {
     }
 
     @PostMapping("/submit-answer")
-    public ResponseEntity<AnswerResultDto> submitAnswer(@RequestBody SubmitAnswerRequestDto request) {
+    public ResponseEntity<AnswerResultDto> submitAnswer(@RequestBody SubmitAnswerRequestDto request, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return ResponseEntity.status(401).build();
+        }
+
         AnswerResultDto result =
         triviaGameService.submitAnswer(
             request.getSessionId(),
             request.getQuestionId(),
             request.getSelectedAnswer());
+        System.out.println("submitAnswer result: " + result);
         return ResponseEntity.ok(result);
     }
 
@@ -135,7 +144,6 @@ public class GameSessionController {
             getRmiService().joinGame(gameSession.getId(), user.getEmail());
             // Generate questions for the memory game session
             List<Question> questions = getRmiService().generateQuestionsForMemorySession(gameSession.getId(), request.getCategory());
-            System.out.println("Generated questions for memory game session: " + questions);
                   
             //question list
             List<MemoryQuestionDto> memoryQuestionDtos = questions.stream()
@@ -155,42 +163,80 @@ public class GameSessionController {
 
                 //Combine question and answer lists
                 memoryQuestionDtos.addAll(memoryAnswerDtos);
-            System.out.println("Memory question DTOs: " + memoryQuestionDtos);
-                return new MemoryGameSessionStartResponseDto(gameSession, memoryQuestionDtos);
+                return new MemoryGameSessionStartResponseDto(gameSession.getId(), memoryQuestionDtos);
         } catch (RemoteException e) {
             return new MemoryGameSessionStartResponseDto(null, null);
         }
     }
 
     @PostMapping("/join-memory")
-    public ResponseEntity<Void> joinMemoryGame(@RequestParam Long sessionId, HttpSession session) {
-    User user = (User) session.getAttribute("user");
-    if (user == null) {
-        return ResponseEntity.status(401).build();
-    }
+    public MemoryGameSessionStartResponseDto joinMemoryGame(@RequestParam Long sessionId, HttpSession session) {
+        
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+        return new MemoryGameSessionStartResponseDto(null,null);
+        }
 
-    try {
-        getRmiService().joinGame(sessionId, user.getEmail());
-        return ResponseEntity.ok().build();
-    } catch (RemoteException e) {
-        return ResponseEntity.status(500).build();
-    }
-}
+        GameSession gameSession = gameSessionRepository.findById(sessionId)
+            .orElseThrow(() -> new RuntimeException("Session not found"));
 
-    // Endpoint for polling memory game state (for frontend polling)
-    @GetMapping("/memory-state")
-    public ResponseEntity<?> getMemoryGameState(@RequestParam Long sessionId) {
+        gameSession.setUser2(user);
+        gameSessionRepository.save(gameSession);
+        System.out.println("User 2 controller: "+ user.getEmail());
+        System.out.println(gameSession.getUser2());
         try {
-            // The RMI service now returns a Map with all game state info
-            Object state = getRmiService().getGameState(sessionId);
-            System.out.println("Memory game state in controller for session " + sessionId + ": " + state);
-            return ResponseEntity.ok(state);
+            getRmiService().joinGame(sessionId, user.getEmail());
+            
+            MemoryGameSessionStartResponseDto response = memoryGameService.retrieveQuestionsForMemorySession(sessionId);
+            return response;
         } catch (RemoteException e) {
-            return ResponseEntity.status(500).body("Failed to get memory game state");
+            System.err.println("Failed to join memory game: " + e.getMessage());
+            return new MemoryGameSessionStartResponseDto(null,null);
+        }
+    }
+    @PostMapping("/flip-question")
+    public ResponseEntity<Void> flipQuestion(@RequestParam Long sessionId, @RequestParam int questionIndex) {
+        try {
+            System.out.println("Flipping question at index: " + questionIndex + " for session: " + sessionId);
+            getRmiService().flipQuestion(sessionId, questionIndex);
+            return ResponseEntity.ok().build();
+        } catch (RemoteException e) {
+            return ResponseEntity.status(500).build();
         }
     }
 
+    @PostMapping("/flip-answer")
+    public ResponseEntity<Void> flipAnswer(@RequestParam Long sessionId, @RequestParam int answerIndex) {
+        try {
+            getRmiService().flipAnswer(sessionId, answerIndex);
+            return ResponseEntity.ok().build();
+        } catch (RemoteException e) {
+            return ResponseEntity.status(500).build();
+        }
+    }
 
+    // Endpoint for polling memory game status (for frontend polling)
+    @GetMapping("/memory-status")
+    public ResponseEntity<Boolean> getMemoryGameStatus(@RequestParam Long sessionId) {
+        try {
+            // The RMI service should provide a method to get the game state for polling
+            // For example: getGameState(sessionId) returns a POJO or Map with readiness and player info
+            boolean state = getRmiService().getGameStatus(sessionId);
+            return ResponseEntity.ok(state);
+        } catch (RemoteException e) {
+            return ResponseEntity.ok(false);
+        }
+    }
+@GetMapping("/memory-state")
+public MemoryStateDto getMemoryGameState(@RequestParam Long sessionId)
+{
+    try {
+        MemoryStateDto state = getRmiService().getGameState(sessionId);
+        return state;
+    } catch (RemoteException e) {
+        return new MemoryStateDto();
+    }
+}
     //Memory game
     @PostMapping("/check-answer")
     public ResponseEntity<Boolean> checkAnswer(@RequestBody CheckAnswerRequestDto request, HttpSession session) {
@@ -204,6 +250,7 @@ public class GameSessionController {
             isCorrect = getRmiService().checkAnswer(
                 request.getSessionId(),
                 user.getEmail(), 
+                request.getCurrentPlayer(),
                 request.getSelectedQuestionCard(),
                 request.getSelectedAnswerCard()
             );

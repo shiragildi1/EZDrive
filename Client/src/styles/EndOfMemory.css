@@ -1,0 +1,106 @@
+.end-of-memory-page {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(120deg, #181c22 60%, #23242a 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.end-of-memory-header {
+  text-align: center;
+  width: 100%;
+  height: 20%;
+}
+.end-of-memory-header h1,
+h2 {
+  color: #00d4ff;
+}
+.squares-end-of-memory {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 7%;
+  width: 100%;
+  height: 100%;
+}
+.square-end-of-memory {
+  background-color: aliceblue;
+  border-radius: 20px;
+  width: 17%;
+  height: 35%;
+  background-color: #181c22;
+  border: 1px solid #00d4ff;
+}
+.square-end-of-memory h3 {
+  color: #ffb400;
+  text-align: center;
+}
+.square-end-of-memory p {
+  color: #ffb400;
+  text-align: center;
+}
+.square-end-of-memory .score,
+.square-end-of-memory .number-of-questions,
+.square-end-of-memory .test-length {
+  border: 1px solid #00d4ff;
+  border-radius: 20px;
+  width: 100%;
+  height: 62%;
+  display: flex;
+  justify-content: center;
+}
+.square-end-of-memory .score p,
+.square-end-of-memory .number-of-questions p,
+.square-end-of-memory .test-length p {
+  font-weight: bold;
+  color: #ffb400;
+  text-align: center;
+  font-size: 38px;
+}
+.buttons-end-of-memory {
+  width: 100%;
+  height: 10%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.buttons-end-of-memory .left-buttons {
+  margin-left: 2%;
+}
+.buttons-end-of-memory .right-buttons {
+  margin-right: 2%;
+}
+.left-buttons,
+.right-buttons {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.menu-button1,
+.play-again-button {
+  height: 70%;
+  width: 160px;
+  background-color: #ffb400;
+  border-radius: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 6px #ffb40088;
+}
+
+.menu-button1 h3,
+.play-again-button h3 {
+  margin: 0;
+  color: #181c22;
+}
+.no-style-link {
+  text-decoration: none;
+  color: inherit;
+  display: inline-block;
+}
