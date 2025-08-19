@@ -1,6 +1,6 @@
 package com.ezdrive.ezdrive.api.controllers;
 
-import java.io.File;
+import java.io.InputStream;
 import java.util.Collections;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +28,11 @@ public class QuestionController
         try 
         {
             ClassPathResource resource = new ClassPathResource("theoryexamhe-data.xml");
-            File file = resource.getFile();
-            questionService.importFromXmlFile(file.getAbsolutePath());
+            InputStream inputStream = resource.getInputStream();
+        questionService.importFromXmlStream(inputStream);
+           // File file = resource.getFile();
+
+           // questionService.importFromXmlFile(file.getAbsolutePath());
             return ResponseEntity.ok(Collections.singletonMap("message", "Succses!"));
         }
         catch (Exception e) 

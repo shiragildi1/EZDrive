@@ -16,4 +16,5 @@ public class MemoryQuestionDto implements Serializable {
     private String text;
     private boolean question;
     private int cardId;
+    private String imageURl;
 }

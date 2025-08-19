@@ -65,6 +65,8 @@ export default function GamesPage() {
 
         setQuestions(formattedQuestions); // שמור את השאלות בפורמט החדש
          setSessionId(data.session.id); // שמור את מזהה הסשן
+//          setSessionId(data.sessionId); // שמור את מזהה הסשן
+// >>>>>>> origin/08/19-1-P
         setShowTrivia(true);
         console.log("formattedQuestions:", formattedQuestions); // עבור למצב משחק
       })
@@ -142,13 +144,14 @@ export default function GamesPage() {
           if (ready) {
             clearInterval(interval);
             // ממפה את השאלות לפורמט אחיד עבור הקומפוננטה
-
             // כל שאלה הופכת לאובייקט עם cardId, isQuestion, text
             const formattedQuestions = data.questions.map((question) => ({
               cardId: question.cardId,
               isQuestion: question.question,
               text: question.text,
+              imageUrl: question.imageURl || null,
             }));
+            console.log("FORMATTED: ", formattedQuestions);
             setQuestions(formattedQuestions); // שומר את השאלות המעובדות ב-state
             setShowMemory(true); // עובר למצב משחק זיכרון
             setSessionId(data.sessionId); // שומר את מזהה הסשן
@@ -183,26 +186,28 @@ export default function GamesPage() {
           if (ready) {
             clearInterval(interval);
             // ממפה את השאלות לפורמט אחיד עבור הקומפוננטה
-
             const formattedQuestions = data.questions.map((question) => ({
               cardId: question.cardId,
               isQuestion: question.question,
               text: question.text,
+              imageUrl: question.imageURl || null,
             }));
             setQuestions(formattedQuestions); // שומר את השאלות המעובדות ב-state
             setShowMemory(true); // עובר למצב משחק זיכרון
-
+            setSessionId(data.sessionId); // שומר את מזהה הסשן
             setWaitingForOpponent(false); // מפסיק להציג את מסך ההמתנה
           }
-        } catch (err) {
+        } 
+        catch (err) 
+        {
           console.error("[Memory] שגיאה ב-polling:", err);
         }
       }, 2000);
     } catch (err) {
-      console.error("[Memory] שגיאה בהצטרפות למשחק:", err);
+      console.error("[Memory] שגיאה ביצירת משחק:", err);
       setWaitingForOpponent(false);
     } finally {
-      setJoining(false);
+      setLoadingMemory(false);
     }
   };
   if (showMemory) {

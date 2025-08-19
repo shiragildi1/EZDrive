@@ -1,3 +1,4 @@
+
 package com.ezdrive.ezdrive.api.controllers;
 
 import java.rmi.RemoteException;
@@ -150,7 +151,8 @@ public class GameSessionController {
                 .map(p -> new MemoryQuestionDto(
                     p.getQuestionText(),
                     true,
-                    memoryGameRepository.findQuestionCardPositionByGameSesstionAndQuestion(gameSession.getId(),p.getQuestionId())))
+                    memoryGameRepository.findQuestionCardPositionByGameSesstionAndQuestion(gameSession.getId(),p.getQuestionId()),
+                    p.getImageUrl()))
                 .collect(Collectors.toList());
 
             //answer list
@@ -158,7 +160,8 @@ public class GameSessionController {
                 .map(p -> new MemoryQuestionDto(
                     questionRepository.findCorrectAnswerByQuestion(p.getQuestionId()),
                     false,
-                    memoryGameRepository.findAnswerCardPositionByGameSesstionAndQuestion(gameSession.getId(),p.getQuestionId())))
+                    memoryGameRepository.findAnswerCardPositionByGameSesstionAndQuestion(gameSession.getId(),p.getQuestionId()),
+                    p.getImageUrl()))
                 .collect(Collectors.toList());
 
                 //Combine question and answer lists

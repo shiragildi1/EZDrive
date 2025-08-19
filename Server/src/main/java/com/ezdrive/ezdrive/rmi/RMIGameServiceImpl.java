@@ -90,7 +90,8 @@ public class RMIGameServiceImpl extends UnicastRemoteObject implements RMIGameSe
                 .map(p -> new MemoryQuestionDto(
                     p.getQuestionText(),
                     true,
-                    memoryGameRepository.findQuestionCardPositionByGameSesstionAndQuestion(sessionId ,p.getQuestionId())))
+                    memoryGameRepository.findQuestionCardPositionByGameSesstionAndQuestion(sessionId ,p.getQuestionId()),
+                    p.getImageUrl()))
                 .collect(Collectors.toList());
 
             //answer list
@@ -98,7 +99,8 @@ public class RMIGameServiceImpl extends UnicastRemoteObject implements RMIGameSe
                 .map(p -> new MemoryQuestionDto(
                     questionRepository.findCorrectAnswerByQuestion(p.getQuestionId()),
                     false,
-                    memoryGameRepository.findAnswerCardPositionByGameSesstionAndQuestion(sessionId,p.getQuestionId())))
+                    memoryGameRepository.findAnswerCardPositionByGameSesstionAndQuestion(sessionId,p.getQuestionId()),
+                     p.getImageUrl()))
                 .collect(Collectors.toList());
 
                 //Combine question and answer lists

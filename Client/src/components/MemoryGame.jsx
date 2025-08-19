@@ -5,7 +5,7 @@ import { flipQuestion, flipAnswer } from "../services/GameMemoryServiceRMI";
 import { getMemoryGameState } from "../services/GameMemoryServiceRMI";
 import { useUserContext } from "../context/UserContext";
 import { getGameResult } from "../services/GameMemoryServiceRMI";
-import EndOfMemoryPage from "../pages/EndOfMemoryPage";
+//import EndOMemoryPage from "../pages/EndOMemoryPage";
 import "../styles/MemoryGame.css";
 import logo from "../assets/logo1.png";
 
@@ -19,7 +19,6 @@ export default function memoryGame({ questions, sessionId, topic }) {
     getCurrentUser()
       .then((user) => {
         setUser(user);
-        console.log("User loaded from session - MemoryGame:", user);
       })
       .catch(() => {
         setUser(null);
@@ -58,6 +57,7 @@ export default function memoryGame({ questions, sessionId, topic }) {
 
     setQuestionCards(sortedQuestions);
     setAnswerCards(sortedAnswers);
+    console.log(questionCards[8]);
   }, [questions]);
 
   const [questionFlipped, setQuestionFlipped] = useState(false);
@@ -81,6 +81,7 @@ export default function memoryGame({ questions, sessionId, topic }) {
     if (currentPlayer != userEmail) {
       return;
     }
+
     const alreadyFlipped = flippedQuestionCards.some((flipped) => flipped); // Check if any card is already flipped
     if (alreadyFlipped) return; // If yes, do nothing
 
@@ -230,13 +231,13 @@ export default function memoryGame({ questions, sessionId, topic }) {
           );
           console.log("Game over! Final result:", finalResult);
 
-          return (
-            <EndOfMemoryPage
-              score1={scoreResult.finalResult.scores[userEmail]}
-              score2={scoreResult.finalResult.scores[opponentEmail]}
-              sessionId={sessionId}
-            />
-          );
+          // return (
+          //   <EndOMemoryPage
+          //     score1={scoreResult.finalResult.scores[userEmail]}
+          //     score2={scoreResult.finalResult.scores[opponentEmail]}
+          //     sessionId={sessionId}
+          //   />
+          // );
         }
       } catch (err) {
         console.error("Polling error in MemoryGameState:", err);
@@ -252,8 +253,8 @@ export default function memoryGame({ questions, sessionId, topic }) {
       <div className="memory_game">
         {showResult && <div className="score-popup">+1</div>}
         {/* <div className="header">
-        <div className="score"> </div>
-       </div> */}
+  <div className="score"> </div>
+ </div> */}
 
         <div className="board">
           <div className="questions-board">
@@ -277,21 +278,57 @@ export default function memoryGame({ questions, sessionId, topic }) {
                   }`}
                 >
                   <div className="card-front">
-                    <img src={logo} alt="EZDrive Logo" className="logo_img" />
+                    {questionStatus[card.cardId] !== "disabled" && (
+                      <>
+                        <span className="card-text">{card.text}</span>
+                        {card.imageUrl && (
+                          <img
+                            src={
+                              card.imageUrl.startsWith("http")
+                                ? card.imageUrl
+                                : `https://${card.imageUrl}`
+                            }
+                            alt="שאלה"
+                            className="question-image"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = logo; // fallback to EZDrive logo
+                            }}
+                          />
+                        )}
+                      </>
+                    )}
+                    {/* <img src={logo} alt="EZDrive Logo" className="logo_img" /> */}
                   </div>
                   <div className="card-back">
-                    {questionStatus[card.cardId] === "disabled" && (
-                      <img src={logo} alt="EZDrive Logo" className="logo_img" />
+                    {questionStatus[card.cardId] !== "disabled" && (
+                      <>
+                        <span className="card-text">{card.text}</span>
+                        {card.imageUrl && (
+                          <img
+                            src={
+                              card.imageUrl.startsWith("http")
+                                ? card.imageUrl
+                                : `https://${card.imageUrl}`
+                            }
+                            alt="שאלה"
+                            className="question-image"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = logo; // fallback to EZDrive logo
+                            }}
+                          />
+                        )}
+                      </>
                     )}
-                    {questionStatus[card.cardId] != "disabled" && (
-                      <span className="card-text">{card.text}</span>
-                    )}
+                    {/*questionStatus[card.cardId] != "disabled" && (
+        <span className="card-text">{card.text}</span>
+      )*/}
                   </div>
                 </div>
               </div>
             ))}
           </div>
-
           <div className="answer-board">
             {answerCards.map((card, i) => (
               <div
@@ -313,14 +350,21 @@ export default function memoryGame({ questions, sessionId, topic }) {
                   }`}
                 >
                   <div className="card-front">
-                    <img src={logo} alt="EZDrive Logo" className="logo_img" />
+                    {answerStatus[card.cardId] != "disabled" && (
+                      <>
+                        <span className="card-text">{card.text}</span>
+                      </>
+                    )}
+                    {/* <img src={logo} alt="EZDrive Logo" className="logo_img" /> */}
                   </div>
                   <div className="card-back">
                     {answerStatus[card.cardId] === "disabled" && (
                       <img src={logo} alt="EZDrive Logo" className="logo_img" />
                     )}
                     {answerStatus[card.cardId] != "disabled" && (
-                      <span className="card-text">{card.text}</span>
+                      <>
+                        <span className="card-text">{card.text}</span>
+                      </>
                     )}
                   </div>
                 </div>

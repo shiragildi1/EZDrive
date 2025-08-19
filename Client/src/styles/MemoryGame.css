@@ -49,6 +49,12 @@
   margin-right: 20px;
   margin-left: 0px;
 }
+.question-image {
+  max-width: 100%;
+  max-height: 120px;
+  object-fit: contain;
+  margin-bottom: 8px;
+}
 .score-popup {
   position: absolute;
   top: 40px;
@@ -135,6 +141,8 @@
 
 .card-back {
   transform: rotateY(180deg);
+  flex-direction: column;
+  text-align: center;
 }
 .cardFlip {
   transform: rotateY(180deg);
