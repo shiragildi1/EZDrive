@@ -142,13 +142,14 @@ export default function GamesPage() {
           if (ready) {
             clearInterval(interval);
             // ממפה את השאלות לפורמט אחיד עבור הקומפוננטה
-
             // כל שאלה הופכת לאובייקט עם cardId, isQuestion, text
             const formattedQuestions = data.questions.map((question) => ({
               cardId: question.cardId,
               isQuestion: question.question,
               text: question.text,
+              imageUrl: question.imageURl || null,
             }));
+            console.log("FORMATTED: ", formattedQuestions);
             setQuestions(formattedQuestions); // שומר את השאלות המעובדות ב-state
             setShowMemory(true); // עובר למצב משחק זיכרון
             setSessionId(data.sessionId); // שומר את מזהה הסשן
@@ -183,11 +184,12 @@ export default function GamesPage() {
           if (ready) {
             clearInterval(interval);
             // ממפה את השאלות לפורמט אחיד עבור הקומפוננטה
-
+            console.log("IMage url back0: ", data.questions[9].imageURl);
             const formattedQuestions = data.questions.map((question) => ({
               cardId: question.cardId,
               isQuestion: question.question,
               text: question.text,
+              imageUrl: question.imageURl || null,
             }));
             setQuestions(formattedQuestions); // שומר את השאלות המעובדות ב-state
             setShowMemory(true); // עובר למצב משחק זיכרון

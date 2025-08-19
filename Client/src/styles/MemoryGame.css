@@ -32,6 +32,7 @@
   display: flex;
   justify-content: space-between;
 } */
+
 .player_A,
 .player_B {
   background: linear-gradient(90deg, #ff9800 0%, #ffd600 100%);
@@ -48,6 +49,12 @@
 .player_B {
   margin-right: 20px;
   margin-left: 0px;
+}
+.question-image {
+  max-width: 100%;
+  max-height: 120px;
+  object-fit: contain;
+  margin-bottom: 8px;
 }
 .score-popup {
   position: absolute;
@@ -135,6 +142,8 @@
 
 .card-back {
   transform: rotateY(180deg);
+  flex-direction: column;
+  text-align: center;
 }
 .cardFlip {
   transform: rotateY(180deg);

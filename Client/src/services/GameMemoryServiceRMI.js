@@ -82,7 +82,6 @@ export async function getMemoryGameStatus(sessionId) {
 }
 
 export function flipQuestion({ sessionId, selectedQuestionCard }) {
-  console.log("Going to update question: ", sessionId);
   return fetch(
     `http://localhost:8080/game-sessions/flip-question?sessionId=${sessionId}&questionIndex=${selectedQuestionCard}`,
     {
@@ -92,7 +91,6 @@ export function flipQuestion({ sessionId, selectedQuestionCard }) {
   );
 }
 export function flipAnswer({ sessionId, selectedAnswerCard }) {
-  console.log("Going to update: ", sessionId);
   return fetch(
     `http://localhost:8080/game-sessions/flip-answer?sessionId=${sessionId}&answerIndex=${selectedAnswerCard}`,
     {

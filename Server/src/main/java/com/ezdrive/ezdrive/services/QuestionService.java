@@ -1,6 +1,6 @@
 package com.ezdrive.ezdrive.services;
 
-import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,44 +26,73 @@ public class QuestionService
     @Autowired
     private QuestionRepository questionRepository;
 
-    public void importFromXmlFile(String filePath) 
-    {
-        List<Question> questions = extractQuestionsFromXml(filePath);
-        questionRepository.saveAll(questions);
-    }
+    // public void importFromXmlFile(String filePath) 
+    // {
+    //     List<Question> questions = extractQuestionsFromXml(filePath);
+    //     questionRepository.saveAll(questions);
+    // }
+public void importFromXmlStream(InputStream inputStream) {
+    List<Question> questions = extractQuestionsFromXml(inputStream);
+    questionRepository.saveAll(questions);
+}
 
     
-    private List<Question> extractQuestionsFromXml(String filePath) 
-    {
-        List<Question> questions = new ArrayList<>();
-        try 
-        {
-            File file = new File(filePath);
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            //Dom stractur
-            org.w3c.dom.Document xmlDoc = builder.parse(file);
+    // private List<Question> extractQuestionsFromXml(String filePath) 
+    // {
+    //     List<Question> questions = new ArrayList<>();
+    //     try 
+    //     {
+    //         File file = new File(filePath);
+    //         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    //         DocumentBuilder builder = factory.newDocumentBuilder();
+    //         //Dom stractur
+    //         org.w3c.dom.Document xmlDoc = builder.parse(file);
 
-            NodeList items = xmlDoc.getElementsByTagName("item");
-            for (int i = 0; i < items.getLength(); i++) 
-            {
-                org.w3c.dom.Element item = (org.w3c.dom.Element) items.item(i);
+    //         NodeList items = xmlDoc.getElementsByTagName("item");
+    //         for (int i = 0; i < items.getLength(); i++) 
+    //         {
+    //             org.w3c.dom.Element item = (org.w3c.dom.Element) items.item(i);
 
-                String title = getText(item, "title");          
-                String description = getText(item, "description"); 
-                String category = getText(item, "category"); 
+    //             String title = getText(item, "title");          
+    //             String description = getText(item, "description"); 
+    //             String category = getText(item, "category"); 
 
-                Question question = parseQuestionFromHtml(title, description, category);
-                questions.add(question); 
+    //             Question question = parseQuestionFromHtml(title, description, category);
+    //             questions.add(question); 
                 
+    //         }
+    //     } 
+    //     catch (Exception e) 
+    //     {
+    //         e.printStackTrace(); 
+    //     }
+    //     return questions;
+    // }
+    private List<Question> extractQuestionsFromXml(InputStream inputStream) {
+    List<Question> questions = new ArrayList<>();
+    try {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        org.w3c.dom.Document xmlDoc = builder.parse(inputStream);
+
+        NodeList items = xmlDoc.getElementsByTagName("item");
+        for (int i = 0; i < items.getLength(); i++) {
+            org.w3c.dom.Element item = (org.w3c.dom.Element) items.item(i);
+
+            String title = getText(item, "title");
+            String description = getText(item, "description");
+            String category = getText(item, "category");
+
+            Question question = parseQuestionFromHtml(title, description, category);
+            if (question != null) {
+                questions.add(question);
             }
-        } 
-        catch (Exception e) 
-        {
-            e.printStackTrace(); 
         }
-        return questions;
+    } catch (Exception e) {
+        e.printStackTrace();
     }
+    return questions;
+}
 
     private String getText(org.w3c.dom.Element element, String tagName) 
     {
@@ -98,14 +127,17 @@ public class QuestionService
                     }
                 }
             }
+           Element img = doc.selectFirst("img");
+            String imageUrl = (img != null) ? img.attr("src") : null;
+            System.out.println("Image URL service: "+ imageUrl);
+
             if (correctAnswer == -1) return null;
 
             return new Question(
                 null, title, category,
                 answerTexts[0], answerTexts[1], answerTexts[2], answerTexts[3],
-                correctAnswer, answerText
+                correctAnswer, imageUrl
             );
-
         } 
         catch (Exception e) 
         {

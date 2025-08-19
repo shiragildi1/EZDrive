@@ -29,7 +29,8 @@ public class SecurityConfig {
                     "/game-sessions/startMemory",
                     "/swagger-ui/**",
                     "/swagger-ui.html",
-                    "/v3/api-docs/**"
+                    "/v3/api-docs/**",
+                    "/question/xml"
                 ).permitAll()
                 .anyRequest().authenticated()
             )
