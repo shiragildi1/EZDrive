@@ -37,7 +37,7 @@ public class GameSession {
     private User user2;
 
 
-    // סוג המשחק: "trivia", "simulation", "head_to_head"
+    // סוג המשחק: "trivia", "simulation", "Memory"
     @Column(name = "game_type")
     private String gameType;
 
@@ -49,9 +49,11 @@ public class GameSession {
     @Column(name = "score")
     private Integer score;
 
+    // ניקוד סופי (0–100)
     @Column(name = "score2")
     private Integer score2;
-    
+
+
     @Column(name = "played_at")
     private LocalDateTime playedAt;
 }

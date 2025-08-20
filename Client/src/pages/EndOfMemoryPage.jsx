@@ -32,9 +32,6 @@ export default function EndOfMemoryPage({ score1, score2, sessionId }) {
           </Link>
         </div>
       </div>
-      {showPopup && (
-        <YourTriviaAnswer sessionId={sessionId} onClose={handleClose} />
-      )}
     </div>
   );
 }

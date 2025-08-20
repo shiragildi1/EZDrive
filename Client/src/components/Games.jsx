@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { data, useSearchParams } from "react-router-dom";
-import { startTriviaSession } from "../services/GameTriviaService";
+import { startTriviaSession } from "../services/TriviaGameService";
 import TriviaGame from "./TriviaGame";
-import { startMemorySession } from "../services/GameMemoryServiceRMI";
+import { startMemorySession } from "../services/MemoryGameServiceRMI";
 import MemoryGame from "./MemoryGame";
 import GameExplanation from "./GameExplanation";
 import HeadToHeadExplanation from "../data/HeadToHeadExplanationData";
@@ -13,7 +13,7 @@ import memoryExplanation from "../data/MemoryExplanationData";
 import {
   joinMemoryGame,
   getMemoryGameStatus,
-} from "../services/GameMemoryServiceRMI";
+} from "../services/MemoryGameServiceRMI";
 import { useUserContext } from "../context/UserContext";
 
 export default function GamesPage() {
@@ -64,7 +64,9 @@ export default function GamesPage() {
         });
 
         setQuestions(formattedQuestions); // שמור את השאלות בפורמט החדש
-        setSessionId(data.sessionId); // שמור את מזהה הסשן
+        setSessionId(data.session.id); // שמור את מזהה הסשן
+        //          setSessionId(data.sessionId); // שמור את מזהה הסשן
+        // >>>>>>> origin/08/19-1-P
         setShowTrivia(true);
         console.log("formattedQuestions:", formattedQuestions); // עבור למצב משחק
       })
@@ -184,7 +186,6 @@ export default function GamesPage() {
           if (ready) {
             clearInterval(interval);
             // ממפה את השאלות לפורמט אחיד עבור הקומפוננטה
-            console.log("IMage url back0: ", data.questions[9].imageURl);
             const formattedQuestions = data.questions.map((question) => ({
               cardId: question.cardId,
               isQuestion: question.question,
@@ -193,7 +194,7 @@ export default function GamesPage() {
             }));
             setQuestions(formattedQuestions); // שומר את השאלות המעובדות ב-state
             setShowMemory(true); // עובר למצב משחק זיכרון
-
+            setSessionId(data.sessionId); // שומר את מזהה הסשן
             setWaitingForOpponent(false); // מפסיק להציג את מסך ההמתנה
           }
         } catch (err) {
@@ -201,10 +202,10 @@ export default function GamesPage() {
         }
       }, 2000);
     } catch (err) {
-      console.error("[Memory] שגיאה בהצטרפות למשחק:", err);
+      console.error("[Memory] שגיאה ביצירת משחק:", err);
       setWaitingForOpponent(false);
     } finally {
-      setJoining(false);
+      setLoadingMemory(false);
     }
   };
   if (showMemory) {

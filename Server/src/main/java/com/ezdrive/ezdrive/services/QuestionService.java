@@ -33,7 +33,22 @@ public class QuestionService
     // }
 public void importFromXmlStream(InputStream inputStream) {
     List<Question> questions = extractQuestionsFromXml(inputStream);
-    questionRepository.saveAll(questions);
+    for (Question question : questions) {
+        Question existing = questionRepository.findByQuestionText(question.getQuestionText());
+        if (existing != null) {
+            // עדכון ערכים קיימים
+            existing.setCategory(question.getCategory());
+            existing.setAnswer1(question.getAnswer1());
+            existing.setAnswer2(question.getAnswer2());
+            existing.setAnswer3(question.getAnswer3());
+            existing.setAnswer4(question.getAnswer4());
+            existing.setCorrectAnswer(question.getCorrectAnswer());
+            existing.setImageUrl(question.getImageUrl());
+            questionRepository.save(existing);
+        } else {
+            questionRepository.save(question);
+        }
+    }
 }
 
     

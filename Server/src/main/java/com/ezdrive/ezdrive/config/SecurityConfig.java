@@ -26,7 +26,7 @@ public class SecurityConfig {
                     "/api/user/me",
                     "/api/game-sessions/**",
                     "/game-sessions/**",
-                    "/game-sessions/startMemory",
+                    "/game-sessions/start-memory",
                     "/swagger-ui/**",
                     "/swagger-ui.html",
                     "/v3/api-docs/**",

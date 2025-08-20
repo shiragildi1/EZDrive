@@ -154,13 +154,21 @@ public class RMIGameServiceImpl extends UnicastRemoteObject implements RMIGameSe
     }
 
     @Override
-    public synchronized MemoryGameResultResponseDto getGameResultMemory(Long sessionId) throws RemoteException {
+    public synchronized MemoryGameResultResponseDto getMemoryGameResult(Long sessionId) throws RemoteException {
         GameState gameState = gameStates.get(sessionId);
         if (gameState == null) {
             throw new RemoteException("Game state not found for session " + sessionId);
         }
 
-        return memoryGame.getGameResultMemory(sessionId, gameState.getScores());
+        MemoryGameResultResponseDto resultMemory = memoryGame.getMemoryGameResult(sessionId, gameState.getScores());
+        if(!gameState.isPlayerAfinished())
+        {
+            gameState.setPlayerAfinished(true);
+        }else{
+             gameState.setPlayerBfinished(true);
+             memoryGameRepository.deleteByGameSessionId(sessionId);
+        }
+        return resultMemory;
     }
 
     @Override

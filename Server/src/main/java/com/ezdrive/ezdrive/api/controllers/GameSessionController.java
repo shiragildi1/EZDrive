@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ezdrive.ezdrive.api.dto.AnswerResultDto;
-import com.ezdrive.ezdrive.api.dto.CheckAnswerRequestDto;
 import com.ezdrive.ezdrive.api.dto.GameResultResponseDto;
 import com.ezdrive.ezdrive.api.dto.GameSessionStartRequestDto;
 import com.ezdrive.ezdrive.api.dto.GameSessionStartResponseDto;
+import com.ezdrive.ezdrive.api.dto.MemoryCheckAnswerRequestDto;
 import com.ezdrive.ezdrive.api.dto.MemoryGameResultResponseDto;
 import com.ezdrive.ezdrive.api.dto.MemoryGameSessionStartResponseDto;
 import com.ezdrive.ezdrive.api.dto.MemoryGameStartRequestDto;
@@ -28,13 +28,14 @@ import com.ezdrive.ezdrive.api.dto.MemoryQuestionDto;
 import com.ezdrive.ezdrive.api.dto.MemoryStateDto;
 import com.ezdrive.ezdrive.api.dto.QuestionFeedbackDto;
 import com.ezdrive.ezdrive.api.dto.QuestionTriviaDto;
-import com.ezdrive.ezdrive.api.dto.SubmitAnswerRequestDto;
+import com.ezdrive.ezdrive.api.dto.TriviaSubmitAnswerRequestDto;
 import com.ezdrive.ezdrive.persistence.Entities.GameSession;
 import com.ezdrive.ezdrive.persistence.Entities.Question;
 import com.ezdrive.ezdrive.persistence.Entities.User;
 import com.ezdrive.ezdrive.persistence.Repositories.GameSessionRepository;
 import com.ezdrive.ezdrive.persistence.Repositories.MemoryGameRepository;
 import com.ezdrive.ezdrive.persistence.Repositories.QuestionRepository;
+import com.ezdrive.ezdrive.persistence.Repositories.TriviaGameRepository;
 import com.ezdrive.ezdrive.rmi.RMIGameService;
 import com.ezdrive.ezdrive.services.GameSessionService;
 import com.ezdrive.ezdrive.services.TriviaGameService;
@@ -63,6 +64,9 @@ public class GameSessionController {
     @Autowired
     private QuestionRepository questionRepository;
 
+    @Autowired
+    private TriviaGameRepository triviaGameRepository;
+
     private RMIGameService getRmiService() {
     if (memoryGameService == null) {
         try {
@@ -79,7 +83,7 @@ public class GameSessionController {
 
     //--------------------------------------game session---------------------------------------------------
     //--------------------------------------trivia--------------------------------------------------------
-    @PostMapping("/start")
+    @PostMapping("/start-trivia")
     public GameSessionStartResponseDto startSession(@RequestBody GameSessionStartRequestDto request, HttpSession session) {
         User user = (User) session.getAttribute("user");
         if (user == null) {
@@ -91,7 +95,7 @@ public class GameSessionController {
 
         GameSession gameSession = gameSessionService.createGameSession(userEmail, gameType, category);
 
-        List<Question> questions = triviaGameService.generateQuestionsForSession(gameSession.getId(), category);
+        List<Question> questions = triviaGameService.generateQuestionsForTriviaSession(gameSession.getId(), category);
 
         List<QuestionTriviaDto> questionDtos = questions.stream()
         .map(q -> new QuestionTriviaDto(
@@ -107,30 +111,38 @@ public class GameSessionController {
     }
 
     @PostMapping("/submit-answer")
-    public ResponseEntity<AnswerResultDto> submitAnswer(@RequestBody SubmitAnswerRequestDto request) {
+    public ResponseEntity<AnswerResultDto> submitAnswer(@RequestBody TriviaSubmitAnswerRequestDto request, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return ResponseEntity.status(401).build();
+        }
+
         AnswerResultDto result =
         triviaGameService.submitAnswer(
             request.getSessionId(),
             request.getQuestionId(),
             request.getSelectedAnswer());
+        System.out.println("submitAnswer result: " + result);
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping("/result")
-    public GameResultResponseDto getGameResult(@RequestParam Long sessionId) {
-        return triviaGameService.getGameResult(sessionId);    
+    @GetMapping("/result-trivia")
+    public GameResultResponseDto getTriviaGameResult(@RequestParam Long sessionId) {
+        return triviaGameService.getTriviaGameResult(sessionId);    
     }
 
    @GetMapping("/summary")
     public ResponseEntity<List<QuestionFeedbackDto>> getFeedback(@RequestParam Long sessionId) {
         List<QuestionFeedbackDto> summary = triviaGameService.getSessionFeedback(sessionId);
         
+        /*triviaGameRepository.deleteByGameSessionId(sessionId);*/
+        
         return ResponseEntity.ok(summary);
     }
 
     //----------------------------------------------memory-----------------------------------------------------
 
-    @PostMapping("/startMemory")
+    @PostMapping("/start-memory")
     public MemoryGameSessionStartResponseDto startMemorySession(@RequestBody MemoryGameStartRequestDto request, HttpSession session) {
         User user = (User) session.getAttribute("user");
         // שחקן ראשון יוצר סשן חדש
@@ -187,6 +199,7 @@ public class GameSessionController {
             MemoryGameSessionStartResponseDto response = memoryGameService.retrieveQuestionsForMemorySession(sessionId);
             return response;
         } catch (RemoteException e) {
+            System.err.println("Failed to join memory game: " + e.getMessage());
             return new MemoryGameSessionStartResponseDto(null,null);
         }
     }
@@ -235,7 +248,7 @@ public MemoryStateDto getMemoryGameState(@RequestParam Long sessionId)
 }
     //Memory game
     @PostMapping("/check-answer")
-    public ResponseEntity<Boolean> checkAnswer(@RequestBody CheckAnswerRequestDto request, HttpSession session) {
+    public ResponseEntity<Boolean> checkAnswer(@RequestBody MemoryCheckAnswerRequestDto request, HttpSession session) {
         User user = (User) session.getAttribute("user");
         if (user == null) {
             return ResponseEntity.status(401).build();
@@ -258,9 +271,9 @@ public MemoryStateDto getMemoryGameState(@RequestParam Long sessionId)
     }
 
     @GetMapping("/result-memory")
-    public MemoryGameResultResponseDto getGameResultMemory(@RequestParam Long sessionId) {
+    public MemoryGameResultResponseDto getMemoryGameResult(@RequestParam Long sessionId) {
         try {
-            return getRmiService().getGameResultMemory(sessionId);
+            return getRmiService().getMemoryGameResult(sessionId);
         } catch (RemoteException e) {
             e.printStackTrace();
             throw new RuntimeException("Failed to get memory game result: " + e.getMessage());

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { checkAnswer } from "../services/GameMemoryServiceRMI";
+import { checkAnswer } from "../services/MemoryGameServiceRMI";
 import { getCurrentUser } from "../services/userService";
-import { flipQuestion, flipAnswer } from "../services/GameMemoryServiceRMI";
-import { getMemoryGameState } from "../services/GameMemoryServiceRMI";
+import { flipQuestion, flipAnswer } from "../services/MemoryGameServiceRMI";
+import { getMemoryGameState } from "../services/MemoryGameServiceRMI";
 import { useUserContext } from "../context/UserContext";
-import { getGameResult } from "../services/GameMemoryServiceRMI";
-//import EndOMemoryPage from "../pages/EndOMemoryPage";
+import { getGameResult } from "../services/MemoryGameServiceRMI";
+import EndOfMemoryPage from "../pages/EndOfMemoryPage";
 import "../styles/MemoryGame.css";
 import logo from "../assets/logo1.png";
 
@@ -225,19 +225,16 @@ export default function memoryGame({ questions, sessionId, topic }) {
           const opponentEmail = Object.keys(finalResult.scores).find(
             (email) => email !== userEmail
           );
-          setScoreResult(
-            finalResult.scores[userEmail],
-            finalResult.scores[opponentEmail]
-          );
+          setScoreResult(finalResult.scores[userEmail]);
           console.log("Game over! Final result:", finalResult);
 
-          // return (
-          //   <EndOMemoryPage
-          //     score1={scoreResult.finalResult.scores[userEmail]}
-          //     score2={scoreResult.finalResult.scores[opponentEmail]}
-          //     sessionId={sessionId}
-          //   />
-          // );
+          return (
+            <EndOfMemoryPage
+              score1={scoreResult.finalResult.scores[userEmail]}
+              score2={scoreResult.finalResult.scores[opponentEmail]}
+              sessionId={sessionId}
+            />
+          );
         }
       } catch (err) {
         console.error("Polling error in MemoryGameState:", err);
@@ -278,7 +275,27 @@ export default function memoryGame({ questions, sessionId, topic }) {
                   }`}
                 >
                   <div className="card-front">
-                    <img src={logo} alt="EZDrive Logo" className="logo_img" />
+                    {questionStatus[card.cardId] !== "disabled" && (
+                      <>
+                        <span className="card-text">{card.text}</span>
+                        {card.imageUrl && (
+                          <img
+                            src={
+                              card.imageUrl.startsWith("http")
+                                ? card.imageUrl
+                                : `https://${card.imageUrl}`
+                            }
+                            alt="שאלה"
+                            className="question-image"
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.src = logo; // fallback to EZDrive logo
+                            }}
+                          />
+                        )}
+                      </>
+                    )}
+                    {/* <img src={logo} alt="EZDrive Logo" className="logo_img" /> */}
                   </div>
                   <div className="card-back">
                     {questionStatus[card.cardId] !== "disabled" && (
@@ -330,7 +347,12 @@ export default function memoryGame({ questions, sessionId, topic }) {
                   }`}
                 >
                   <div className="card-front">
-                    <img src={logo} alt="EZDrive Logo" className="logo_img" />
+                    {answerStatus[card.cardId] != "disabled" && (
+                      <>
+                        <span className="card-text">{card.text}</span>
+                      </>
+                    )}
+                    {/* <img src={logo} alt="EZDrive Logo" className="logo_img" /> */}
                   </div>
                   <div className="card-back">
                     {answerStatus[card.cardId] === "disabled" && (
@@ -338,13 +360,6 @@ export default function memoryGame({ questions, sessionId, topic }) {
                     )}
                     {answerStatus[card.cardId] != "disabled" && (
                       <>
-                        {/*card.imageUrl ? (
-            <img
-src={card.imageUrl}
-alt="תמרור"
-className="question-image"
-            />
-          ) : null*/}
                         <span className="card-text">{card.text}</span>
                       </>
                     )}

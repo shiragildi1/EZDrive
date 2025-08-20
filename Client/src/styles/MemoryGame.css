@@ -32,7 +32,6 @@
   display: flex;
   justify-content: space-between;
 } */
-
 .player_A,
 .player_B {
   background: linear-gradient(90deg, #ff9800 0%, #ffd600 100%);

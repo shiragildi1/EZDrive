@@ -13,5 +13,3 @@ import lombok.Setter;
 public class MemoryGameResultResponseDto implements Serializable {
     private Map<String, Integer> scores;
 }
-
-

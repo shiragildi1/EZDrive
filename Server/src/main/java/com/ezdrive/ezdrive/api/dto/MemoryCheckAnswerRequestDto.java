@@ -8,10 +8,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CheckAnswerRequestDto {
+public class MemoryCheckAnswerRequestDto {
     private Long sessionId;
     private String currentPlayer;
     private int selectedQuestionCard; 
     private int selectedAnswerCard; 
 }
-

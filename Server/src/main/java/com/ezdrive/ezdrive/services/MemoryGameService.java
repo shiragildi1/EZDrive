@@ -2,6 +2,7 @@ package com.ezdrive.ezdrive.services;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -87,7 +88,7 @@ public class MemoryGameService {
     }
 
     //שלב 3: חישוב תוצאה סופית
-    public MemoryGameResultResponseDto getGameResultMemory(Long sessionId,  Map<String, Integer> scores) {
+    public MemoryGameResultResponseDto getMemoryGameResult(Long sessionId,  Map<String, Integer> scores) {
         GameSession session = gameSessionRepository.findById(sessionId)
         .orElseThrow(() -> new RuntimeException("Session not found"));
 
@@ -97,11 +98,19 @@ public class MemoryGameService {
         int score1 = scores.getOrDefault(userEmail1, 0);
         int score2 = scores.getOrDefault(userEmail2, 0);
 
-        session.setScore(score1);
-        session.setScore2(score2);
+        int totalPairs = 12;
 
+        int percentP1 = (int) Math.round((score1 * 100.0) / totalPairs);
+        int percentP2 = (int) Math.round((score2 * 100.0) / totalPairs);
+
+        session.setScore(percentP1);
+        session.setScore2(percentP2);
         gameSessionRepository.save(session);
 
-        return new MemoryGameResultResponseDto(scores);
+        Map<String, Integer> percentMap = new HashMap<>();
+        percentMap.put(userEmail1, percentP1);
+        percentMap.put(userEmail2, percentP2);
+
+        return new MemoryGameResultResponseDto(percentMap);
     }
 }

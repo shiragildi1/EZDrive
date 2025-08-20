@@ -1,7 +1,7 @@
 export async function startMemorySession(category) {
   // יוצר סשן חדש ומחזיר אובייקט עם session (האובייקט של הסשן) ו-questions (רשימת השאלות)
   // לכן בפרונט יש להשתמש ב-data.session.id ולא ב-data ישירות!
-  const res = await fetch("http://localhost:8080/game-sessions/startMemory", {
+  const res = await fetch("http://localhost:8080/game-sessions/start-memory", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "include",

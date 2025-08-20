@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import com.ezdrive.ezdrive.persistence.Entities.Question;
 
 public interface QuestionRepository extends JpaRepository<Question, Long> {
+    Question findByQuestionText(String questionText);
     List<Question> findByCategory(String category);
 
     @Query(value = "SELECT * FROM questions WHERE category = :category ORDER BY RANDOM() LIMIT 10", nativeQuery = true)

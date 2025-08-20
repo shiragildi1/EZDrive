@@ -17,4 +17,3 @@ public class MemoryStateDto implements Serializable{
     private String currentPlayer;
     private boolean gameOver;
 }
-

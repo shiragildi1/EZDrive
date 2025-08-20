@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Repository;
 import com.ezdrive.ezdrive.persistence.Entities.GameSession;
 import com.ezdrive.ezdrive.persistence.Entities.MemoryGame;
 import com.ezdrive.ezdrive.persistence.Entities.Question;
+
+import jakarta.transaction.Transactional;
 
 
 @Repository
@@ -30,4 +33,10 @@ public interface MemoryGameRepository extends JpaRepository<MemoryGame, Long> {
 
     @Query("SELECT COUNT(m) = 0 FROM MemoryGame m WHERE m.gameSession.id = :sessionId AND m.isFlipped = false")
     boolean areAllPairsFlipped(@Param("sessionId") Long sessionId);
+
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM MemoryGame mg WHERE mg.gameSession.id = :sessionId")
+    void deleteByGameSessionId(Long sessionId);
+
 }

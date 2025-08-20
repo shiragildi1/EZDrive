@@ -36,7 +36,7 @@ public class GameSessionService {
         return gameSession;
     }
 
-     public GameSession createMemoryGameSession(String userEmail, String userEmail2, String gameType, String category) {
+    public GameSession createMemoryGameSession(String userEmail, String userEmail2, String gameType, String category) {
         System.out.println("createMemoryGameSession: "+userEmail2);
         User user = userRepository.findByEmail(userEmail)
             .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + userEmail));
