@@ -183,7 +183,7 @@ public class GameSessionController {
         
         User user = (User) session.getAttribute("user");
         if (user == null) {
-        return new MemoryGameSessionStartResponseDto(null,null);
+            return new MemoryGameSessionStartResponseDto(null, null);
         }
 
         GameSession gameSession = gameSessionRepository.findById(sessionId)
@@ -200,9 +200,22 @@ public class GameSessionController {
             return response;
         } catch (RemoteException e) {
             System.err.println("Failed to join memory game: " + e.getMessage());
-            return new MemoryGameSessionStartResponseDto(null,null);
+            return new MemoryGameSessionStartResponseDto(null, null);
         }
     }
+
+    @GetMapping("/get-opponent-b")
+    public ResponseEntity<User> getPlayerB(@RequestParam Long sessionId) {
+        User opponent = gameSessionRepository.getUser2BySessionId(sessionId);
+        return ResponseEntity.ok(opponent);
+    }
+
+    @GetMapping("/get-opponent-a")
+    public ResponseEntity<User> getPlayerA(@RequestParam Long sessionId) {
+        User opponent = gameSessionRepository.getUserBySessionId(sessionId);
+        return ResponseEntity.ok(opponent);
+    }
+
     @PostMapping("/flip-question")
     public ResponseEntity<Void> flipQuestion(@RequestParam Long sessionId, @RequestParam int questionIndex) {
         try {

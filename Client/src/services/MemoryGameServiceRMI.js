@@ -34,6 +34,35 @@ export async function joinMemoryGame(sessionId) {
   }
   return await res.json();
 }
+export async function getOpponentB(sessionId) {
+  const response = await fetch(
+    `http://localhost:8080/game-sessions/get-opponent-b?sessionId=${sessionId}`,
+    {
+      method: "GET",
+      credentials: "include",
+    }
+  );
+  if (!response.ok) {
+    throw new Error("Failed to get memory game opponent");
+  }
+  //מצפה לתשובה: { ready, questions }
+  return await response.json();
+}
+
+export async function getOpponentA(sessionId) {
+  const response = await fetch(
+    `http://localhost:8080/game-sessions/get-opponent-a?sessionId=${sessionId}`,
+    {
+      method: "GET",
+      credentials: "include",
+    }
+  );
+  if (!response.ok) {
+    throw new Error("Failed to get memory game opponent");
+  }
+  //מצפה לתשובה: { ready, questions }
+  return await response.json();
+}
 
 export function checkAnswer({
   sessionId,

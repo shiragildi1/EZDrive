@@ -9,7 +9,7 @@ import EndOfMemoryPage from "../pages/EndOfMemoryPage";
 import "../styles/MemoryGame.css";
 import logo from "../assets/logo1.png";
 
-export default function memoryGame({ questions, sessionId, topic }) {
+export default function memoryGame({ questions, sessionId, opponent }) {
   const [currentPlayer, setCurrentPlayer] = useState(null);
   const [showResult, setShowResult] = useState(false);
   //const [gameOver, setGameOver] = useState(false);
@@ -30,7 +30,6 @@ export default function memoryGame({ questions, sessionId, topic }) {
 
   const [questionMatched, setQuestionMatched] = useState([]);
   const [answerMatched, setAnswerMatched] = useState([]);
-  const [found, setFound] = useState(Array(questions.length).fill(false));
   const [currentQuestion, setCurrentQuestion] = useState(-1);
   const [currentAnswer, setCurrentAnswer] = useState(-1);
   const [questionStatus, setQuestionStatus] = useState({});
@@ -57,7 +56,6 @@ export default function memoryGame({ questions, sessionId, topic }) {
 
     setQuestionCards(sortedQuestions);
     setAnswerCards(sortedAnswers);
-    console.log(questionCards[8]);
   }, [questions]);
 
   const [questionFlipped, setQuestionFlipped] = useState(false);
@@ -179,13 +177,6 @@ export default function memoryGame({ questions, sessionId, topic }) {
                   prev.map((flip, i) => (i === currentAnswer ? false : flip))
                 );
               }, 3000); // green flash for 3 seconds
-
-              setFound((prev) => {
-                const updated = [...prev];
-                updated[currentQuestion] = true;
-                updated[currentAnswer] = true;
-                return updated;
-              });
             }
             1;
           }, 750);
@@ -246,7 +237,13 @@ export default function memoryGame({ questions, sessionId, topic }) {
 
   return (
     <div className="board-wrapper">
-      <div className="player_A">Player A</div>
+      <div
+        className={`player_A ${
+          user.email === currentPlayer ? "active-player" : ""
+        }`}
+      >
+        <img src={user.picture} alt="Player A" className="profile-pic" />
+      </div>
       <div className="memory_game">
         {showResult && <div className="score-popup">+1</div>}
         {/* <div className="header">
@@ -370,7 +367,13 @@ export default function memoryGame({ questions, sessionId, topic }) {
           </div>
         </div>
       </div>
-      <div className="player_B">Player B</div>
+      <div
+        className={`player_B ${
+          opponent.email === currentPlayer ? "active-player" : ""
+        }`}
+      >
+        <img src={opponent.picture} alt="Player B" className="profile-pic" />
+      </div>
     </div>
   );
 }

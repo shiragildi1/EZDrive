@@ -19,6 +19,7 @@ import com.ezdrive.ezdrive.api.dto.MemoryGameSessionStartResponseDto;
 import com.ezdrive.ezdrive.api.dto.MemoryQuestionDto;
 import com.ezdrive.ezdrive.api.dto.MemoryStateDto;
 import com.ezdrive.ezdrive.persistence.Entities.Question;
+import com.ezdrive.ezdrive.persistence.Repositories.GameSessionRepository;
 import com.ezdrive.ezdrive.persistence.Repositories.MemoryGameRepository;
 import com.ezdrive.ezdrive.persistence.Repositories.QuestionRepository;
 import com.ezdrive.ezdrive.services.MemoryGameService;

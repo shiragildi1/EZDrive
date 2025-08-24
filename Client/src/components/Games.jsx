@@ -2,7 +2,11 @@ import React, { useState } from "react";
 import { data, useSearchParams } from "react-router-dom";
 import { startTriviaSession } from "../services/TriviaGameService";
 import TriviaGame from "./TriviaGame";
-import { startMemorySession } from "../services/MemoryGameServiceRMI";
+import {
+  startMemorySession,
+  getOpponentA,
+  getOpponentB,
+} from "../services/MemoryGameServiceRMI";
 import MemoryGame from "./MemoryGame";
 import GameExplanation from "./GameExplanation";
 import HeadToHeadExplanation from "../data/HeadToHeadExplanationData";
@@ -22,6 +26,7 @@ export default function GamesPage() {
   const topic = searchParams.get("topic");
 
   const [questions, setQuestions] = useState([]);
+  const [opponent, setOpponent] = useState([]);
   const [sessionId, setSessionId] = useState(null);
   const [showTrivia, setShowTrivia] = useState(false);
   const [showMemory, setShowMemory] = useState(false);
@@ -151,8 +156,10 @@ export default function GamesPage() {
               text: question.text,
               imageUrl: question.imageURl || null,
             }));
-            console.log("FORMATTED: ", formattedQuestions);
+            const opponent = await getOpponentB(data.sessionId);
+            console.log("opponent join: ", opponent);
             setQuestions(formattedQuestions); // שומר את השאלות המעובדות ב-state
+            setOpponent(opponent);
             setShowMemory(true); // עובר למצב משחק זיכרון
             setSessionId(data.sessionId); // שומר את מזהה הסשן
             setWaitingForOpponent(false); // מפסיק להציג את מסך ההמתנה
@@ -192,7 +199,10 @@ export default function GamesPage() {
               text: question.text,
               imageUrl: question.imageURl || null,
             }));
+            const opponent = await getOpponentA(data.sessionId);
+            console.log("opponent join: ", opponent);
             setQuestions(formattedQuestions); // שומר את השאלות המעובדות ב-state
+            setOpponent(opponent);
             setShowMemory(true); // עובר למצב משחק זיכרון
             setSessionId(data.sessionId); // שומר את מזהה הסשן
             setWaitingForOpponent(false); // מפסיק להציג את מסך ההמתנה
@@ -213,7 +223,7 @@ export default function GamesPage() {
       <MemoryGame
         questions={questions}
         sessionId={sessionId}
-        topic={topicsMap[topic]}
+        opponent={opponent}
       />
     );
   }
