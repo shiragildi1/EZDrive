@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0">
+<rss version="2.0"
+     xmlns:atom="http://www.w3.org/2005/Atom">
+<?xml-stylesheet type="text/css" href="http://tq.mot.gov.il/media/system/css/modal.css" type="text/css"?>
+
     <channel>
         <title>מאגר השאלות והתשובות הרשמי למבחן נהיגה עיוני ממוחשב</title>
         <description>משרד התחבורה, מאגר השאלות והתשובות הרשמי למבחן נהיגה עיוני ממוחשב - תאוריה</description>

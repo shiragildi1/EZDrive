@@ -25,12 +25,15 @@ public class SecurityConfig {
                     "/api/otp/**",
                     "/api/user/me",
                     "/api/game-sessions/**",
+                    "/api/profile/**",
+                    "/api/ranking/**",
                     "/game-sessions/**",
-                    "/game-sessions/start-memory",
+                    "/game-sessions/startMemory",
                     "/swagger-ui/**",
                     "/swagger-ui.html",
                     "/v3/api-docs/**",
-                    "/question/xml"
+                    "/question/xml",
+                    "/agent/**"
                 ).permitAll()
                 .anyRequest().authenticated()
             )

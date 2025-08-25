@@ -105,7 +105,8 @@ public class GameSessionController {
                 q.getAnswer1(),
                 q.getAnswer2(),
                 q.getAnswer3(),
-                q.getAnswer4()))
+                q.getAnswer4(),
+                q.getImageUrl()))
             .collect(Collectors.toList());
         return new GameSessionStartResponseDto(gameSession, questionDtos);
     }

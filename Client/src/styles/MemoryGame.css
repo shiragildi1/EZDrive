@@ -8,6 +8,7 @@
   background: linear-gradient(120deg, #181c22 60%, #23242a 100%);
   padding-top: 190px;
 }
+
 .memory_game {
   width: 80%;
   flex: 1;
@@ -45,7 +46,6 @@
   border-radius: 50%;
   box-shadow: 0 4px 18px 0 rgba(49, 62, 75, 0.18);
 }
-
 .player_B {
   margin-right: 20px;
   margin-left: 0px;

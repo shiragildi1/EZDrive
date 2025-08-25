@@ -3,6 +3,7 @@ package com.ezdrive.ezdrive.api.dto;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
@@ -17,4 +18,5 @@ public class QuestionTriviaDto {
     private String answer2;
     private String answer3;
     private String answer4;
+    private String imageUrl;
 }

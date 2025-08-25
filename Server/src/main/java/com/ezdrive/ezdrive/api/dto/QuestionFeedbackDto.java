@@ -1,8 +1,8 @@
 package com.ezdrive.ezdrive.api.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
@@ -14,4 +14,5 @@ public class QuestionFeedbackDto {
     private String userAnswer;
     private String correctAnswer;
     private boolean isCorrect;
+    private String imageUrl;
 }

@@ -30,7 +30,7 @@ public class EzDriveApplication {
             // רושם את השירות תחת השם "RMIGameService"
             registry.rebind("RMIGameService", rmiService);
         } catch (RemoteException e) {
-            System.err.println("❌ RMI service failed to start: " + e.getMessage());
+            System.err.println("RMI service failed to start: " + e.getMessage());
             e.printStackTrace();
         }
     }

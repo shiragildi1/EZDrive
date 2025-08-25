@@ -1,3 +1,18 @@
+.user-rank-cell {
+  position: relative;
+  font-weight: bold;
+}
+.user-rank-cell::after {
+  content: "★";
+  color: #ffd700;
+  font-size: 20px;
+  position: absolute;
+  right: -28px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
 .ranking-page {
   position: relative;
   height: 100%;
@@ -7,6 +22,12 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+}
+.ranking-header {
+  width: 80%;
+  text-align: center;
+  color: #ffae00;
+  font-size: 20px;
 }
 .ranking-table {
   width: 80%;

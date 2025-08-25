@@ -65,6 +65,7 @@ export default function GamesPage() {
               question.answer3,
               question.answer4,
             ],
+            imageUrl: question.imageUrl || null,
           };
         });
 

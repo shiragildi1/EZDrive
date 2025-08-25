@@ -106,7 +106,8 @@ public class TriviaGameService {
             q.getQuestionText(),
             userAnswerText,
             correctAnswerText,
-            answer.isCorrect()
+            answer.isCorrect(),
+            q.getImageUrl()
         );
         }).collect(Collectors.toList());
     }
