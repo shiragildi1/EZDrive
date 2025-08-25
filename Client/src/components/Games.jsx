@@ -60,11 +60,12 @@ export default function GamesPage() {
               question.answer3,
               question.answer4,
             ],
+            imageUrl: question.imageUrl || null,
           };
         });
 
         setQuestions(formattedQuestions); // שמור את השאלות בפורמט החדש
-         setSessionId(data.session.id); // שמור את מזהה הסשן
+        setSessionId(data.session.id); // שמור את מזהה הסשן
 //          setSessionId(data.sessionId); // שמור את מזהה הסשן
 // >>>>>>> origin/08/19-1-P
         setShowTrivia(true);

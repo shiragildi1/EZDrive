@@ -6,7 +6,6 @@ import Typography from "@mui/material/Typography";
 import { useUserContext } from "../context/UserContext";
 import { getProfileStats } from "../services/ProfileService";
 
-
 export default function ProfilePage() {
   const { user } = useUserContext();
   const [range, setRange] = useState("all");
@@ -49,33 +48,38 @@ export default function ProfilePage() {
       <h2 className="profile-page-subtitle">הישגים</h2>
 
       <div className="filter-buttons">
-        <button className="share-result" onClick={() => setRange("All")}>הכל</button>
-        <button className="last-month" onClick={() => setRange("30")}>30 ימים אחרונים</button>
-        <button className="last-week" onClick={() => setRange("7")}>7 ימים אחרונים</button>
+        <button className="share-result" onClick={() => setRange("All")}>
+          הכל
+        </button>
+        <button className="last-month" onClick={() => setRange("30")}>
+          30 ימים אחרונים
+        </button>
+        <button className="last-week" onClick={() => setRange("7")}>
+          7 ימים אחרונים
+        </button>
         {/* <button className="share-result" onClick={() => {}}>שתף תוצאות</button> */}
-
       </div>
-      
-        <div className="profile-achievements-row">
-          {/* זיכרון */}
-          <AchievementCard
-            title="זיכרון"
-            percentage={memory.average}
-            gamesCount={memory.count}
-          />
-          {/* טריוויה */}
-          <AchievementCard
-            title="טריוויה"
-            percentage={trivia.average}
-            gamesCount={trivia.count}
-          />
-          {/* סימולטור */}
-          <AchievementCard
-            title="סימולטור"
-            percentage={simulation.average}
-            gamesCount={simulation.count}
-          />
-        </div>
+
+      <div className="profile-achievements-row">
+        {/* זיכרון */}
+        <AchievementCard
+          title="זכרון"
+          percentage={memory.average}
+          gamesCount={memory.count}
+        />
+        {/* טריוויה */}
+        <AchievementCard
+          title="טריוויה"
+          percentage={trivia.average}
+          gamesCount={trivia.count}
+        />
+        {/* סימולטור */}
+        <AchievementCard
+          title="סימולטור- בפיתוח"
+          percentage={simulation.average}
+          gamesCount={simulation.count}
+        />
+      </div>
     </div>
   );
 }

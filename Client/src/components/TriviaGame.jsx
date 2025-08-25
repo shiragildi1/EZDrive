@@ -19,9 +19,6 @@ export default function TriviaGame({ questions, sessionId, topic }) {
       });
   }, []);
   const { user } = useUserContext();
-  // const userEmail = user?.email || "guest@example.com";
-  // console.log("Email: ", userEmail);
-  // State variables to manage the game state
 
   // Current question index
   const [current, setCurrent] = useState(0);
@@ -127,8 +124,21 @@ export default function TriviaGame({ questions, sessionId, topic }) {
         {current + 1} / {questions.length}
       </div>
 
-      <div className="trivia-question-box">
-        <div className="trivia-question">{question.questionText}</div>
+      <div className="trivia-question-row">
+        <div className="trivia-image">
+          {question.imageUrl && (
+            <img
+              src={question.imageUrl}
+              alt="Question"
+              className="trivia-question-image"
+            />
+          )}
+        </div>
+        <div className="trivia-question-col">
+          <div className="trivia-question-box">
+            <div className="trivia-question">{question.questionText}</div>
+          </div>
+        </div>
       </div>
 
       <div className="trivia-options">

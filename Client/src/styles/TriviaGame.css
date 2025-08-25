@@ -96,6 +96,36 @@
   white-space: normal;
 }
 
+.trivia-image {
+  /* width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 4px 16px #0003;
+  border: 2px solid #00e1ff;
+  background: #fff;
+  margin-bottom: 8px;
+  margin-left: 8px; */
+    background-color: #ff5e3a;
+    display: flex;
+  flex-direction: row; 
+  align-items: center;
+  gap: 24px;
+}
+.trivia-question-image {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 4px 16px #0003;
+  border: 2px solid #00e1ff;
+  background: #fff;
+  margin-bottom: 8px;
+  margin-left: 8px;
+  display: inline-block;
+
+}
+
 .trivia-options {
   display: flex;
   flex-wrap: wrap;
@@ -144,7 +174,6 @@
   color: #fff;
   box-shadow: 0 0 18px 0 #d9000099;
 }
-
 
 .trivia-title {
   font-family: "Varela Round", sans-serif;
