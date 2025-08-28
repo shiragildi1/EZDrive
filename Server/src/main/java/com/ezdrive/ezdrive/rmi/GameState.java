@@ -23,6 +23,9 @@ public class GameState implements Serializable{
     private Map<String, Integer> scores = new HashMap<>();
     private Long sessionId;
     private boolean gameOver = false;
+    private boolean playerAfinished = false;
+    private boolean playerBfinished = false;
+
 
     public GameState(Long sessionId, String player1, String player2) {
         System.out.println("Game state constructor: " + player1);

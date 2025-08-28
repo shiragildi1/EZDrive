@@ -1,8 +1,12 @@
 import React, { useState } from "react";
 import { data, useSearchParams } from "react-router-dom";
-import { startTriviaSession } from "../services/GameTriviaService";
+import { startTriviaSession } from "../services/TriviaGameService";
 import TriviaGame from "./TriviaGame";
-import { startMemorySession } from "../services/GameMemoryServiceRMI";
+import {
+  startMemorySession,
+  getOpponentA,
+  getOpponentB,
+} from "../services/MemoryGameServiceRMI";
 import MemoryGame from "./MemoryGame";
 import GameExplanation from "./GameExplanation";
 import HeadToHeadExplanation from "../data/HeadToHeadExplanationData";
@@ -13,7 +17,7 @@ import memoryExplanation from "../data/MemoryExplanationData";
 import {
   joinMemoryGame,
   getMemoryGameStatus,
-} from "../services/GameMemoryServiceRMI";
+} from "../services/MemoryGameServiceRMI";
 import { useUserContext } from "../context/UserContext";
 
 export default function GamesPage() {
@@ -22,6 +26,7 @@ export default function GamesPage() {
   const topic = searchParams.get("topic");
 
   const [questions, setQuestions] = useState([]);
+  const [opponent, setOpponent] = useState([]);
   const [sessionId, setSessionId] = useState(null);
   const [showTrivia, setShowTrivia] = useState(false);
   const [showMemory, setShowMemory] = useState(false);
@@ -66,8 +71,8 @@ export default function GamesPage() {
 
         setQuestions(formattedQuestions); // שמור את השאלות בפורמט החדש
         setSessionId(data.session.id); // שמור את מזהה הסשן
-//          setSessionId(data.sessionId); // שמור את מזהה הסשן
-// >>>>>>> origin/08/19-1-P
+        //          setSessionId(data.sessionId); // שמור את מזהה הסשן
+        // >>>>>>> origin/08/19-1-P
         setShowTrivia(true);
         console.log("formattedQuestions:", formattedQuestions); // עבור למצב משחק
       })
@@ -152,8 +157,10 @@ export default function GamesPage() {
               text: question.text,
               imageUrl: question.imageURl || null,
             }));
-            console.log("FORMATTED: ", formattedQuestions);
+            const opponent = await getOpponentB(data.sessionId);
+            console.log("opponent join: ", opponent);
             setQuestions(formattedQuestions); // שומר את השאלות המעובדות ב-state
+            setOpponent(opponent);
             setShowMemory(true); // עובר למצב משחק זיכרון
             setSessionId(data.sessionId); // שומר את מזהה הסשן
             setWaitingForOpponent(false); // מפסיק להציג את מסך ההמתנה
@@ -193,14 +200,15 @@ export default function GamesPage() {
               text: question.text,
               imageUrl: question.imageURl || null,
             }));
+            const opponent = await getOpponentA(data.sessionId);
+            console.log("opponent join: ", opponent);
             setQuestions(formattedQuestions); // שומר את השאלות המעובדות ב-state
+            setOpponent(opponent);
             setShowMemory(true); // עובר למצב משחק זיכרון
             setSessionId(data.sessionId); // שומר את מזהה הסשן
             setWaitingForOpponent(false); // מפסיק להציג את מסך ההמתנה
           }
-        } 
-        catch (err) 
-        {
+        } catch (err) {
           console.error("[Memory] שגיאה ב-polling:", err);
         }
       }, 2000);
@@ -216,7 +224,7 @@ export default function GamesPage() {
       <MemoryGame
         questions={questions}
         sessionId={sessionId}
-        topic={topicsMap[topic]}
+        opponent={opponent}
       />
     );
   }

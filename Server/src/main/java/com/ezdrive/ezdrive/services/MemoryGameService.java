@@ -88,7 +88,7 @@ public class MemoryGameService {
     }
 
     //שלב 3: חישוב תוצאה סופית
-    public MemoryGameResultResponseDto getGameResultMemory(Long sessionId,  Map<String, Integer> scores) {
+    public MemoryGameResultResponseDto getMemoryGameResult(Long sessionId,  Map<String, Integer> scores) {
         GameSession session = gameSessionRepository.findById(sessionId)
         .orElseThrow(() -> new RuntimeException("Session not found"));
 

@@ -1,5 +1,5 @@
 export function startTriviaSession({ category }) {
-  return fetch("http://localhost:8080/game-sessions/start", {
+  return fetch("http://localhost:8080/game-sessions/start-trivia", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "include", // חובה
@@ -18,7 +18,11 @@ export function startTriviaSession({ category }) {
 }
 
 export function submitAnswer({ sessionId, questionId, selectedAnswer }) {
-  console.log("submitAnswer called with:", { sessionId, questionId, selectedAnswer });
+  console.log("submitAnswer called with:", {
+    sessionId,
+    questionId,
+    selectedAnswer,
+  });
   return fetch("http://localhost:8080/game-sessions/submit-answer", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -43,7 +47,7 @@ export function submitAnswer({ sessionId, questionId, selectedAnswer }) {
 
 export function getGameResult(sessionId) {
   return fetch(
-    `http://localhost:8080/game-sessions/result?sessionId=${sessionId}`,
+    `http://localhost:8080/game-sessions/result-trivia?sessionId=${sessionId}`,
     {
       method: "GET",
       credentials: "include",

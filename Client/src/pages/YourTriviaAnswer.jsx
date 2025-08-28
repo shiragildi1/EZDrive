@@ -2,7 +2,7 @@ import "../styles/YourTriviaAnswer.css";
 import React, { useState, useEffect } from "react";
 /// This component displays the user's trivia answers in a popup.
 /// It is designed to be used within a modal or popup context.
-import { getGameSummary } from "../services/GameTriviaService";
+import { getGameSummary } from "../services/TriviaGameService";
 
 export default function YourTriviaAnswer({ sessionId, onClose }) {
   const [answers, setAnswers] = useState([]);

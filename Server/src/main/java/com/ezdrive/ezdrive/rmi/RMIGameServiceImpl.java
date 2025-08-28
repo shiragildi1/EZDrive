@@ -19,6 +19,7 @@ import com.ezdrive.ezdrive.api.dto.MemoryGameSessionStartResponseDto;
 import com.ezdrive.ezdrive.api.dto.MemoryQuestionDto;
 import com.ezdrive.ezdrive.api.dto.MemoryStateDto;
 import com.ezdrive.ezdrive.persistence.Entities.Question;
+import com.ezdrive.ezdrive.persistence.Repositories.GameSessionRepository;
 import com.ezdrive.ezdrive.persistence.Repositories.MemoryGameRepository;
 import com.ezdrive.ezdrive.persistence.Repositories.QuestionRepository;
 import com.ezdrive.ezdrive.services.MemoryGameService;
@@ -154,13 +155,21 @@ public class RMIGameServiceImpl extends UnicastRemoteObject implements RMIGameSe
     }
 
     @Override
-    public synchronized MemoryGameResultResponseDto getGameResultMemory(Long sessionId) throws RemoteException {
+    public synchronized MemoryGameResultResponseDto getMemoryGameResult(Long sessionId) throws RemoteException {
         GameState gameState = gameStates.get(sessionId);
         if (gameState == null) {
             throw new RemoteException("Game state not found for session " + sessionId);
         }
 
-        return memoryGame.getGameResultMemory(sessionId, gameState.getScores());
+        MemoryGameResultResponseDto resultMemory = memoryGame.getMemoryGameResult(sessionId, gameState.getScores());
+        if(!gameState.isPlayerAfinished())
+        {
+            gameState.setPlayerAfinished(true);
+        }else{
+             gameState.setPlayerBfinished(true);
+             memoryGameRepository.deleteByGameSessionId(sessionId);
+        }
+        return resultMemory;
     }
 
     @Override

@@ -1,0 +1,145 @@
+.chat-page {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(120deg, #181c22 60%, #23242a 100%);
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.sidebar-chat {
+  width: 13%;
+  box-shadow: 0 0 10px #181c22;
+  flex-direction: column;
+  gap: 12px;
+  margin-right: 5%;
+  margin-bottom: 30%;
+}
+
+.sidebar-chat h2 {
+  font-size: 20px;
+  color: #fff;
+  text-align: center;
+}
+
+#newChatBtn {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  background: #4f8cff;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+#newChatBtn:hover {
+  background: #357ae8;
+}
+
+#historyList {
+  list-style: none;
+  padding: 0;
+  width: 100%;
+}
+#historyList li {
+  padding: 10px;
+  background: #343642;
+  color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+  direction: rtl;
+  margin-bottom: 10%;
+}
+#historyList li:hover {
+  background: #35364a;
+}
+
+.container-chat {
+  height: 100%;
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  margin-right: 10%;
+}
+
+.chat-display {
+  margin-top: 20px;
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.chat-question {
+  align-self: flex-end;
+  background: #4f8cff;
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 18px 18px 0 18px;
+  max-width: 60%;
+  font-size: 1em;
+  box-shadow: 0 2px 8px #23242a33;
+  margin-bottom: 2px;
+}
+
+.chat-answer {
+  align-self: flex-start;
+  background: #343642;
+  color: #eaeaea;
+  padding: 12px 18px;
+  border-radius: 18px 18px 18px 0;
+  max-width: 60%;
+  font-size: 1em;
+  box-shadow: 0 2px 8px #23242a33;
+  margin-bottom: 2px;
+}
+
+.input-container {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  background-color: #23242a;
+  padding: 18px 20px;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px #23242a33;
+}
+
+#questionInput {
+  width: 80%;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 15px;
+  background: #292a33;
+  color: #fff;
+  box-shadow: 0 1px 4px #23242a22;
+}
+
+#sendBtn {
+  width: 20%;
+  padding: 12px 24px;
+  background: #4f8cff;
+  color: #fff;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.privacy-text {
+  color: #bdbdbd;
+  font-size: 0.95em;
+  text-align: center;
+  margin-top: 18px;
+  font-weight: 300;
+}

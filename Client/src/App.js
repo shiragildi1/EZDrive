@@ -14,7 +14,6 @@ import TriviaGame from "./components/TriviaGame";
 import EndOfTriviaPage from "./pages/EndOfTriviaPage";
 import MemoryGame from "./components/MemoryGame";
 import MainLayout from "./layout/MainLayout";
-import profilePage from "./pages/ProfilePage";
 import EndOfMemoryPage from "./pages/EndOfMemoryPage";
 
 function App() {

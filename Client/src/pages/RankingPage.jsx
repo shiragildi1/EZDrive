@@ -46,9 +46,7 @@ export default function RankingPage() {
               className={user?.email === row.userEmail ? "user-row" : ""}
             >
               <td>{row.totalScore}</td>
-              <td>
-                {row.userEmail}
-              </td>
+              <td>{row.userEmail}</td>
               <td>
                 {row.profileImage && (
                   <img

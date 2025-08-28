@@ -31,7 +31,7 @@ public class TriviaGameService {
     private QuestionRepository questionRepository;
 
     // שלב 1: יצירת 10 שאלות רנדומליות ושיוך לסשן
-    public List<Question> generateQuestionsForSession(Long sessionId, String category) {
+    public List<Question> generateQuestionsForTriviaSession(Long sessionId, String category) {
         List<Question> questions = questionRepository.findRandom10ByCategoryForTrivia(category);
 
         GameSession session = gameSessionRepository.findById(sessionId)
@@ -71,7 +71,7 @@ public class TriviaGameService {
     }
 
     // שלב 3: חישוב תוצאה סופית
-    public GameResultResponseDto getGameResult(Long sessionId) {
+    public GameResultResponseDto getTriviaGameResult(Long sessionId) {
         int numberOfCorrectAnswers = triviaGameRepository.countCorrectAnswers(sessionId);
         int score = (numberOfCorrectAnswers * 100) / 10;
 
@@ -121,6 +121,5 @@ public class TriviaGameService {
             default -> "";
         };
     }
-
 }
 

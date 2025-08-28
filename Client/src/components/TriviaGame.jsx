@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { submitAnswer, getGameResult } from "../services/GameTriviaService";
+import { submitAnswer, getGameResult } from "../services/TriviaGameService";
 import { getCurrentUser } from "../services/userService";
 import { useUserContext } from "../context/UserContext";
 import "../styles/TriviaGame.css";

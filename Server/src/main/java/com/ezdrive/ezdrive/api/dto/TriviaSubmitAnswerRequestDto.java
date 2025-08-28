@@ -5,7 +5,7 @@ import lombok.Setter;
 //from client to server
 @Getter
 @Setter
-public class SubmitAnswerRequestDto {
+public class TriviaSubmitAnswerRequestDto {
     private Long sessionId;
     private Long questionId;
     private int selectedAnswer; 
