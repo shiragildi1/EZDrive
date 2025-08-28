@@ -22,5 +22,5 @@ public interface RMIGameService extends Remote{
    void flipQuestion(Long sessionId, int questionIndex) throws RemoteException;
    void flipAnswer(Long sessionId, int answerIndex) throws RemoteException;
    MemoryGameSessionStartResponseDto retrieveQuestionsForMemorySession(Long sessionId) throws RemoteException;
-
+   void deleteMemoryEntries(Long sessionId) throws RemoteException;
 }

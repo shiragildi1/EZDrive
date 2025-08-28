@@ -1,8 +1,11 @@
 import "../styles/EndOfMemory.css";
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import { deleteMemoryEntries } from "../services/MemoryGameServiceRMI";
 
-export default function EndOfMemoryPage({ score1, score2, sessionId }) {
+export default function EndOfMemoryPage({ scores, sessionId }) {
+  deleteMemoryEntries(sessionId);
+  console.log("end of memory:", scores);
   return (
     <div className="end-of-memory-page">
       <div className="end-of-memory-header">

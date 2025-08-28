@@ -162,15 +162,22 @@ public class RMIGameServiceImpl extends UnicastRemoteObject implements RMIGameSe
         }
 
         MemoryGameResultResponseDto resultMemory = memoryGame.getMemoryGameResult(sessionId, gameState.getScores());
-        if(!gameState.isPlayerAfinished())
-        {
-            gameState.setPlayerAfinished(true);
-        }else{
-             gameState.setPlayerBfinished(true);
-             memoryGameRepository.deleteByGameSessionId(sessionId);
-        }
+        
         return resultMemory;
     }
+    
+    @Override
+    public synchronized void deleteMemoryEntries(Long sessionId) throws RemoteException
+    {
+        GameState gameState = gameStates.get(sessionId);
+        if(gameState.isPlayerAfinished() == false)
+        {
+            gameState.setPlayerAfinished(true);
+            memoryGameRepository.deleteByGameSessionId(sessionId);
+        }
+       
+    }
+    
 
     @Override
     public synchronized void flipQuestion(Long sessionId, int questionIndex) throws RemoteException {

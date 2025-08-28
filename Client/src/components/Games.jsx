@@ -34,6 +34,8 @@ export default function GamesPage() {
   const [loading, setLoading] = useState(false);
   const [loadingMemory, setLoadingMemory] = useState(false);
   const [selectedGame, setSelectedGame] = useState(null);
+  const [showMemoryRoadmap, setShowMemoryRoadmap] = useState(false);
+  const [showJoinInput, setShowJoinInput] = useState(false);
   // memory game join flow
   const [joinSessionId, setJoinSessionId] = useState("");
   const [joining, setJoining] = useState(false);
@@ -244,6 +246,51 @@ export default function GamesPage() {
       </div>
     );
   }
+  if (showMemoryRoadmap) {
+    return (
+      <div className="memory-roadmap-container">
+        <h2 className="memory-roadmap-title">{topicsMap[topic]}</h2>
+
+        <button className="gradient-button" onClick={handleStartMemory}>
+          התחל משחק חדש
+        </button>
+
+        <button
+          className="gradient-button"
+          onClick={() => setShowJoinInput(true)}
+        >
+          הצטרף למשחק קיים
+        </button>
+
+        {showJoinInput && (
+          <div className="join-section">
+            <input
+              type="text"
+              placeholder="הכנס מזהה משחק"
+              value={joinSessionId}
+              onChange={(e) => setJoinSessionId(e.target.value)}
+              className="session-input"
+              disabled={joining}
+            />
+            <button
+              className="gradient-button"
+              onClick={handleJoinMemory}
+              disabled={joining || !joinSessionId}
+            >
+              אשר הצטרפות
+            </button>
+          </div>
+        )}
+
+        <button
+          className="back-button"
+          onClick={() => setShowMemoryRoadmap(false)}
+        >
+          חזור
+        </button>
+      </div>
+    );
+  }
   //-------------------------------------------------------------------------------
   return (
     <div className="games-background">
@@ -264,28 +311,11 @@ export default function GamesPage() {
           onClick={() => {
             setSelectedGame("memory");
             setShowPopup(true);
+            setShowMemoryRoadmap(true);
           }}
         >
           <h3>זכרון</h3>
         </button>
-        {/* UI for joining memory game as second player */}
-        <div style={{ marginTop: 10 }}>
-          <input
-            type="text"
-            placeholder="הכנס מזהה משחק להצטרפות (sessionId)"
-            value={joinSessionId}
-            onChange={(e) => setJoinSessionId(e.target.value)}
-            style={{ direction: "ltr", width: 200 }}
-            disabled={joining}
-          />
-          <button
-            onClick={handleJoinMemory}
-            disabled={joining || !joinSessionId}
-            style={{ marginRight: 8 }}
-          >
-            הצטרף למשחק קיים
-          </button>
-        </div>
         <button
           className="square-game"
           onClick={() => {

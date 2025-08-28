@@ -98,8 +98,16 @@ public class TriviaGameService {
 
         return answers.stream().map(answer -> {
         Question q = answer.getQuestion();
-        
-        String userAnswerText = getAnswerText(q, answer.getSelectedAnswer());
+
+        String userAnswerText;
+        if( answer.getSelectedAnswer() != null)
+        {
+            userAnswerText = getAnswerText(q, answer.getSelectedAnswer());
+        }
+        else
+        {
+            userAnswerText = "לא נבחרה תשובה.";
+        }
         String correctAnswerText = getAnswerText(q, q.getCorrectAnswer());
 
         return new QuestionFeedbackDto(
