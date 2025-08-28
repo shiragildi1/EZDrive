@@ -1,11 +1,6 @@
  package com.ezdrive.ezdrive.services;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -17,13 +12,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.ezdrive.ezdrive.api.dto.AgentQuestionPerConv;
 import com.ezdrive.ezdrive.persistence.Entities.ChatbotQuestions;
-import com.ezdrive.ezdrive.persistence.Entities.GameSession;
 import com.ezdrive.ezdrive.persistence.Entities.User;
 import com.ezdrive.ezdrive.persistence.Repositories.ChatbotQuestionsRepository;
-import com.ezdrive.ezdrive.persistence.Repositories.UserRepository;
-
-import io.github.cdimascio.dotenv.Dotenv;
 
 @Service
 public class ChatbotQuestionService {
@@ -109,13 +101,12 @@ public class ChatbotQuestionService {
         }
     }
 
-    public ChatbotQuestions createBotQuestion(User user, String question, String answer) {
-        // אפשר לשנות את זה אם רוצים לנהל שיחות שונות
+    public ChatbotQuestions createBotQuestion(User user, String question, String answer, String conversationId) {
         ChatbotQuestions chatbotQuestions = new ChatbotQuestions();
         chatbotQuestions.setUser(user);
         chatbotQuestions.setQuestion(question);
         chatbotQuestions.setAnswer(answer);
-        chatbotQuestions.setConversationId((Long) 0L);
+        chatbotQuestions.setConversationId(conversationId);
 
         // Save the game session to the database
         chatbotQuestionsRepository.save(chatbotQuestions);
@@ -123,16 +114,11 @@ public class ChatbotQuestionService {
         return chatbotQuestions;
     }
 
-    // public Map<String, List<ChatbotQuestions>> loadUserConversations(String email) {
-    //     List<ChatbotQuestions> rows = chatbotQuestionsRepository.findByUser_EmailOrderByConversationIdAscIdAsc(email);
-    //     Map<String, List<ChatbotQuestions>> byConv = new LinkedHashMap<>();
-    //     for(ChatbotQuestions r : rows) {
-    //         String convid = r.getConversationId();
-    //         if(!byConv.containsKey(convid)) {
-    //             byConv.put(convid, new ArrayList<>());
-    //         }
-    //         byConv.get(convid).add(r);
-    //     }
-    //     return byConv;
-    // }
+    public List<AgentQuestionPerConv> getConversationHistory(String email, String cid) {
+    var rows = chatbotQuestionsRepository
+                 .findByUser_EmailAndConversationIdOrderByIdAsc(email, cid);
+    return rows.stream()
+        .map(r -> new AgentQuestionPerConv(r.getId(), r.getQuestion(), r.getAnswer()))
+        .toList();
+}
 }

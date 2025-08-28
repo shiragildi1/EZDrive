@@ -35,5 +35,5 @@ public class ChatbotQuestions {
     private String answer;
 
     @Column(name = "conversation_id")
-    private Long conversationId;
+    private String conversationId;
 }

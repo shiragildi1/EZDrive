@@ -1,23 +1,25 @@
 package com.ezdrive.ezdrive.api.controllers;
 
-import java.rmi.RemoteException;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ezdrive.ezdrive.api.dto.MemoryGameSessionStartResponseDto;
+import com.ezdrive.ezdrive.api.dto.AgentQuestionPerConv;
+import com.ezdrive.ezdrive.api.dto.AgentRequestDto;
+import com.ezdrive.ezdrive.api.dto.AgentResponseDto;
 import com.ezdrive.ezdrive.persistence.Entities.ChatbotQuestions;
-import com.ezdrive.ezdrive.persistence.Entities.GameSession;
 import com.ezdrive.ezdrive.persistence.Entities.User;
-import com.ezdrive.ezdrive.persistence.Repositories.ChatbotQuestionsRepository;
 import com.ezdrive.ezdrive.services.ChatbotQuestionService;
-
 import jakarta.servlet.http.HttpSession;
 
 @RestController
@@ -28,19 +30,41 @@ public class ChatbotQuestionController {
 
 	// קבלת תשובה לשאלה ע"י טקסט (POST)
 	@PostMapping("/ask")
-    public ResponseEntity<Map<String, String>> askAgent(@RequestBody Map<String, String> body,  HttpSession session) {
-        String question = body.get("question");
+    public ResponseEntity<AgentResponseDto> askAgent(@RequestBody AgentRequestDto req,  HttpSession session) {
+        String question = req.getQuestion();
         if (question == null || question.trim().isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("answer", "נא לשלוח טקסט של שאלה."));
+            return ResponseEntity.badRequest()
+                    .body(new AgentResponseDto("נא לשלוח טקסט של שאלה.", null));
         }
-        String answer = chatbotQuestionService.answer(question.trim());
 
         User user = (User) session.getAttribute("user");
-        chatbotQuestionService.createBotQuestion(user, question.trim(), answer);
+        if (user == null) {
+            return ResponseEntity.status(401)
+                    .body(new AgentResponseDto("נא להתחבר קודם.", null));
+        }
+        String conversationId = req.getConversationId();
+        if (conversationId == null || conversationId.isBlank()) {
+            conversationId = java.util.UUID.randomUUID().toString(); // שיחה חדשה
+        }
+        String answer = chatbotQuestionService.answer(question);
+        chatbotQuestionService.createBotQuestion(user, question, answer, conversationId);
 
 
-        return ResponseEntity.ok(Map.of("answer", answer));
+        return ResponseEntity.ok(new AgentResponseDto(answer, conversationId));
     }
+
+    @GetMapping("/conversations")
+public ResponseEntity<List<AgentQuestionPerConv>> getConversation(
+    @RequestParam("conversationId") String conversationId, HttpSession session) {
+
+    User user = (User) session.getAttribute("user");
+    if (user == null) return ResponseEntity.status(401).build();
+
+    List<AgentQuestionPerConv> history =
+        chatbotQuestionService.getConversationHistory(user.getEmail(), conversationId);
+
+    return ResponseEntity.ok(history); 
+}
 
 }
 

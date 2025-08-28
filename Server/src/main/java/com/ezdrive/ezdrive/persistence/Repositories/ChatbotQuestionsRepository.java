@@ -8,7 +8,7 @@ import com.ezdrive.ezdrive.persistence.Entities.ChatbotQuestions;
 
 
 public interface ChatbotQuestionsRepository extends JpaRepository<ChatbotQuestions, Long> {
-    List<ChatbotQuestions> findByUser_EmailOrderByConversationIdAscIdAsc(String email);
+    List<ChatbotQuestions> findByUser_EmailAndConversationIdOrderByIdAsc(String email, String conversationId);
 }
 //return ChatbotQuestions{id=1, user=alice, conversationId="convA",
 //                    question="מה זה תמרור עצור?", answer="תמרור עצור מחייב עצירה."},
