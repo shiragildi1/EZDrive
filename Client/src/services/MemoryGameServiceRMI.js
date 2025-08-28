@@ -151,3 +151,13 @@ export function getGameResult(sessionId) {
     }
   ).then((res) => res.json());
 }
+
+export function deleteMemoryEntries(sessionId) {
+  return fetch(
+    `http://localhost:8080/game-sessions/delete-memory-entries?sessionId=${sessionId}`,
+    {
+      method: "DELETE",
+      credentials: "include",
+    }
+  );
+}

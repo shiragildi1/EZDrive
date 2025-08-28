@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ezdrive.ezdrive.api.dto.EmailRequestDto;
 import com.ezdrive.ezdrive.persistence.Entities.User;
+import com.ezdrive.ezdrive.persistence.Repositories.UserRepository;
 import com.ezdrive.ezdrive.services.OtpService;
 import com.ezdrive.ezdrive.services.UserService;
 
@@ -29,6 +30,8 @@ public class OtpController
     private OtpService otpService;
     @Autowired
     private UserService userService;
+    @Autowired
+private UserRepository userRepository;
 
     @PostMapping("/create")
     public ResponseEntity<?> createOtp(@RequestBody EmailRequestDto request) 
@@ -55,8 +58,21 @@ public class OtpController
                 if (session != null) session.invalidate();
                 session = req.getSession(true);
 
-                User user = userService.findByEmail(request.getEmail())
+                User user;
+                if(userService.findByEmail(request.getEmail()).isPresent())
+                {
+                    user = userService.findByEmail(request.getEmail())
                                     .orElseThrow(() -> new RuntimeException("User not found"));
+                }
+                else
+                {
+                    user = new User();
+                    user.setEmail(request.getEmail());
+                    user.setEmailVerified(isValid);
+                    userRepository.save(user);
+
+                }
+                
                 session.setAttribute("user", user);
                 System.out.println("New session ID: " + session.getId());
                 System.out.println("User logged in: " + user.getEmail());

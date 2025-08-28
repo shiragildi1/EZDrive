@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -293,4 +294,16 @@ public MemoryStateDto getMemoryGameState(@RequestParam Long sessionId)
             throw new RuntimeException("Failed to get memory game result: " + e.getMessage());
         }
     }
+
+   
+    @DeleteMapping("/delete-memory-entries")
+    public ResponseEntity<Void> deleteMemoryEntries(@RequestParam Long sessionId) {
+    try {
+        getRmiService().deleteMemoryEntries(sessionId);
+        return ResponseEntity.noContent().build(); // 204 No Content
+    } catch (RemoteException e) {
+        e.printStackTrace();
+        return ResponseEntity.status(500).build();// 500 Internal Server Error
+    }
+}
 }

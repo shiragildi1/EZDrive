@@ -216,13 +216,12 @@ export default function memoryGame({ questions, sessionId, opponent }) {
           const opponentEmail = Object.keys(finalResult.scores).find(
             (email) => email !== userEmail
           );
-          setScoreResult(finalResult.scores[userEmail]);
+          setScoreResult(finalResult);
           console.log("Game over! Final result:", finalResult);
 
           return (
             <EndOfMemoryPage
-              score1={scoreResult.finalResult.scores[userEmail]}
-              score2={scoreResult.finalResult.scores[opponentEmail]}
+              scores={finalResult.scores}
               sessionId={sessionId}
             />
           );
@@ -237,13 +236,32 @@ export default function memoryGame({ questions, sessionId, opponent }) {
 
   return (
     <div className="board-wrapper">
-      <div
-        className={`player_A ${
-          user.email === currentPlayer ? "active-player" : ""
-        }`}
-      >
-        <img src={user.picture} alt="Player A" className="profile-pic" />
+      <div className="player_A">
+        {user.picture ? (
+          <img
+            src={user.picture}
+            alt="Player A"
+            className={`profile-pic ${
+              user.email === currentPlayer ? "active-player" : ""
+            }`}
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.style.display = "none";
+              e.target.nextSibling.style.display = "flex";
+            }}
+          />
+        ) : (
+          <div
+            className={`fallback-avatar ${
+              user.email === currentPlayer ? "active-player" : ""
+            }`}
+          >
+            {user.email.slice(0, 2).toUpperCase()}
+          </div>
+        )}
+        <div className="player-email">{user.name ? user.name : user.email}</div>
       </div>
+
       <div className="memory_game">
         {showResult && <div className="score-popup">+1</div>}
         {/* <div className="header">
@@ -367,12 +385,40 @@ export default function memoryGame({ questions, sessionId, opponent }) {
           </div>
         </div>
       </div>
-      <div
+      {/* <div
         className={`player_B ${
           opponent.email === currentPlayer ? "active-player" : ""
         }`}
       >
         <img src={opponent.picture} alt="Player B" className="profile-pic" />
+      </div> */}
+      <div className="player_B">
+        {opponent.picture ? (
+          <img
+            src={opponent.picture}
+            alt="Player B"
+            className={`profile-pic ${
+              opponent.email === currentPlayer ? "active-player" : ""
+            }`}
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.style.display = "none";
+              e.target.nextSibling.style.display = "flex";
+            }}
+          />
+        ) : (
+          <div
+            className={`fallback-avatar ${
+              user.email === currentPlayer ? "active-player" : ""
+            }`}
+          >
+            {user.email.slice(0, 2).toUpperCase()}
+          </div>
+        )}
+
+        <div className="player-email">
+          {opponent.name ? opponent.name : opponent.email}
+        </div>
       </div>
     </div>
   );
