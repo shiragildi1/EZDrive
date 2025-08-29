@@ -289,7 +289,7 @@ export default function memoryGame({ questions, sessionId, opponent }) {
                     flippedQuestionCards[i] ? "flipped" : ""
                   }`}
                 >
-                  <div className="card-front">
+                  {/* <div className="card-front">
                     {questionStatus[card.cardId] !== "disabled" && (
                       <>
                         <span className="card-text">{card.text}</span>
@@ -311,6 +311,16 @@ export default function memoryGame({ questions, sessionId, opponent }) {
                       </>
                     )}
                     {/* <img src={logo} alt="EZDrive Logo" className="logo_img" /> */}
+                  {/* </div> */} 
+
+                  <div className="card-front">
+                    {questionStatus[card.cardId] !== "disabled" && (
+                      <>
+                        <span className="card-text">{card.text}</span>
+                        
+                      </>
+                    )}
+                    <img src={logo} alt="EZDrive Logo" className="logo_img" />
                   </div>
                   <div className="card-back">
                     {questionStatus[card.cardId] !== "disabled" && (
@@ -361,14 +371,14 @@ export default function memoryGame({ questions, sessionId, opponent }) {
                     flippedAnswerCards[i] ? "flipped" : ""
                   }`}
                 >
-                  <div className="card-front">
+                  {<div className="card-front">
                     {answerStatus[card.cardId] != "disabled" && (
                       <>
                         <span className="card-text">{card.text}</span>
                       </>
                     )}
                     {/* <img src={logo} alt="EZDrive Logo" className="logo_img" /> */}
-                  </div>
+                  </div>}
                   <div className="card-back">
                     {answerStatus[card.cardId] === "disabled" && (
                       <img src={logo} alt="EZDrive Logo" className="logo_img" />

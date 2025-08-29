@@ -19,6 +19,7 @@
 .login-form h2 {
   font-size: 20px;
   margin-bottom: 30px;
+  color: black;
 }
 .login-form input {
   width: 92%;

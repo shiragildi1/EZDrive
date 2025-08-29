@@ -22,8 +22,8 @@ export default function EndOfTriviaPage({
   return (
     <div className="end-of-trivia-page">
       <div className="end-of-trivia-header">
-        <h1>!סיימת את הטריוויה</h1>
-        <h2>הנה התוצאות שלך</h2>
+        <end-of-trivia-header-h1>!סיימת את הטריוויה</end-of-trivia-header-h1>
+        <end-of-trivia-header-h2>הנה התוצאות שלך</end-of-trivia-header-h2>
       </div>
       <div className="squares-end-of-trivia">
         <div className="square-end-of-trivia">

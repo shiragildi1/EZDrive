@@ -12,7 +12,7 @@ export default function HomePage() {
       <img src={backgroundImage} alt="רקע כביש" className="bg-image" />
       <div className="overlay-content">
         <div className="slogan1">?רוצה ללמוד תיאוריה</div>
-        <div className="slogan2">.שחק אותה</div>
+        <div className="slogan2">למד בדרך שלך</div>
         <div className="squares">
           <Link to="/games?topic=traffic" className="square">
             <TrafficIcon className="icon" />
