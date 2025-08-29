@@ -5,15 +5,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import com.ezdrive.ezdrive.model.OtpData;
 
-import org.springframework.mail.javamail.JavaMailSender;
 
 
-
-
+// Service for handling OTP (One-Time Password) generation and validation
 @Service
 public class OtpService 
 {
@@ -21,22 +20,29 @@ public class OtpService
     @Autowired
     private JavaMailSender mailSender;
 
+    // Creates OTP data for a given email
     public String createOtpData(String email)
     {
         String code= generateOtpCode();
         System.out.println("the otp coode is: " + code);
-        OtpData otp = new OtpData(code, System.currentTimeMillis() + 10 * 60 * 1000, 0);
+        int tenMinutes = 10 * 60 * 1000;
+        OtpData otp = new OtpData(code, System.currentTimeMillis() + tenMinutes , 0);
         otpStore.put(email, otp);
         sendEmail(email, code);
         return code;
     }
-    
+
+    // Generates a random OTP code
     private String generateOtpCode()
     {
-        int code = (int)(Math.random() * 900_000) + 100_000;
+        int min = 100_000;
+        int max = 900_000;
+
+        int code = (int)(Math.random() * max) + min;
         return String.valueOf(code);
     }
 
+    // Sends an email with the OTP code
     private void sendEmail(String to, String code) {
     try {
         SimpleMailMessage message = new SimpleMailMessage();
@@ -51,6 +57,7 @@ public class OtpService
     }
 }
 
+    // Verifies the OTP for a given email
     public boolean verifyOtp(String email, String code)
     {
         OtpData otpData= otpStore.get(email);

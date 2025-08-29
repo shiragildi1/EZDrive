@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.ezdrive.ezdrive.persistence.Entities.User;
 import com.ezdrive.ezdrive.persistence.Repositories.UserRepository;
 
+//Service to handle users
 @Service
 public class UserService {
     @Autowired

@@ -12,7 +12,6 @@ import logo from "../assets/logo1.png";
 export default function memoryGame({ questions, sessionId, opponent }) {
   const [currentPlayer, setCurrentPlayer] = useState(null);
   const [showResult, setShowResult] = useState(false);
-  //const [gameOver, setGameOver] = useState(false);
   const [scoreResult, setScoreResult] = useState({ user1: 0, user2: 0 });
   const { setUser } = useUserContext();
   useEffect(() => {
@@ -87,7 +86,6 @@ export default function memoryGame({ questions, sessionId, opponent }) {
     setFlippedQuestionCards((prev) =>
       prev.map((flipped, index) => (index === i ? true : flipped))
     );
-    //updateOpponentFlippedCards(sessionId,i);
     setQuestionFlipped(true);
     setCurrentQuestion(i);
     flipQuestion({ sessionId, selectedQuestionCard: i });
@@ -207,15 +205,11 @@ export default function memoryGame({ questions, sessionId, opponent }) {
               updateAnswerFlip(gameState.flippedAnswer);
             }
           }
-          //setFound(gameState.matchedCards);
         }
         if (gameState.gameOver) {
           clearInterval(interval);
           console.log("Game over detected in MemoryGameState");
           const finalResult = await getGameResult(sessionId);
-          const opponentEmail = Object.keys(finalResult.scores).find(
-            (email) => email !== userEmail
-          );
           setScoreResult(finalResult);
           console.log("Game over! Final result:", finalResult);
 
@@ -264,134 +258,112 @@ export default function memoryGame({ questions, sessionId, opponent }) {
 
       <div className="memory_game">
         {showResult && <div className="score-popup">+1</div>}
-        {/* <div className="header">
-  <div className="score"> </div>
- </div> */}
-
         <div className="board">
-          <div className="questions-board">
-            {questionCards.map((card, i) => (
-              <div
-                key={card.cardId}
-                className={`card ${
-                  questionMatched === card.cardId
-                    ? "correct"
-                    : questionStatus[card.cardId] === "incorrect"
-                    ? "incorrect"
-                    : questionStatus[card.cardId] === "disabled"
-                    ? "disabled"
-                    : ""
-                }`}
-                onClick={() => handleQuestionFlip(i)}
-              >
+          <div className="question-header">
+            <h2>שאלות</h2>
+            <div className="questions-board">
+              {questionCards.map((card, i) => (
                 <div
-                  className={`card-inner ${
-                    flippedQuestionCards[i] ? "flipped" : ""
+                  key={card.cardId}
+                  className={`card ${
+                    questionMatched === card.cardId
+                      ? "correct"
+                      : questionStatus[card.cardId] === "incorrect"
+                      ? "incorrect"
+                      : questionStatus[card.cardId] === "disabled"
+                      ? "disabled"
+                      : ""
                   }`}
+                  onClick={() => handleQuestionFlip(i)}
                 >
-                  <div className="card-front">
-                    {questionStatus[card.cardId] !== "disabled" && (
-                      <>
-                        <span className="card-text">{card.text}</span>
-                        {card.imageUrl && (
-                          <img
-                            src={
-                              card.imageUrl.startsWith("http")
-                                ? card.imageUrl
-                                : `https://${card.imageUrl}`
-                            }
-                            alt="שאלה"
-                            className="question-image"
-                            onError={(e) => {
-                              e.target.onerror = null;
-                              e.target.src = logo; // fallback to EZDrive logo
-                            }}
-                          />
-                        )}
-                      </>
-                    )}
-                    {/* <img src={logo} alt="EZDrive Logo" className="logo_img" /> */}
-                  </div>
-                  <div className="card-back">
-                    {questionStatus[card.cardId] !== "disabled" && (
-                      <>
-                        <span className="card-text">{card.text}</span>
-                        {card.imageUrl && (
-                          <img
-                            src={
-                              card.imageUrl.startsWith("http")
-                                ? card.imageUrl
-                                : `https://${card.imageUrl}`
-                            }
-                            alt="שאלה"
-                            className="question-image"
-                            onError={(e) => {
-                              e.target.onerror = null;
-                              e.target.src = logo; // fallback to EZDrive logo
-                            }}
-                          />
-                        )}
-                      </>
-                    )}
-                    {/*questionStatus[card.cardId] != "disabled" && (
-        <span className="card-text">{card.text}</span>
-      )*/}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="answer-board">
-            {answerCards.map((card, i) => (
-              <div
-                key={card.cardId}
-                className={`card ${
-                  answerMatched === card.cardId
-                    ? "correct"
-                    : answerStatus[card.cardId] === "incorrect"
-                    ? "incorrect"
-                    : answerStatus[card.cardId] === "disabled"
-                    ? "disabled"
-                    : ""
-                }`}
-                onClick={() => handleAnswerFlip(i)}
-              >
-                <div
-                  className={`card-inner ${
-                    flippedAnswerCards[i] ? "flipped" : ""
-                  }`}
-                >
-                  <div className="card-front">
-                    {answerStatus[card.cardId] != "disabled" && (
-                      <>
-                        <span className="card-text">{card.text}</span>
-                      </>
-                    )}
-                    {/* <img src={logo} alt="EZDrive Logo" className="logo_img" /> */}
-                  </div>
-                  <div className="card-back">
-                    {answerStatus[card.cardId] === "disabled" && (
+                  <div
+                    className={`card-inner ${
+                      flippedQuestionCards[i] ? "flipped" : ""
+                    }`}
+                  >
+                    <div className="card-front">
                       <img src={logo} alt="EZDrive Logo" className="logo_img" />
-                    )}
-                    {answerStatus[card.cardId] != "disabled" && (
-                      <>
-                        <span className="card-text">{card.text}</span>
-                      </>
-                    )}
+                    </div>
+                    <div className="card-back">
+                      {questionStatus[card.cardId] !== "disabled" && (
+                        <>
+                          <span className="card-text">{card.text}</span>
+                          {card.imageUrl && (
+                            <img
+                              src={
+                                card.imageUrl.startsWith("http")
+                                  ? card.imageUrl
+                                  : `https://${card.imageUrl}`
+                              }
+                              alt="שאלה"
+                              className="question-image"
+                              onError={(e) => {
+                                e.target.onerror = null;
+                                e.target.src = logo; // fallback to EZDrive logo
+                              }}
+                            />
+                          )}
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+          </div>
+          <div className="answer-header">
+            <h2>תשובות</h2>
+            <div className="answer-board">
+              {answerCards.map((card, i) => (
+                <div
+                  key={card.cardId}
+                  className={`card ${
+                    answerMatched === card.cardId
+                      ? "correct"
+                      : answerStatus[card.cardId] === "incorrect"
+                      ? "incorrect"
+                      : answerStatus[card.cardId] === "disabled"
+                      ? "disabled"
+                      : ""
+                  }`}
+                  onClick={() => handleAnswerFlip(i)}
+                >
+                  <div
+                    className={`card-inner ${
+                      flippedAnswerCards[i] ? "flipped" : ""
+                    }`}
+                  >
+                    {
+                      <div className="card-front">
+                        <img
+                          src={logo}
+                          alt="EZDrive Logo"
+                          className="logo_img"
+                        />
+                      </div>
+                    }
+                    <div className="card-back">
+                      {answerStatus[card.cardId] === "disabled" && (
+                        <img
+                          src={logo}
+                          alt="EZDrive Logo"
+                          className="logo_img"
+                        />
+                      )}
+                      {answerStatus[card.cardId] != "disabled" && (
+                        <>
+                          <span className="card-text">{card.text}</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
-      {/* <div
-        className={`player_B ${
-          opponent.email === currentPlayer ? "active-player" : ""
-        }`}
-      >
-        <img src={opponent.picture} alt="Player B" className="profile-pic" />
-      </div> */}
+
       <div className="player_B">
         {opponent.picture ? (
           <img

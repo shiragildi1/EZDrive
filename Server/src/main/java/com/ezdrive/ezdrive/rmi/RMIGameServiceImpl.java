@@ -19,6 +19,7 @@ import com.ezdrive.ezdrive.api.dto.MemoryGameSessionStartResponseDto;
 import com.ezdrive.ezdrive.api.dto.MemoryQuestionDto;
 import com.ezdrive.ezdrive.api.dto.MemoryStateDto;
 import com.ezdrive.ezdrive.persistence.Entities.Question;
+import com.ezdrive.ezdrive.persistence.Repositories.GameSessionRepository;
 import com.ezdrive.ezdrive.persistence.Repositories.MemoryGameRepository;
 import com.ezdrive.ezdrive.persistence.Repositories.QuestionRepository;
 import com.ezdrive.ezdrive.services.MemoryGameService;
@@ -31,7 +32,6 @@ public class RMIGameServiceImpl extends UnicastRemoteObject implements RMIGameSe
     private final QuestionRepository questionRepository;
     private final Map<Long, GameState> gameStates = new ConcurrentHashMap<>();
     private final Map<Long, Set<String>> gamePlayers = new ConcurrentHashMap<>();
-    // שמירת רשימת השאלות שנוצרה בפעם הראשונה לכל sessionId
     private final Map<Long, List<Question>> sessionQuestions = new ConcurrentHashMap<>();
 
     public RMIGameServiceImpl(ApplicationContext springContext) throws RemoteException {
@@ -42,9 +42,10 @@ public class RMIGameServiceImpl extends UnicastRemoteObject implements RMIGameSe
     }
 
     /**
-     * מצרף שחקן למשחק קיים או יוצר GameState חדש אם זה השחקן השני.
-     * שחקן ראשון: יתווסף ל-gamePlayers בלבד.
-     * שחקן שני: יווצר GameState חדש, המשחק מוכן.
+    - Adds a player to an existing game or creates a new GameState if it's the second player.
+- First player: will be added only to gamePlayers.
+- Second player: a new GameState will be created, and the game will be ready.
+
      */
     @Override
     public synchronized void joinGame(Long sessionId, String userEmail) throws RemoteException {
@@ -67,10 +68,7 @@ public class RMIGameServiceImpl extends UnicastRemoteObject implements RMIGameSe
         }
     }
     
-    /**
-     * יוצרת שאלות רק אם זה לא נוצר כבר עבור sessionId, ושומרת אותן במפה.
-     * כל קריאה נוספת תחזיר את אותה רשימת שאלות.
-     */
+    //generates question for memory game
     @Override
     public synchronized List<Question> generateQuestionsForMemorySession(Long sessionId, String category) throws RemoteException {
         // if (!sessionQuestions.containsKey(sessionId)) {
@@ -107,10 +105,7 @@ public class RMIGameServiceImpl extends UnicastRemoteObject implements RMIGameSe
                 memoryQuestionDtos.addAll(memoryAnswerDtos);
                 return new MemoryGameSessionStartResponseDto(sessionId, memoryQuestionDtos);
     }
-
-    /**
-     * בודק אם המשחק מוכן (יש שני שחקנים ו-GameState מאותחל)
-     */
+    //check if there are 2 playeres
     public synchronized boolean isGameReady(Long sessionId) throws RemoteException {
         Set<String> players = gamePlayers.get(sessionId);
         return players != null && players.size() == 2 && gameStates.containsKey(sessionId);

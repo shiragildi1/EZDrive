@@ -12,15 +12,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ezdrive.ezdrive.api.dto.EmailRequestDto;
-import com.ezdrive.ezdrive.persistence.Entities.User;
-import com.ezdrive.ezdrive.persistence.Repositories.UserRepository;
 import com.ezdrive.ezdrive.services.OtpService;
-import com.ezdrive.ezdrive.services.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 
+//controls otp for sign in
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/otp")
@@ -28,11 +25,8 @@ public class OtpController
 {
     @Autowired
     private OtpService otpService;
-    @Autowired
-    private UserService userService;
-    @Autowired
-private UserRepository userRepository;
 
+    //create an OTP
     @PostMapping("/create")
     public ResponseEntity<?> createOtp(@RequestBody EmailRequestDto request) 
     {
@@ -48,39 +42,12 @@ private UserRepository userRepository;
         }
     }
 
+    //Verifies the OTP
     @PostMapping("/verify")
     public ResponseEntity<?> verifyCode(@RequestBody EmailRequestDto request, HttpServletRequest req) {
         try {
             boolean isValid = otpService.verifyOtp(request.getEmail(), request.getCode());
-
-            if (isValid) {
-                HttpSession session = req.getSession(false);
-                if (session != null) session.invalidate();
-                session = req.getSession(true);
-
-                User user;
-                if(userService.findByEmail(request.getEmail()).isPresent())
-                {
-                    user = userService.findByEmail(request.getEmail())
-                                    .orElseThrow(() -> new RuntimeException("User not found"));
-                }
-                else
-                {
-                    user = new User();
-                    user.setEmail(request.getEmail());
-                    user.setEmailVerified(isValid);
-                    userRepository.save(user);
-
-                }
-                
-                session.setAttribute("user", user);
-                System.out.println("New session ID: " + session.getId());
-                System.out.println("User logged in: " + user.getEmail());
-
-                return ResponseEntity.ok(Collections.singletonMap("valid", true));
-            }
-
-            return ResponseEntity.ok(Collections.singletonMap("valid", false));
+            return ResponseEntity.ok(Collections.singletonMap("valid", isValid));
         } 
         catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

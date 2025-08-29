@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ezdrive.ezdrive.services.QuestionService;
 
+//creates the question db out of the theoryexamhe-data.xml
 @RestController
 @RequestMapping("/question")
 public class QuestionController

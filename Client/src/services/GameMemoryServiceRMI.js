@@ -1,6 +1,4 @@
 export async function startMemorySession(category) {
-  // יוצר סשן חדש ומחזיר אובייקט עם session (האובייקט של הסשן) ו-questions (רשימת השאלות)
-  // לכן בפרונט יש להשתמש ב-data.session.id ולא ב-data ישירות!
   const res = await fetch("http://localhost:8080/game-sessions/startMemory", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -14,12 +12,11 @@ export async function startMemorySession(category) {
     const text = await res.text();
     throw new Error(`startMemorySession failed: ${res.status} - ${text}`);
   }
-  // מחזיר את כל האובייקט (ולא רק מזהה!)
+
   return await res.json();
 }
 
 export async function joinMemoryGame(sessionId) {
-  // שחקן שני מצטרף לסשן קיים
   const res = await fetch(
     `http://localhost:8080/game-sessions/join-memory?sessionId=${sessionId}`,
     {
@@ -77,7 +74,6 @@ export async function getMemoryGameStatus(sessionId) {
   if (!response.ok) {
     throw new Error("Failed to get memory game status");
   }
-  //מצפה לתשובה: { ready, questions }
   return await response.json();
 }
 
@@ -110,7 +106,6 @@ export async function getMemoryGameState(sessionId) {
   if (!response.ok) {
     throw new Error("Failed to get memory game state");
   }
-  //מצפה לתשובה: { ready, questions }
   return await response.json();
 }
 export function getGameResult(sessionId) {

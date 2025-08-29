@@ -13,6 +13,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 
+// Service for handling authentication
 @Service
 public class AuthService 
 {
@@ -23,6 +24,7 @@ public class AuthService
     @Autowired
     private UserService userService;
 
+    // Verifies the Google ID token
     private GoogleIdToken.Payload verifyToken(String idTokenString) throws Exception
     {
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory())
@@ -41,6 +43,7 @@ public class AuthService
     }
 
 
+    // Registers a Google user
     public User registerGoogleUser(String idTokenString) throws Exception
     {
         GoogleIdToken.Payload payload = verifyToken(idTokenString);
@@ -66,6 +69,7 @@ public class AuthService
         return newUser;
     }
 
+    // Registers an email user
     public String registerEmailUser(String email)
     {
         if (userService.findByEmail(email).isPresent()) 

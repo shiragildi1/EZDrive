@@ -1,6 +1,7 @@
 package com.ezdrive.ezdrive.api.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

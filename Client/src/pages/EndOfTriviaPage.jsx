@@ -11,7 +11,6 @@ export default function EndOfTriviaPage({
 }) {
   const [showPopup, setShowPopup] = useState(false);
 
-
   const handleClose = () => {
     setShowPopup(false);
   };
@@ -22,8 +21,8 @@ export default function EndOfTriviaPage({
   return (
     <div className="end-of-trivia-page">
       <div className="end-of-trivia-header">
-        <h1>!סיימת את הטריוויה</h1>
-        <h2>הנה התוצאות שלך</h2>
+        <div className="end-of-trivia-header-1"> !סיימת את הטריוויה</div>
+        <div className="end-of-trivia-header-2">הנה התוצאות שלך</div>
       </div>
       <div className="squares-end-of-trivia">
         <div className="square-end-of-trivia">
@@ -52,21 +51,16 @@ export default function EndOfTriviaPage({
               <h3>חזרה לעמוד הבית</h3>
             </button>
           </Link>
-
-
         </div>
         <div className="right-buttons">
           <button className="show-answers-button" onClick={handleOpen}>
             <h3>הצגת תשובות</h3>
           </button>
 
-
           <Link to="/HomePage" className="no-style-link">
             <button className="play-again-button">
               <h3>שחק שוב</h3>
             </button>
-
-
           </Link>
         </div>
       </div>

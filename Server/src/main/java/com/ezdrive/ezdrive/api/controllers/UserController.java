@@ -13,12 +13,10 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/api/user")
 public class UserController
 {
+    //returns current user
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(HttpSession session) {
         User user = (User) session.getAttribute("user");
-
-        // System.out.println("Session ID:" + session.getId());
-        // System.out.println("Session User:" + user);
 
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)

@@ -1,14 +1,30 @@
  package com.ezdrive.ezdrive.services;
 
+import java.util.List;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.springframework.http.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.ezdrive.ezdrive.api.dto.AgentQuestionPerConvDto;
+import com.ezdrive.ezdrive.persistence.Entities.ChatbotQuestions;
+import com.ezdrive.ezdrive.persistence.Entities.User;
+import com.ezdrive.ezdrive.persistence.Repositories.ChatbotQuestionsRepository;
+
+// Service for handling chatbot questions
 @Service
-public class AgentService {
-    // לפי בקשתך — מפתח ישירות בקוד. החליפי אותו בקרוב והעבירי ל-ENV.
+public class ChatbotQuestionService {
+    @Autowired
+    private ChatbotQuestionsRepository chatbotQuestionsRepository;
+    @Autowired
+
+
     private static final String GEMINI_API_KEY = "AIzaSyArbxIckbdnLr7ig92GGseyfKl8S5i7c-U";
     private static final String MODEL = "gemini-2.0-flash";
     private static final String URL =
@@ -16,6 +32,7 @@ public class AgentService {
 
     private final RestTemplate http = new RestTemplate();
 
+    // Answers a user's question
     public String answer(String userQuestion) {
         if (userQuestion == null || userQuestion.isBlank()) {
             return "נא לנסח שאלה.";
@@ -26,7 +43,7 @@ public class AgentService {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
 
-            // ---------- systemInstruction (מגבלות ואופי תשובה) ----------
+            // ---------- systemInstruction ----------
             String systemText = """
                     אתה עוזר לענייני תיאוריה לנהיגה בישראל (מבחן עיוני).
                     כללי עבודה:
@@ -43,7 +60,7 @@ public class AgentService {
 
             // ---------- generationConfig ----------
             JSONObject genCfg = new JSONObject()
-                    .put("temperature", 0.2) // תשובות שמרניות
+                    .put("temperature", 0.2)
                     .put("response_mime_type", "text/plain");
 
             // ---------- user content ----------
@@ -85,4 +102,27 @@ public class AgentService {
             return "אירעה שגיאה בעיבוד השאלה. נסי שוב.";
         }
     }
+
+    // Creates a new chatbot question in the DB
+    public ChatbotQuestions createBotQuestion(User user, String question, String answer, String conversationId) {
+        ChatbotQuestions chatbotQuestions = new ChatbotQuestions();
+        chatbotQuestions.setUser(user);
+        chatbotQuestions.setQuestion(question);
+        chatbotQuestions.setAnswer(answer);
+        chatbotQuestions.setConversationId(conversationId);
+
+        // Save the game session to the database
+        chatbotQuestionsRepository.save(chatbotQuestions);
+
+        return chatbotQuestions;
+    }
+
+    // Retrieves the conversation history for a user
+    public List<AgentQuestionPerConvDto> getConversationHistory(String email, String cid) {
+    var rows = chatbotQuestionsRepository
+                 .findByUser_EmailAndConversationIdOrderByIdAsc(email, cid);
+    return rows.stream()
+        .map(r -> new AgentQuestionPerConvDto(r.getId(), r.getQuestion(), r.getAnswer()))
+        .toList();
+}
 }

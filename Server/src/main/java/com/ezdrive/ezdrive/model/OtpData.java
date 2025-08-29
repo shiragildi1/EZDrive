@@ -6,9 +6,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class OtpData {
-    private String code;//קוד
-    private long expiry;//זמן תפוגה
-    private int attempts;//מספר ניסיונות
+    private String code;//otp
+    private long expiry;//expiration time
+    private int attempts;//number of tries
 
     
     public OtpData(String code, long expiry, int attempts)

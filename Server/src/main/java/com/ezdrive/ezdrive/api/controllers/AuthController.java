@@ -34,7 +34,7 @@ public class AuthController
 
     @PostMapping("/google")
     public ResponseEntity<?> googleLogin(@RequestBody GoogleTokenRequestDto request, HttpServletRequest req) {
-        HttpSession session = req.getSession(); // יוצר סשן חדש אם אין
+        HttpSession session = req.getSession(); 
         try {
             User user = authService.registerGoogleUser(request.getToken());
             session.setAttribute("user", user); 

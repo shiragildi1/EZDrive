@@ -1,4 +1,3 @@
-
 .profile-page {
   position: relative;
   height: 100%;
@@ -44,7 +43,6 @@
   cursor: pointer;
 }
 
-/* עיצוב לעיגול ההישג */
 .circle-box {
   width: 90px;
   height: 90px;
@@ -69,7 +67,7 @@
   font-size: 22px;
   font-weight: bold;
 }
-/* שורה של כרטיסי הישגים */
+
 .profile-achievements-row {
   display: flex;
   flex-direction: row;

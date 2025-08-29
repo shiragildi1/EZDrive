@@ -67,17 +67,17 @@ export default function TriviaGame({ questions, sessionId, topic }) {
 
   // Function to handle the answer selection
   async function handleAnswer(selectedAnswerIndex) {
-    setSelected(selectedAnswerIndex); // זה האינדקס של התשובה שנבחרה (0-based)
+    setSelected(selectedAnswerIndex);
     setShowResult(true);
 
     const result = await submitAnswer({
       sessionId,
       questionId: question.questionId,
       selectedAnswer:
-        selectedAnswerIndex != null ? selectedAnswerIndex + 1 : null, // המרה ל־1-based לשרת
+        selectedAnswerIndex != null ? selectedAnswerIndex + 1 : null,
     });
 
-    setCorrectAnswerIndex(result.correctAnswerIndex - 1); // נניח שהתשובה מהשרת היא 1-based
+    setCorrectAnswerIndex(result.correctAnswerIndex - 1);
     setIsCorrect(result.isCorrect);
 
     setTimeout(async () => {
@@ -123,53 +123,58 @@ export default function TriviaGame({ questions, sessionId, topic }) {
       <div className="trivia-progress">
         {current + 1} / {questions.length}
       </div>
+      <div className="image-container">
+        <div className="trivia-question-row">
+          <div className="trivia-question-col">
+            <div className="trivia-content-row">
+              <div className="trivia-image">
+                {question.imageUrl && (
+                  <img src={question.imageUrl} alt="Question-img" />
+                )}
+              </div>
+              <div className="question-answer">
+                <div className="trivia-content">
+                  <div className="trivia-question-box">
+                    <div className="trivia-question">
+                      {question.questionText}
+                    </div>
+                  </div>
+                </div>
 
-      <div className="trivia-question-row">
-        <div className="trivia-image">
-          {question.imageUrl && (
-            <img
-              src={question.imageUrl}
-              alt="Question"
-              className="trivia-question-image"
-            />
-          )}
-        </div>
-        <div className="trivia-question-col">
-          <div className="trivia-question-box">
-            <div className="trivia-question">{question.questionText}</div>
+                <div className="trivia-options">
+                  {question.options.map((opt, idx) => {
+                    let className = "trivia-option";
+
+                    if (showResult) {
+                      if (idx === correctAnswerIndex) {
+                        className += " correct";
+                      }
+
+                      if (
+                        selected !== null &&
+                        idx === selected &&
+                        idx !== correctAnswerIndex
+                      ) {
+                        className += " wrong";
+                      }
+                    }
+
+                    return (
+                      <button
+                        key={idx}
+                        className={className}
+                        onClick={() => !showResult && handleAnswer(idx)}
+                        disabled={showResult}
+                      >
+                        {opt}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-
-      <div className="trivia-options">
-        {question.options.map((opt, idx) => {
-          let className = "trivia-option";
-
-          if (showResult) {
-            if (idx === correctAnswerIndex) {
-              className += " correct";
-            }
-
-            if (
-              selected !== null &&
-              idx === selected &&
-              idx !== correctAnswerIndex
-            ) {
-              className += " wrong";
-            }
-          }
-
-          return (
-            <button
-              key={idx}
-              className={className}
-              onClick={() => !showResult && handleAnswer(idx)}
-              disabled={showResult}
-            >
-              {opt}
-            </button>
-          );
-        })}
       </div>
     </div>
   );

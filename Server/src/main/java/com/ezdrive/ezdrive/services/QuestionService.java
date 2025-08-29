@@ -19,6 +19,7 @@ import com.ezdrive.ezdrive.api.dto.QuestionTriviaDto;
 import com.ezdrive.ezdrive.persistence.Entities.Question;
 import com.ezdrive.ezdrive.persistence.Repositories.QuestionRepository;
 
+// Service for handling questions
 @Service
 public class QuestionService 
 {
@@ -26,17 +27,12 @@ public class QuestionService
     @Autowired
     private QuestionRepository questionRepository;
 
-    // public void importFromXmlFile(String filePath) 
-    // {
-    //     List<Question> questions = extractQuestionsFromXml(filePath);
-    //     questionRepository.saveAll(questions);
-    // }
-public void importFromXmlStream(InputStream inputStream) {
+  // Imports questions from an XML input stream
+    public void importFromXmlStream(InputStream inputStream) {
     List<Question> questions = extractQuestionsFromXml(inputStream);
     for (Question question : questions) {
         Question existing = questionRepository.findByQuestionText(question.getQuestionText());
         if (existing != null) {
-            // עדכון ערכים קיימים
             existing.setCategory(question.getCategory());
             existing.setAnswer1(question.getAnswer1());
             existing.setAnswer2(question.getAnswer2());
@@ -52,37 +48,7 @@ public void importFromXmlStream(InputStream inputStream) {
 }
 
     
-    // private List<Question> extractQuestionsFromXml(String filePath) 
-    // {
-    //     List<Question> questions = new ArrayList<>();
-    //     try 
-    //     {
-    //         File file = new File(filePath);
-    //         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    //         DocumentBuilder builder = factory.newDocumentBuilder();
-    //         //Dom stractur
-    //         org.w3c.dom.Document xmlDoc = builder.parse(file);
-
-    //         NodeList items = xmlDoc.getElementsByTagName("item");
-    //         for (int i = 0; i < items.getLength(); i++) 
-    //         {
-    //             org.w3c.dom.Element item = (org.w3c.dom.Element) items.item(i);
-
-    //             String title = getText(item, "title");          
-    //             String description = getText(item, "description"); 
-    //             String category = getText(item, "category"); 
-
-    //             Question question = parseQuestionFromHtml(title, description, category);
-    //             questions.add(question); 
-                
-    //         }
-    //     } 
-    //     catch (Exception e) 
-    //     {
-    //         e.printStackTrace(); 
-    //     }
-    //     return questions;
-    // }
+   //Extracts the question from the xml
     private List<Question> extractQuestionsFromXml(InputStream inputStream) {
     List<Question> questions = new ArrayList<>();
     try {
@@ -109,6 +75,7 @@ public void importFromXmlStream(InputStream inputStream) {
     return questions;
 }
 
+    // Extracts text content from a specific tag within an XML element
     private String getText(org.w3c.dom.Element element, String tagName) 
     {
         NodeList list = element.getElementsByTagName(tagName);
@@ -119,6 +86,7 @@ public void importFromXmlStream(InputStream inputStream) {
         return null;
     }
 
+    // Parses a question from HTML content
     private Question parseQuestionFromHtml(String title, String html, String category) 
     {
         try {
@@ -161,6 +129,7 @@ public void importFromXmlStream(InputStream inputStream) {
         }
     }
 
+    // Retrieves questions for a specific game
     public List<QuestionTriviaDto> getQuestionsForGame(String category) {
     List<Question> questions = questionRepository.findByCategory(category);
     List<QuestionTriviaDto> dtoList = new ArrayList<>();

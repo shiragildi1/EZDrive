@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.ezdrive.ezdrive.persistence.Repositories.ProfileRepository;
 
+// Service for handling user profiles
 @Service
 public class ProfileService {
      @Autowired
@@ -20,16 +21,18 @@ public class ProfileService {
     {
         // Implementation to retrieve game counts for the user
         List<Object[]> rows;
+        String week = "7";
+        String month = "30";
 
         if (range == null || range.equalsIgnoreCase("all")) 
         {
             rows = profileRepository.countByGameTypeAllTime(userEmail);
         } 
-        else if ("7".equals(range)) 
+        else if (week.equals(range)) 
         {
             rows = profileRepository.countByGameTypeLast7Days(userEmail, LocalDateTime.now().minusDays(7));
         } 
-        else if ("30".equals(range)) 
+        else if (month.equals(range)) 
         {
             rows = profileRepository.countByGameTypeLast30Days(userEmail, LocalDateTime.now().minusDays(30));
         } 
@@ -45,20 +48,24 @@ public class ProfileService {
         }
         return result;
     }
+
+    // Retrieves game average scores for a specific user and time range.
     public Map<String, Long> getGameAverage(String userEmail, String range)
     {
         // Implementation to retrieve game counts for the user
         List<Object[]> rows;
+                String week = "7";
+        String month = "30";
 
         if (range == null || range.equalsIgnoreCase("all")) 
         {
             rows = profileRepository.findAverageScoreByGameType(userEmail);
         } 
-        else if ("7".equals(range)) 
+        else if (week.equals(range)) 
         {
             rows = profileRepository.findAverageScoreByGameTypeLast7Days(userEmail, LocalDateTime.now().minusDays(7));
         } 
-        else if ("30".equals(range)) 
+        else if (month.equals(range)) 
         {
             rows = profileRepository.findAverageScoreByGameTypeLast30Days(userEmail, LocalDateTime.now().minusDays(30));
         } 

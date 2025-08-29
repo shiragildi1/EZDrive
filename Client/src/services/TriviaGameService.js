@@ -2,7 +2,7 @@ export function startTriviaSession({ category }) {
   return fetch("http://localhost:8080/game-sessions/start-trivia", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    credentials: "include", // חובה
+    credentials: "include",
     body: JSON.stringify({
       gameType: "trivia",
       category,

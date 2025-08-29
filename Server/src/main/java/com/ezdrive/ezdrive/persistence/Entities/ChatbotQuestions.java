@@ -1,7 +1,5 @@
 package com.ezdrive.ezdrive.persistence.Entities;
 
-import java.time.LocalDateTime;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -20,32 +18,22 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "Trivia_Game")
-public class TriviaGame {
-
+@Table(name = "chatbot_questions")
+public class ChatbotQuestions {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // relation to gameSession
     @ManyToOne
-    @JoinColumn(name = "game_session_id", nullable = false)
-    private GameSession gameSession;
+    @JoinColumn(name = "user_email")
+    private User user;
 
-    //relation to Question
-    @ManyToOne
-    @JoinColumn(name = "question_id", nullable = false)
-    private Question question;
+    @Column(columnDefinition = "TEXT", nullable = false)
+    private String question;
 
+    @Column(columnDefinition = "TEXT")
+    private String answer;
 
-    @Column(name = "selected_answer")
-    private Integer selectedAnswer;
-
-    @Column(name = "is_correct")
-    private boolean isCorrect;
-
-    @Column(name = "answered_at")
-    private LocalDateTime answeredAt;
+    @Column(name = "conversation_id")
+    private String conversationId;
 }
-
-

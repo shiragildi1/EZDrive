@@ -8,11 +8,13 @@ import org.springframework.stereotype.Service;
 import com.ezdrive.ezdrive.api.dto.RankingStatsDto;
 import com.ezdrive.ezdrive.persistence.Repositories.RankingRepository;
 
+// Service for handling user rankings
 @Service
 public class RankingService {
     @Autowired
     private RankingRepository rankingRepository;
 
+    // Retrieves the total scores of all users
     public List<RankingStatsDto> getAllUsersTotalScores() {
         List<Object[]> rows = rankingRepository.findAllUsersTotalScores();
         List<RankingStatsDto> result = new ArrayList<>();

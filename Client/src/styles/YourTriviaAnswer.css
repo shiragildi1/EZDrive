@@ -37,7 +37,7 @@
 .answers-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  grid-auto-rows: 300px; /* גובה קבוע לכל ריבוע */
+  grid-auto-rows: 300px;
   gap: 30px;
   margin-top: 20px;
   text-align: right;
