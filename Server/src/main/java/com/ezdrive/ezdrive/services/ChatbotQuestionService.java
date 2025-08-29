@@ -25,7 +25,7 @@ public class ChatbotQuestionService {
     @Autowired
 
 
-    private static final String GEMINI_API_KEY = "AIzaSyArbxIckbdnLr7ig92GGseyfKl8S5i7c-U";
+    private static final String GEMINI_API_KEY = "";
     private static final String MODEL = "gemini-2.0-flash";
     private static final String URL =
             "https://generativelanguage.googleapis.com/v1beta/models/" + MODEL + ":generateContent?key=" + GEMINI_API_KEY;
