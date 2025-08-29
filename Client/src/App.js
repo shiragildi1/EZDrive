@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { useEffect } from "react";
-import { useUserContext } from "./context/UserContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 import SignUpPage from "./pages/SignUpPage";
 import SignInPage from "./pages/SignInPage";
@@ -20,13 +19,18 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* עמודים ללא Sidebar */}
         <Route path="/" element={<SignUpPage />} />
         <Route path="/SignInPage" element={<SignInPage />} />
         <Route path="/OtpPage" element={<OtpPage />} />
 
-        {/* עמודים עם Sidebar קבוע */}
-        <Route path="/" element={<MainLayout />}>
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <MainLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route path="HomePage" element={<HomePage />} />
           <Route path="RankingPage" element={<RankingPage />} />
           <Route path="ProfilePage" element={<ProfilePage />} />

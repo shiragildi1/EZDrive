@@ -19,6 +19,7 @@ import com.ezdrive.ezdrive.persistence.Repositories.GameSessionRepository;
 import com.ezdrive.ezdrive.persistence.Repositories.MemoryGameRepository;
 import com.ezdrive.ezdrive.persistence.Repositories.QuestionRepository;
 
+// Service for handling memory games
 @Service
 public class MemoryGameService {
 
@@ -31,9 +32,9 @@ public class MemoryGameService {
     @Autowired
     private QuestionRepository questionRepository;
 
-    // שלב 1: יצירת 10 שאלות רנדומליות ושיוך לסשן
+    // generates 12 random questions for a memory game session
     public List<Question> generateQuestionsForMemorySession(Long sessionId, String category) {
-        List<Question> questions = questionRepository.findRandom10ByCategoryForMemory(category);
+        List<Question> questions = questionRepository.findRandom12ByCategoryForMemory(category);
         GameSession session = gameSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new RuntimeException("Session not found"));
 
@@ -66,7 +67,7 @@ public class MemoryGameService {
     }
 
     
-    // שלב 2: בדיקה האם הזוג נכון
+    // Checks if the selected pair is correct
     public boolean checkAnswer(Long sessionId, String userEmail, String currentPlayer, int selectedQuestionCard, int selectedAnswerCard) {
         GameSession session = gameSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new RuntimeException("Session not found"));
@@ -87,7 +88,7 @@ public class MemoryGameService {
         return gameAnswer.getAnswerCard() == selectedAnswerCard;
     }
 
-    //שלב 3: חישוב תוצאה סופית
+    // Calculates the final result
     public MemoryGameResultResponseDto getMemoryGameResult(Long sessionId,  Map<String, Integer> scores) {
         GameSession session = gameSessionRepository.findById(sessionId)
         .orElseThrow(() -> new RuntimeException("Session not found"));

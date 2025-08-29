@@ -10,12 +10,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ezdrive.ezdrive.api.dto.RankingStatsDto;
 import com.ezdrive.ezdrive.services.RankingService;
 
+//controls the ranking
 @RestController 
 @RequestMapping("/api/ranking")
 public class RankingController {
     @Autowired
     private RankingService rankingService;
 
+    //returns the ranking of all the users
     @GetMapping("/stats")
     public List<RankingStatsDto> getAllUsersTotalScores() {
         return rankingService.getAllUsersTotalScores();

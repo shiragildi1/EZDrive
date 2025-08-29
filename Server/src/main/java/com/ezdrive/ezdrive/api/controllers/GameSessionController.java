@@ -36,14 +36,13 @@ import com.ezdrive.ezdrive.persistence.Entities.User;
 import com.ezdrive.ezdrive.persistence.Repositories.GameSessionRepository;
 import com.ezdrive.ezdrive.persistence.Repositories.MemoryGameRepository;
 import com.ezdrive.ezdrive.persistence.Repositories.QuestionRepository;
-import com.ezdrive.ezdrive.persistence.Repositories.TriviaGameRepository;
 import com.ezdrive.ezdrive.rmi.RMIGameService;
 import com.ezdrive.ezdrive.services.GameSessionService;
 import com.ezdrive.ezdrive.services.TriviaGameService;
 
 import jakarta.servlet.http.HttpSession;
 
-
+//Controls all the endpoints of all games and game sessions
 
 @RestController
 @RequestMapping("/game-sessions")
@@ -65,8 +64,6 @@ public class GameSessionController {
     @Autowired
     private QuestionRepository questionRepository;
 
-    @Autowired
-    private TriviaGameRepository triviaGameRepository;
 
     private RMIGameService getRmiService() {
     if (memoryGameService == null) {
@@ -112,6 +109,7 @@ public class GameSessionController {
         return new GameSessionStartResponseDto(gameSession, questionDtos);
     }
 
+    //sumbits the players answer
     @PostMapping("/submit-answer")
     public ResponseEntity<AnswerResultDto> submitAnswer(@RequestBody TriviaSubmitAnswerRequestDto request, HttpSession session) {
         User user = (User) session.getAttribute("user");
@@ -128,26 +126,27 @@ public class GameSessionController {
         return ResponseEntity.ok(result);
     }
 
+    //returns the score 
     @GetMapping("/result-trivia")
     public GameResultResponseDto getTriviaGameResult(@RequestParam Long sessionId) {
         return triviaGameService.getTriviaGameResult(sessionId);    
     }
 
+    //returns the feedback for the trivia
    @GetMapping("/summary")
     public ResponseEntity<List<QuestionFeedbackDto>> getFeedback(@RequestParam Long sessionId) {
         List<QuestionFeedbackDto> summary = triviaGameService.getSessionFeedback(sessionId);
-        
-        /*triviaGameRepository.deleteByGameSessionId(sessionId);*/
-        
+                
         return ResponseEntity.ok(summary);
     }
 
     //----------------------------------------------memory-----------------------------------------------------
 
+    //starts the memory game
     @PostMapping("/start-memory")
     public MemoryGameSessionStartResponseDto startMemorySession(@RequestBody MemoryGameStartRequestDto request, HttpSession session) {
         User user = (User) session.getAttribute("user");
-        // שחקן ראשון יוצר סשן חדש
+        
         GameSession gameSession = gameSessionService.createMemoryGameSession(user.getEmail(), null, request.getGameType(), request.getCategory());
         try {
             getRmiService().joinGame(gameSession.getId(), user.getEmail());
@@ -180,6 +179,7 @@ public class GameSessionController {
         }
     }
 
+    //allows a second player to join the game
     @PostMapping("/join-memory")
     public MemoryGameSessionStartResponseDto joinMemoryGame(@RequestParam Long sessionId, HttpSession session) {
         
@@ -206,18 +206,21 @@ public class GameSessionController {
         }
     }
 
+    //returns the opponents info 
     @GetMapping("/get-opponent-b")
     public ResponseEntity<User> getPlayerB(@RequestParam Long sessionId) {
         User opponent = gameSessionRepository.getUser2BySessionId(sessionId);
         return ResponseEntity.ok(opponent);
     }
 
+    //returns the opponents info 
     @GetMapping("/get-opponent-a")
     public ResponseEntity<User> getPlayerA(@RequestParam Long sessionId) {
         User opponent = gameSessionRepository.getUserBySessionId(sessionId);
         return ResponseEntity.ok(opponent);
     }
 
+    //flip question on opponents board
     @PostMapping("/flip-question")
     public ResponseEntity<Void> flipQuestion(@RequestParam Long sessionId, @RequestParam int questionIndex) {
         try {
@@ -229,6 +232,7 @@ public class GameSessionController {
         }
     }
 
+    //flip answer on opponents board
     @PostMapping("/flip-answer")
     public ResponseEntity<Void> flipAnswer(@RequestParam Long sessionId, @RequestParam int answerIndex) {
         try {
@@ -251,6 +255,8 @@ public class GameSessionController {
             return ResponseEntity.ok(false);
         }
     }
+
+    //returns the current game state, all the info to update opponents board
 @GetMapping("/memory-state")
 public MemoryStateDto getMemoryGameState(@RequestParam Long sessionId)
 {
@@ -261,7 +267,8 @@ public MemoryStateDto getMemoryGameState(@RequestParam Long sessionId)
         return new MemoryStateDto();
     }
 }
-    //Memory game
+
+    //checks whether flipped pair is correct
     @PostMapping("/check-answer")
     public ResponseEntity<Boolean> checkAnswer(@RequestBody MemoryCheckAnswerRequestDto request, HttpSession session) {
         User user = (User) session.getAttribute("user");
@@ -285,6 +292,7 @@ public MemoryStateDto getMemoryGameState(@RequestParam Long sessionId)
         return ResponseEntity.ok(isCorrect);
     }
 
+    //returns the result of the memory game
     @GetMapping("/result-memory")
     public MemoryGameResultResponseDto getMemoryGameResult(@RequestParam Long sessionId) {
         try {
@@ -295,7 +303,7 @@ public MemoryStateDto getMemoryGameState(@RequestParam Long sessionId)
         }
     }
 
-   
+   //deletes the old entries of finished memory games
     @DeleteMapping("/delete-memory-entries")
     public ResponseEntity<Void> deleteMemoryEntries(@RequestParam Long sessionId) {
     try {

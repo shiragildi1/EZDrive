@@ -27,25 +27,23 @@ public class TriviaGame {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // קשר למשחק (GameSession)
+    // relation to gameSession
     @ManyToOne
     @JoinColumn(name = "game_session_id", nullable = false)
     private GameSession gameSession;
 
-    // קשר לשאלה (Question)
+    //relation to Question
     @ManyToOne
     @JoinColumn(name = "question_id", nullable = false)
     private Question question;
 
-    // מספר התשובה שהמשתמש בחר (1–4), או null אם לא ענה
+
     @Column(name = "selected_answer")
     private Integer selectedAnswer;
 
-    // האם התשובה נכונה
     @Column(name = "is_correct")
     private boolean isCorrect;
 
-    // מתי ענה על השאלה (או פג הזמן)
     @Column(name = "answered_at")
     private LocalDateTime answeredAt;
 }

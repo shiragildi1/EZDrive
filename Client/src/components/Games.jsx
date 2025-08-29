@@ -9,7 +9,6 @@ import {
 } from "../services/MemoryGameServiceRMI";
 import MemoryGame from "./MemoryGame";
 import GameExplanation from "./GameExplanation";
-import HeadToHeadExplanation from "../data/HeadToHeadExplanationData";
 import simulationExplanation from "../data/SimulationExplanationData";
 import triviaExplanation from "../data/TriviaExplanationData";
 import "../styles/Games.css";
@@ -56,7 +55,6 @@ export default function GamesPage() {
       .then((data) => {
         console.log("response from startTriviaSession:", data);
 
-        // הפוך כל שאלה לאובייקט עם שדה options שמכיל את כל ארבע התשובות
         const formattedQuestions = data.questions.map((question) => {
           return {
             questionId: question.questionId,
@@ -71,12 +69,10 @@ export default function GamesPage() {
           };
         });
 
-        setQuestions(formattedQuestions); // שמור את השאלות בפורמט החדש
-        setSessionId(data.session.id); // שמור את מזהה הסשן
-        //          setSessionId(data.sessionId); // שמור את מזהה הסשן
-        // >>>>>>> origin/08/19-1-P
+        setQuestions(formattedQuestions);
+        setSessionId(data.session.id);
         setShowTrivia(true);
-        console.log("formattedQuestions:", formattedQuestions); // עבור למצב משחק
+        console.log("formattedQuestions:", formattedQuestions);
       })
       .catch((err) => {
         console.error("שגיאה ב-startTriviaSession:", err);
@@ -92,8 +88,6 @@ export default function GamesPage() {
         return triviaExplanation;
       case "memory":
         return memoryExplanation;
-      case "headToHead":
-        return HeadToHeadExplanation;
       case "simulation":
         return simulationExplanation;
       default:
@@ -107,8 +101,7 @@ export default function GamesPage() {
       case "trivia":
         return handleStartTrivia;
       case "memory":
-        return handleStartMemory;
-      case "headToHead":
+        return () => setShowMemoryRoadmap(true);
       case "simulation":
         return null;
       default:
@@ -128,18 +121,13 @@ export default function GamesPage() {
     );
   }
   //------------------------------------------------------------------------------
-  // --- זיכרון מול שחקן אחר ---
 
-  // שחקן ראשון - יצירת משחק חדש
+  //creat new memory games
   const handleStartMemory = async () => {
     setLoadingMemory(true);
     setWaitingForOpponent(true);
     const category = topicsMap[topic];
     try {
-      // שולח בקשה ל-backend ליצור משחק חדש ומקבל מזהה סשן
-      // const sessionId = await startMemorySession(category);
-      // setSessionId(sessionId);
-      // מתחיל polling לבדוק אם המשחק מוכן (כלומר, אם שחקן שני הצטרף)
       const data = await startMemorySession(category);
       if (data == null) {
         throw new Error("No session returned form startMemory session");
@@ -147,12 +135,11 @@ export default function GamesPage() {
       setSessionId(data.sessionId);
       const interval = setInterval(async () => {
         try {
-          // מקבל את מצב המשחק והשאלות מה-backend
+          // check if there are 2 players
           const ready = await getMemoryGameStatus(data.sessionId);
           if (ready) {
             clearInterval(interval);
-            // ממפה את השאלות לפורמט אחיד עבור הקומפוננטה
-            // כל שאלה הופכת לאובייקט עם cardId, isQuestion, text
+
             const formattedQuestions = data.questions.map((question) => ({
               cardId: question.cardId,
               isQuestion: question.question,
@@ -161,11 +148,11 @@ export default function GamesPage() {
             }));
             const opponent = await getOpponentB(data.sessionId);
             console.log("opponent join: ", opponent);
-            setQuestions(formattedQuestions); // שומר את השאלות המעובדות ב-state
+            setQuestions(formattedQuestions);
             setOpponent(opponent);
-            setShowMemory(true); // עובר למצב משחק זיכרון
-            setSessionId(data.sessionId); // שומר את מזהה הסשן
-            setWaitingForOpponent(false); // מפסיק להציג את מסך ההמתנה
+            setShowMemory(true);
+            setSessionId(data.sessionId);
+            setWaitingForOpponent(false);
           }
         } catch (err) {
           console.error("[Memory] שגיאה ב-polling:", err);
@@ -179,23 +166,21 @@ export default function GamesPage() {
     }
   };
 
-  // שחקן שני - מצטרף למשחק קיים
+  // second players joins
   const handleJoinMemory = async () => {
     if (!joinSessionId) return;
     setJoining(true);
     setWaitingForOpponent(true);
     try {
-      // שולח בקשה ל-backend להצטרף למשחק קיים
+      // send join request
       const data = await joinMemoryGame(joinSessionId);
       setSessionId(joinSessionId);
-      // מתחיל polling לבדוק אם המשחק מוכן (כלומר, אם שני שחקנים מחוברים)
       const interval = setInterval(async () => {
         try {
-          // מקבל את מצב המשחק והשאלות מה-backend
           const ready = await getMemoryGameStatus(joinSessionId);
           if (ready) {
             clearInterval(interval);
-            // ממפה את השאלות לפורמט אחיד עבור הקומפוננטה
+
             const formattedQuestions = data.questions.map((question) => ({
               cardId: question.cardId,
               isQuestion: question.question,
@@ -204,11 +189,11 @@ export default function GamesPage() {
             }));
             const opponent = await getOpponentA(data.sessionId);
             console.log("opponent join: ", opponent);
-            setQuestions(formattedQuestions); // שומר את השאלות המעובדות ב-state
+            setQuestions(formattedQuestions);
             setOpponent(opponent);
-            setShowMemory(true); // עובר למצב משחק זיכרון
-            setSessionId(data.sessionId); // שומר את מזהה הסשן
-            setWaitingForOpponent(false); // מפסיק להציג את מסך ההמתנה
+            setShowMemory(true);
+            setSessionId(data.sessionId);
+            setWaitingForOpponent(false);
           }
         } catch (err) {
           console.error("[Memory] שגיאה ב-polling:", err);
@@ -230,7 +215,7 @@ export default function GamesPage() {
       />
     );
   }
-  // מחכה ליריב
+
   if (waitingForOpponent) {
     return (
       <div className="waiting-modal">
@@ -311,24 +296,14 @@ export default function GamesPage() {
           onClick={() => {
             setSelectedGame("memory");
             setShowPopup(true);
-            setShowMemoryRoadmap(true);
           }}
         >
-          <h3>זכרון</h3>
+          <h3>זכרון - ראש בראש</h3>
         </button>
         <button
           className="square-game"
           onClick={() => {
-            setSelectedGame("headToHead");
-            setShowPopup(true);
-          }}
-        >
-          <h3>ראש בראש</h3>
-        </button>
-        <button
-          className="square-game"
-          onClick={() => {
-            setSelectedGame("simulation");
+            setSelectedGame("memory");
             setShowPopup(true);
           }}
         >

@@ -26,30 +26,27 @@ public class GameSession {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // קשר למשתמש ששיחק
     @ManyToOne
     @JoinColumn(name = "user_email")
     private User user;
 
-    // קשר למשתמש ששיחק
     @ManyToOne
     @JoinColumn(name = "user_email2")
     private User user2;
 
 
-    // סוג המשחק: "trivia", "simulation", "Memory"
+    // game type "trivia", "simulation", "Memory"
     @Column(name = "game_type")
     private String gameType;
 
-    // קטגוריה: "חוקי התנועה", "תמרורים" וכו'
     @Column(name = "category")
     private String category;
 
-    // ניקוד סופי (0–100)
+    // final score- percent
     @Column(name = "score")
     private Integer score;
 
-    // ניקוד סופי (0–100)
+    // final score for second player in memory game-percent
     @Column(name = "score2")
     private Integer score2;
 

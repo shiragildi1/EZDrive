@@ -16,11 +16,13 @@ import com.ezdrive.ezdrive.services.ProfileService;
 @RestController
 @RequestMapping("/api/profile")
 
+//controls profile and achievments
 public class ProfileController {
 
     @Autowired
     private ProfileService profileService;
 
+    //returns stats for current user
     @GetMapping("/stats")
     public ProfileStatsDto getProfileStats(@RequestParam String userEmail, @RequestParam String range) {
         Map<String, Long> counts = profileService.getGameCounts(userEmail, range);

@@ -61,19 +61,18 @@ export default function ProfilePage() {
       </div>
 
       <div className="profile-achievements-row">
-        {/* זיכרון */}
         <AchievementCard
           title="זכרון"
           percentage={memory.average}
           gamesCount={memory.count}
         />
-        {/* טריוויה */}
+
         <AchievementCard
           title="טריוויה"
           percentage={trivia.average}
           gamesCount={trivia.count}
         />
-        {/* סימולטור */}
+
         <AchievementCard
           title="סימולטור- בפיתוח"
           percentage={simulation.average}

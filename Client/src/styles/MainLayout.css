@@ -11,6 +11,16 @@ html {
   flex-direction: column;
   height: 100vh;
 }
+.profile-container {
+  display: flex;
+  align-items: center;
+  flex-direction: row-reverse;
+  gap: 10px;
+}
+.log-out {
+  width: 60px;
+  height: 40px;
+}
 .main-header {
   height: 10%;
   display: flex;
@@ -25,6 +35,14 @@ html {
   height: 40px;
   border-radius: 50%;
   direction: ltr;
+}
+.profile-container button {
+  background-color: whitesmoke;
+  color: black;
+}
+
+.profile-container :hover {
+  cursor: pointer;
 }
 .logo {
   height: 85%;

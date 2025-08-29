@@ -12,11 +12,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.ezdrive.ezdrive.api.dto.AgentQuestionPerConv;
+import com.ezdrive.ezdrive.api.dto.AgentQuestionPerConvDto;
 import com.ezdrive.ezdrive.persistence.Entities.ChatbotQuestions;
 import com.ezdrive.ezdrive.persistence.Entities.User;
 import com.ezdrive.ezdrive.persistence.Repositories.ChatbotQuestionsRepository;
 
+// Service for handling chatbot questions
 @Service
 public class ChatbotQuestionService {
     @Autowired
@@ -31,6 +32,7 @@ public class ChatbotQuestionService {
 
     private final RestTemplate http = new RestTemplate();
 
+    // Answers a user's question
     public String answer(String userQuestion) {
         if (userQuestion == null || userQuestion.isBlank()) {
             return "נא לנסח שאלה.";
@@ -101,6 +103,7 @@ public class ChatbotQuestionService {
         }
     }
 
+    // Creates a new chatbot question in the DB
     public ChatbotQuestions createBotQuestion(User user, String question, String answer, String conversationId) {
         ChatbotQuestions chatbotQuestions = new ChatbotQuestions();
         chatbotQuestions.setUser(user);
@@ -114,11 +117,12 @@ public class ChatbotQuestionService {
         return chatbotQuestions;
     }
 
-    public List<AgentQuestionPerConv> getConversationHistory(String email, String cid) {
+    // Retrieves the conversation history for a user
+    public List<AgentQuestionPerConvDto> getConversationHistory(String email, String cid) {
     var rows = chatbotQuestionsRepository
                  .findByUser_EmailAndConversationIdOrderByIdAsc(email, cid);
     return rows.stream()
-        .map(r -> new AgentQuestionPerConv(r.getId(), r.getQuestion(), r.getAnswer()))
+        .map(r -> new AgentQuestionPerConvDto(r.getId(), r.getQuestion(), r.getAnswer()))
         .toList();
 }
 }

@@ -27,33 +27,32 @@ public class MemoryGame {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // קשר למשחק (GameSession)
     @ManyToOne
     @JoinColumn(name = "game_session_id", nullable = false)
     private GameSession gameSession;
 
-    // קשר לשאלה (Question)
+    // (Question)
     @ManyToOne
     @JoinColumn(name = "question_id", nullable = false)
     private Question question;
 
-    // מספר כרטיס שמכיל את השאלה
+    // holds question card position
     @Column(name = "question_card")
     private Integer questionCard;
 
-    // מספר כרטיס שמכיל את התשובה
+    // holds answer card position
     @Column(name = "answer_card")
     private Integer answerCard;
 
-    // האם הזוג נבחר
+    // was the pair found
     @Column(name = "is_flipped")
     private boolean isFlipped;
 
-    //מי הפך את הזוג
+    // who flipped the pair
     @Column(name = "player_answered")
     private String playerAnsweredEmail;
 
-    // מתי ענה על השאלה (או פג הזמן)
+    
     @Column(name = "answered_at")
     private LocalDateTime answeredAt;
 }

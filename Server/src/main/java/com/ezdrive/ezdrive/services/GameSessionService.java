@@ -9,6 +9,7 @@ import com.ezdrive.ezdrive.persistence.Entities.User;
 import com.ezdrive.ezdrive.persistence.Repositories.GameSessionRepository;
 import com.ezdrive.ezdrive.persistence.Repositories.UserRepository;
 
+// Service for handling game sessions
 @Service
 public class GameSessionService {
 
@@ -18,6 +19,7 @@ public class GameSessionService {
     @Autowired
     private UserRepository userRepository;
 
+    // Creates a new game session
     public GameSession createGameSession(String userEmail, String gameType, String category) {
         User user = userRepository.findByEmail(userEmail)
     .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + userEmail));
@@ -36,6 +38,7 @@ public class GameSessionService {
         return gameSession;
     }
 
+    // Creates a new memory game session
     public GameSession createMemoryGameSession(String userEmail, String userEmail2, String gameType, String category) {
         System.out.println("createMemoryGameSession: "+userEmail2);
         User user = userRepository.findByEmail(userEmail)
@@ -43,7 +46,6 @@ public class GameSessionService {
 
         GameSession gameSession = new GameSession();
         gameSession.setUser(user);
-        // אפשר ליצור session בלי user2 (שחקן שני)
         System.out.println("Service ueser email 2: "+userEmail2);
         if (userEmail2 != null) {
             User user2 = userRepository.findByEmail(userEmail2)

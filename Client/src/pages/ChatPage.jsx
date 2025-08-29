@@ -10,14 +10,12 @@ export default function ChatPage() {
   const [loading, setLoading] = useState(false);
   const [currentConversationId, setCurrentConversationId] = useState(null);
 
-  // שליחת שאלה
   const handleSend = async () => {
     const q = question.trim();
     if (!q) return;
 
     setLoading(true);
 
-    // טיוטה עדכנית
     const draft = [
       ...currentSession,
       { question: q, answer: "⌛ טוען תשובה..." },
@@ -25,7 +23,6 @@ export default function ChatPage() {
     setCurrentSession(draft);
 
     try {
-      // שולחים את ה-cid אם יש; אם אין — הבאק ייצור חדש ויחזיר
       const { answer, conversationId } = await sendQuestion(
         q,
         currentConversationId
@@ -33,12 +30,10 @@ export default function ChatPage() {
 
       setCurrentConversationId(conversationId);
 
-      // מחליפים את הודעת הטעינה בתשובה האמיתית
       draft[draft.length - 1].answer = answer;
       setCurrentSession([...draft]);
 
       if (activeSession !== null) {
-        // מעדכן שיחה קיימת בסיידבר
         const updated = [...sessions];
         updated[activeSession] = {
           ...updated[activeSession],
@@ -47,7 +42,6 @@ export default function ChatPage() {
         };
         setSessions(updated);
       } else {
-        // שאלה ראשונה בשיחה חדשה → פותחים פריט חדש בסיידבר
         const title = "שיחה " + (sessions.length + 1);
         const newSessions = [
           ...sessions,
@@ -67,10 +61,8 @@ export default function ChatPage() {
     }
   };
 
-  // פתיחת שיחה חדשה: שומר (אם צריך) את הנוכחית ומאפס מזהה שיחה
   const handleNewChat = () => {
     if (currentSession.length > 0 && activeSession === null) {
-      // שומר רק אם לא בשיחה קיימת
       const title = "שיחה " + (sessions.length + 1);
       setSessions([
         ...sessions,
@@ -82,7 +74,6 @@ export default function ChatPage() {
     setCurrentConversationId(null);
   };
 
-  // מעבר לשיחה ישנה
   const handleSessionClick = (idx) => {
     setActiveSession(idx);
     setCurrentSession([...sessions[idx].messages]);

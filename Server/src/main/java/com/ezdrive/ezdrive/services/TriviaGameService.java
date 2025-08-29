@@ -18,6 +18,7 @@ import com.ezdrive.ezdrive.persistence.Repositories.GameSessionRepository;
 import com.ezdrive.ezdrive.persistence.Repositories.QuestionRepository;
 import com.ezdrive.ezdrive.persistence.Repositories.TriviaGameRepository;
 
+// Service for handling trivia games
 @Service
 public class TriviaGameService {
 
@@ -30,7 +31,6 @@ public class TriviaGameService {
     @Autowired
     private QuestionRepository questionRepository;
 
-    // שלב 1: יצירת 10 שאלות רנדומליות ושיוך לסשן
     public List<Question> generateQuestionsForTriviaSession(Long sessionId, String category) {
         List<Question> questions = questionRepository.findRandom10ByCategoryForTrivia(category);
 
@@ -41,14 +41,13 @@ public class TriviaGameService {
             TriviaGame answer = new TriviaGame();
             answer.setGameSession(session);
             answer.setQuestion(q);
-            // selectedAnswer = null, לא ענה עדיין
             triviaGameRepository.save(answer);
         }
 
         return questions;
     }
 
-    // שלב 2: שמירת תשובה לשאלה
+//save answer for question
     public AnswerResultDto  submitAnswer(Long sessionId, Long questionId, int selectedAnswer) {
         GameSession session = gameSessionRepository.findById(sessionId)
                 .orElseThrow(() -> new RuntimeException("Session not found"));
@@ -70,7 +69,7 @@ public class TriviaGameService {
         return new AnswerResultDto(question.getCorrectAnswer(), isCorrect);
     }
 
-    // שלב 3: חישוב תוצאה סופית
+    // calculate and return game result
     public GameResultResponseDto getTriviaGameResult(Long sessionId) {
         int numberOfCorrectAnswers = triviaGameRepository.countCorrectAnswers(sessionId);
         int score = (numberOfCorrectAnswers * 100) / 10;
@@ -91,7 +90,7 @@ public class TriviaGameService {
         return new GameResultResponseDto(score, numberOfCorrectAnswers, totalTimeFormatted);
     }
 
-
+    // Retrieves feedback for a specific game session
     public List<QuestionFeedbackDto> getSessionFeedback(Long sessionId)
     {
         List<TriviaGame> answers = triviaGameRepository.findByGameSessionId(sessionId);
@@ -120,6 +119,7 @@ public class TriviaGameService {
         }).collect(Collectors.toList());
     }
 
+    // Retrieves the text for a specific answer option
     private String getAnswerText(Question question, int index) {
         return switch (index) {
             case 1 -> question.getAnswer1();

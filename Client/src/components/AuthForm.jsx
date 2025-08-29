@@ -46,7 +46,6 @@ export default function AuthForm({ title, buttonText, bottomText, link }) {
               .then(async (user) => {
                 console.log("Verification succeeded!", user);
 
-                // אם יש צורך לוודא שה-session אכן נשמר
                 const me = await getCurrentUser();
                 setUser(me);
                 console.log("User loaded from session - AuthForm:", me);

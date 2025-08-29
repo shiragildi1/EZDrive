@@ -13,12 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ezdrive.ezdrive.api.dto.EmailRequestDto;
 import com.ezdrive.ezdrive.services.OtpService;
-import com.ezdrive.ezdrive.services.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 
+//controls otp for sign in
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/otp")
@@ -27,6 +26,7 @@ public class OtpController
     @Autowired
     private OtpService otpService;
 
+    //create an OTP
     @PostMapping("/create")
     public ResponseEntity<?> createOtp(@RequestBody EmailRequestDto request) 
     {
@@ -42,6 +42,7 @@ public class OtpController
         }
     }
 
+    //Verifies the OTP
     @PostMapping("/verify")
     public ResponseEntity<?> verifyCode(@RequestBody EmailRequestDto request, HttpServletRequest req) {
         try {
