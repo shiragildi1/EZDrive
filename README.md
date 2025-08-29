@@ -27,6 +27,12 @@ Follow these steps to run the website locally on your computer:
 2. Open CMD from the folder you opened
 3. Link to clone repository: https://github.com/shiragildi1/EZDrive.git
 
+Add necessary files:
+1. add file named ".env" in the Client
+   In the file put: REACT_APP_GOOGLE_CLIENT_ID=250713696752-4k026jggdvnitarn3efqudooqignqc68.apps.googleusercontent.com 
+3. add file named ".env" in teh Server
+   In the file put: GOOGLE_CLIENT_ID="250713696752-4k026jggdvnitarn3efqudooqignqc68.apps.googleusercontent.com
+
 How to run front:
 1. Open integreted terminal
 1. Run: npm install
