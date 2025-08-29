@@ -30,8 +30,9 @@ Follow these steps to run the website locally on your computer:
 Add necessary files:
 1. add file named ".env" in the Client
    In the file put: REACT_APP_GOOGLE_CLIENT_ID=250713696752-4k026jggdvnitarn3efqudooqignqc68.apps.googleusercontent.com 
-3. add file named ".env" in teh Server
+2. add file named ".env" in teh Server
    In the file put: GOOGLE_CLIENT_ID="250713696752-4k026jggdvnitarn3efqudooqignqc68.apps.googleusercontent.com
+3. add an API key in the ChatBotQuestionService.java file in order to receive proper responses from our bot.
 
 How to run front:
 1. Open integreted terminal
