@@ -16,7 +16,8 @@
 //     throw error;
 //   }
 // }
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8080";
+const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:8080";
+
 export async function getCurrentUser() {
   try {
     const res = await fetch(`${API_BASE}/api/user/me`, {
