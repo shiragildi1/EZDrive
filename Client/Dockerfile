@@ -1,41 +1,41 @@
 # ----- Build stage -----
-FROM node:20-alpine AS build
+FROM node:20-bullseye-slim AS build
 WORKDIR /app
 
-# רק קובצי החבילות
+# העדפה לנעילה לפי package-lock.json
 COPY package*.json ./
 
-# הגדרות npm + התקנה עם fallback "תמיד תעבוד"
-RUN npm config set registry https://registry.npmjs.org/ \
-  && npm config set prefer-online true \
-  && npm config set fetch-retries 5 \
-  && npm config set fetch-retry-factor 2 \
-  && npm config set fetch-retry-mintimeout 20000 \
-  && npm config set fetch-retry-maxtimeout 120000 \
-  && npm config set cache /tmp/.npm --global \
-  && npm cache clean --force \
-  && (npm install --no-audit --no-fund --legacy-peer-deps \
-      || npm install --no-audit --no-fund --force)
+# הגדרות רשת/ריטרייז לנמוך תקלות הורדה
+ENV NPM_CONFIG_REGISTRY="https://registry.npmjs.org/"
+ENV NPM_CONFIG_PREFER_ONLINE=true
+ENV NPM_CONFIG_FETCH_RETRIES=8
+ENV NPM_CONFIG_FETCH_RETRY_FACTOR=2
+ENV NPM_CONFIG_FETCH_RETRY_MINTIMEOUT=20000
+ENV NPM_CONFIG_FETCH_RETRY_MAXTIMEOUT=120000
 
-# שאר הקוד
+# ניקוי קאש והתקנה "אמינה" (נעילה + דאון-גרייד לניהול)
+RUN rm -rf /root/.npm && npm cache clean --force \
+  && npx -y npm@10.8.2 ci --no-audit --no-fund || \
+     npx -y npm@10.8.2 install --no-audit --no-fund --legacy-peer-deps || \
+     npx -y npm@10.8.2 install --no-audit --no-fund --force
+
+# קוד האפליקציה
 COPY . ./
 
-# משתנים ש-CRA קורא בזמן build
+# משתני סביבה בזמן build (CRA קורא REACT_APP_ בזמן build)
 ARG REACT_APP_API_BASE
 ARG REACT_APP_GOOGLE_CLIENT_ID
 ENV REACT_APP_API_BASE=$REACT_APP_API_BASE
 ENV REACT_APP_GOOGLE_CLIENT_ID=$REACT_APP_GOOGLE_CLIENT_ID
 
-# Build production
+# build production
 RUN npm run build
 
 # ----- Run stage -----
-FROM node:20-alpine AS runner
+FROM node:20-bullseye-slim AS runner
 WORKDIR /app
 RUN npm i -g serve
 COPY --from=build /app/build ./build
-
 ENV PORT=10000
 EXPOSE 10000
-
-CMD ["sh", "-c", "serve -s build -l $PORT"]
+CMD sh -c "serve -s build -l $PORT"
