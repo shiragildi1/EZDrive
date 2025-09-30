@@ -19,7 +19,8 @@
 //   }).then((res) => res.json());
 // }
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8080";
+const API_BASE = process.env.REACT_APP_API_BASE || "http://localhost:8080";
+
 export function sendGoogleToken(idToken) {
   return fetch(`${API_BASE}/api/auth/google`, {
     method: "POST",
