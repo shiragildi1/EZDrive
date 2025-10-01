@@ -67,6 +67,7 @@ import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod; // ← for OPTIONS permitAll
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
@@ -77,8 +78,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 public class SecurityConfig {
 
-    // נקרא מה-properties/ENV
-    @Value("${app.cors.allowed-origin-patterns}")
+    // נקרא מה-properties/ENV (עם ברירת מחדל בטוחה לפרוד)
+    @Value("${app.cors.allowed-origin-patterns:https://ezdrive-client.onrender.com,http://localhost:3000}")
     private String allowedOriginPatternsCsv;
 
     @Bean
@@ -87,6 +88,8 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
+                // לאפשר preflight
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers(
                     "/api/auth/**",
                     "/api/otp/**",
@@ -114,9 +117,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration cfg = new CorsConfiguration();
-        cfg.setAllowCredentials(true); 
+        cfg.setAllowCredentials(true);
         cfg.setAllowedOriginPatterns(Arrays.asList(allowedOriginPatternsCsv.split("\\s*,\\s*")));
-        cfg.setAllowedHeaders(Arrays.asList("*"));
+        cfg.setAllowedHeaders(Arrays.asList("Content-Type", "Authorization", "Accept"));
+        cfg.setExposedHeaders(Arrays.asList("Authorization", "Set-Cookie"));
         cfg.setAllowedMethods(Arrays.asList("GET","POST","PUT","PATCH","DELETE","OPTIONS"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
