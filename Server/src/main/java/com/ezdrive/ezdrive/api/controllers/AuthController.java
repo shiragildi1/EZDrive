@@ -10,16 +10,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ezdrive.ezdrive.api.dto.EmailRequestDto;
 import com.ezdrive.ezdrive.api.dto.GoogleTokenRequestDto;
 import com.ezdrive.ezdrive.exceptions.UserAlreadyExistsException;
+import com.ezdrive.ezdrive.persistence.Entities.User;
 import com.ezdrive.ezdrive.services.AuthService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-
-import com.ezdrive.ezdrive.api.dto.EmailRequestDto;
-import com.ezdrive.ezdrive.persistence.Entities.User;
-
 import lombok.AllArgsConstructor;
 
 

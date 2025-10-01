@@ -49,8 +49,8 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowCredentials(true); // מאפשר שליחת עוגיות (session)
-        configuration.setAllowedOrigins(List.of("http://localhost:3000")); // הדומיין של React
+        configuration.setAllowCredentials(true); 
+        configuration.setAllowedOrigins(List.of("http://localhost:3000")); 
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 
