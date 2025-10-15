@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Service;
 import com.ezdrive.ezdrive.model.OtpData;
 
 
-
+@ConditionalOnProperty(value = "app.otp.enabled", havingValue = "true")
 // Service for handling OTP (One-Time Password) generation and validation
 @Service
 public class OtpService 

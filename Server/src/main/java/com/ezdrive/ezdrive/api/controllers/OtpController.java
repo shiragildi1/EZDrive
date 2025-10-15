@@ -4,6 +4,7 @@ package com.ezdrive.ezdrive.api.controllers;
 import java.util.Collections;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +20,7 @@ import lombok.AllArgsConstructor;
 
 //controls otp for sign in
 @AllArgsConstructor
+@ConditionalOnProperty(value = "app.otp.enabled", havingValue = "true")
 @RestController
 @RequestMapping("/api/otp")
 public class OtpController
