@@ -70,25 +70,22 @@ public class AuthService
     }
 
     // Registers an email user
-    public String registerEmailUser(String email)
+    public User registerEmailUser(String email)
     {
-        if (userService.findByEmail(email).isPresent()) 
+        return userService.findByEmail(email)
+        .orElseGet(() -> 
         {
-            return "User already exists, logging in...";
-        }
-
-        User newUser = new User();
-        newUser.setEmail(email);
-        newUser.setName(" ");
-        newUser.setPicture(" ");
-        newUser.setGoogleId(" ");
-        newUser.setEmailVerified(true);
-        newUser.setGivenName(" ");
-        newUser.setFamilyName(" ");
-
-        userService.createUser(newUser);
-        return "New user created successfully";
+            User newUser = new User();
+            newUser.setEmail(email);
+            newUser.setName(" ");
+            newUser.setPicture(" ");
+            newUser.setGoogleId(" ");
+            newUser.setEmailVerified(true);
+            newUser.setGivenName(" ");
+            newUser.setFamilyName(" ");
+            userService.createUser(newUser);
+            System.out.println("New user created successfully (email)");
+            return newUser;
+        });
     }
-
-    
 }

@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ezdrive.ezdrive.api.dto.EmailRequestDto;
 import com.ezdrive.ezdrive.api.dto.GoogleTokenRequestDto;
-import com.ezdrive.ezdrive.exceptions.UserAlreadyExistsException;
 import com.ezdrive.ezdrive.persistence.Entities.User;
 import com.ezdrive.ezdrive.services.AuthService;
 
@@ -48,25 +47,19 @@ public class AuthController
 
 
     @PostMapping("/email")
-    public ResponseEntity<?> emailLogin(@RequestBody EmailRequestDto request) 
-    {
-        try 
-        {
-            String message = authService.registerEmailUser(request.getEmail());
-            return ResponseEntity.ok(Collections.singletonMap("message", message));
-        } 
-        catch (UserAlreadyExistsException e) 
-        {
-            if ("User already exists".equals(e.getMessage())) 
-            {
-                return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(Collections.singletonMap("message", e.getMessage()));
-            }
-            return ResponseEntity.badRequest().body(Collections.singletonMap("error", e.getMessage()));
-        }
-        catch(Exception e)
-        {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("error", e.getMessage()));
-        }
-    }   
+    public ResponseEntity<?> emailLogin(@RequestBody EmailRequestDto request, HttpServletRequest req) {
+    try {
+      
+        User user = authService.registerEmailUser(request.getEmail());
+
+        HttpSession session = req.getSession(true);
+        session.setAttribute("user", user);
+
+        return ResponseEntity.ok(Collections.singletonMap("message", "User logged in"));
+
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                             .body(Collections.singletonMap("error", e.getMessage()));
+    }
+    }  
 }       

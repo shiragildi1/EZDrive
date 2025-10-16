@@ -4,21 +4,24 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import com.ezdrive.ezdrive.model.OtpData;
 
+import lombok.extern.slf4j.Slf4j;
 
-@ConditionalOnProperty(value = "app.otp.enabled", havingValue = "true")
+
+//@ConditionalOnProperty(value = "app.otp.enabled", havingValue = "true")
 // Service for handling OTP (One-Time Password) generation and validation
+@Slf4j
 @Service
 public class OtpService 
 {
     private Map<String, OtpData> otpStore = new ConcurrentHashMap<>();
-    @Autowired
+    
+    @Autowired(required = false) 
     private JavaMailSender mailSender;
 
     // Creates OTP data for a given email

@@ -15,12 +15,17 @@ export default function OtpPage() {
   const location = useLocation();
   const userEmail = location.state?.userEmail;
 
+  console.log('OtpPage mount. location.state=', location.state, 'userEmail=', userEmail);
+
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    // console.log("Email: ", userEmail);
+    console.log("Email: ", userEmail);
     sendEmailForOtp(userEmail);
+    console.log("Email sent for OTP to:", userEmail);
     navigate("/OtpPage", { state: { userEmail: userEmail } });
   };
+
   //if there is a numaric and there is no the last inpute  pass the fucuse to the next.
   function handleChange(e, idx) {
     const value = e.target.value;
@@ -33,6 +38,7 @@ export default function OtpPage() {
     }
     if (value && idx == 5) {
       sendCodeForOtp(newOtp.join(""), userEmail).then((data) => {
+        console.log("OTP verification response:", data);
         if (data.valid) {
           console.log("Verification succeeded!");
           // saveUser(userEmail);

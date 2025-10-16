@@ -13,6 +13,7 @@ export default function AuthForm({ title, buttonText, bottomText, link }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     sendEmailForOtp(email);
+    console.log("Email sent for OTP to:", email);
     navigate("/OtpPage", { state: { userEmail: email } });
   };
   const { setUser } = useUserContext();
